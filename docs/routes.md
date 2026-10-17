@@ -12,7 +12,7 @@ The inventory is a minimum baseline, not a verified complete inventory of live U
 
 - `PRODUCTION_ORIGIN`: `https://www.skloservis-brod.cz`, retained for future authorized production use.
 - `SERVICE_ROUTES`: the eight stable Czech service slugs mapped to their English slugs, without slashes.
-- `ROUTES`: a readonly list of 14 `{ id, cs, en }` page pairs without any deployment base.
+- `ROUTES`: the 14 historical pairs plus cookies and company/legal pages, as `{ id, cs, en }` entries without any deployment base.
   Future `getStaticPaths`, navigation and production sitemap code should consume this same list.
 - `pageUrl(page: PageId, language: Language = 'cs', base = '/'): string`:
   returns a local path with the deployment base and trailing slash. An unknown runtime page ID throws
@@ -23,7 +23,7 @@ The inventory is a minimum baseline, not a verified complete inventory of live U
   `undefined`, so callers can omit an unavailable switch instead of silently linking to the homepage.
 - Types: `Language` (`'cs' | 'en'`), `ServiceSlug` (keys of `SERVICE_ROUTES`), `PageId` and `PageRoute`.
 
-Main page IDs are `home`, `products`, `services`, `gallery`, `contact`, and `privacy`.
+Main page IDs are `home`, `products`, `services`, `gallery`, `contact`, `privacy`, `cookies` and `legal`.
 Service page IDs are their stable Czech slugs, for example `sklenene-dvere`.
 Editable titles and Astro collection entry IDs must not determine URLs.
 

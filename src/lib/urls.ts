@@ -24,6 +24,8 @@ const MAIN_ROUTES = [
   { id: 'gallery', cs: '/galerie/', en: '/en/gallery/' },
   { id: 'contact', cs: '/kontakt/', en: '/en/contact/' },
   { id: 'privacy', cs: '/ochrana-osobnich-udaju/', en: '/en/privacy/' },
+  { id: 'cookies', cs: '/cookies/', en: '/en/cookies/' },
+  { id: 'legal', cs: '/pravni-informace/', en: '/en/legal/' },
 ] as const;
 
 export type PageId = (typeof MAIN_ROUTES)[number]['id'] | ServiceSlug;

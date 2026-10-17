@@ -24,6 +24,8 @@ Fotografii nahrajte do médií galerie a přidejte ji do seznamu galerie. Vyplň
 
 Stejně lze upravit firemní údaje, texty, produkty a popisy pro vyhledávače. Stabilní adresy produktových stránek zachovejte. Jejich změna může poškodit existující odkazy a vyžaduje plán přesměrování.
 
+V části „Soukromí a právní informace“ lze upravit české i anglické dokumenty. Změna zásad musí odpovídat skutečnému fungování firmy. Běžné vyřízené poptávky mají podle potvrzené politiky lhůtu jeden měsíc od vyřízení; zákazník může e-mailem požádat o odůvodněné prodloužení nebo o výmaz elektronických i papírových podkladů. Zákonné povinnosti uchování zůstávají zachované. Web sám nemaže firemní schránku ani fyzické dokumenty.
+
 ## Zveřejnění
 
 Uložení v CMS vytvoří změnu v GitHubu. Finální nasazovací postup musí před zveřejněním ověřit obsah, typy, testy a sestavení. Při chybě zůstává poslední úspěšná verze. Během přípravy je publikace záměrně ruční; automatické publikování změn zapne dokončovací běh po 21:05.

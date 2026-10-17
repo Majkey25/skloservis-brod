@@ -51,6 +51,6 @@ Business content lives in [`src/data`](src/data). The [Pages CMS configuration](
 
 ## Privacy and legal information
 
-The website's privacy, storage, company and consumer information is being prepared against the actual implementation. No analytics, advertising or mail relay is configured. Legal notices must describe the services actually enabled; this repository does not claim universal legal compliance.
+The repository includes Czech and English [privacy notices](src/pages/ochrana-osobnich-udaju.md), [cookies and storage information](src/pages/cookies.md), and [company and consumer information](src/pages/pravni-informace.md). No analytics, advertising or mail relay is configured. Legal notices describe the current implementation; account-specific provider arrangements and operational retention procedures require separate verification.
 
 Supplied photographs and branding belong to their respective rights holders. No open-source media license or stock-video rights are implied.

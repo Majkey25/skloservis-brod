@@ -12,6 +12,51 @@ media:
       - webp
       - avif
 content:
+  - name: legal
+    label: Soukromí a právní informace
+    type: group
+    items:
+      - name: privacy_cs
+        label: Ochrana údajů — česky
+        type: file
+        path: src/pages/ochrana-osobnich-udaju.md
+        format: yaml-frontmatter
+        fields: &legal_fields
+          - { name: title, label: Nadpis, type: string, required: true }
+          - { name: body, label: Obsah, type: rich-text, required: true }
+          - { name: layout, label: Layout, type: string, hidden: true, readonly: true }
+          - { name: lang, label: Jazyk, type: string, hidden: true, readonly: true }
+          - { name: alternate, label: Druhý jazyk, type: string, hidden: true, readonly: true }
+      - name: privacy_en
+        label: Ochrana údajů — anglicky
+        type: file
+        path: src/pages/en/privacy.md
+        format: yaml-frontmatter
+        fields: *legal_fields
+      - name: cookies_cs
+        label: Cookies a úložiště — česky
+        type: file
+        path: src/pages/cookies.md
+        format: yaml-frontmatter
+        fields: *legal_fields
+      - name: cookies_en
+        label: Cookies a úložiště — anglicky
+        type: file
+        path: src/pages/en/cookies.md
+        format: yaml-frontmatter
+        fields: *legal_fields
+      - name: company_cs
+        label: Provozovatel a spotřebitelé — česky
+        type: file
+        path: src/pages/pravni-informace.md
+        format: yaml-frontmatter
+        fields: *legal_fields
+      - name: company_en
+        label: Provozovatel a spotřebitelé — anglicky
+        type: file
+        path: src/pages/en/legal.md
+        format: yaml-frontmatter
+        fields: *legal_fields
   - name: settings
     label: Nastavení a texty webu
     type: file
