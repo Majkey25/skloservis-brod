@@ -341,50 +341,57 @@ const enquiryTexts = JSON.stringify({
           status.textContent = '';
         }),
       );
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (!form.isConnected || activeRequests.has(form)) return;
-        controls.forEach(validate);
-        if (!form.reportValidity()) return;
-        if (valueOf('_honey')) {
-          status.textContent = texts.failed;
-          return;
-        }
-        const controller = new AbortController();
-        activeRequests.set(form, controller);
-        const originalLabel = label.textContent;
-        button.disabled = true;
-        label.textContent = texts.sending;
-        controls.forEach((control) => (control.readOnly = true));
-        form.setAttribute('aria-busy', 'true');
-        status.textContent = texts.sending;
-        try {
-          await sendEnquiry(
-            endpoint,
-            {
-              name: valueOf('name'),
-              email: valueOf('email'),
-              message: valueOf('message'),
-              _honey: '',
-              _subject: valueOf('_subject'),
-              _template: 'table',
-              _captcha: 'false',
-            },
-            controller.signal,
-          );
-          if (!form.isConnected) return;
-          form.reset();
-          status.textContent = texts.accepted;
-        } catch {
-          if (form.isConnected) status.textContent = texts.failed;
-        } finally {
-          activeRequests.delete(form);
-          button.disabled = false;
-          label.textContent = originalLabel;
-          controls.forEach((control) => (control.readOnly = false));
-          form.removeAttribute('aria-busy');
-        }
-      });
+      // Capture owns submission even when a cached script version also bound a bubbling listener.
+      form.addEventListener(
+        'submit',
+        async (event) => {
+          if (event.defaultPrevented) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          if (!form.isConnected || activeRequests.has(form)) return;
+          controls.forEach(validate);
+          if (!form.reportValidity()) return;
+          if (valueOf('_honey')) {
+            status.textContent = texts.failed;
+            return;
+          }
+          const controller = new AbortController();
+          activeRequests.set(form, controller);
+          const originalLabel = label.textContent;
+          button.disabled = true;
+          label.textContent = texts.sending;
+          controls.forEach((control) => (control.readOnly = true));
+          form.setAttribute('aria-busy', 'true');
+          status.textContent = texts.sending;
+          try {
+            await sendEnquiry(
+              endpoint,
+              {
+                name: valueOf('name'),
+                email: valueOf('email'),
+                message: valueOf('message'),
+                _honey: '',
+                _subject: valueOf('_subject'),
+                _template: 'table',
+                _captcha: 'false',
+              },
+              controller.signal,
+            );
+            if (!form.isConnected) return;
+            form.reset();
+            status.textContent = texts.accepted;
+          } catch {
+            if (form.isConnected) status.textContent = texts.failed;
+          } finally {
+            activeRequests.delete(form);
+            button.disabled = false;
+            label.textContent = originalLabel;
+            controls.forEach((control) => (control.readOnly = false));
+            form.removeAttribute('aria-busy');
+          }
+        },
+        true,
+      );
     });
   }
 
@@ -406,7 +413,7 @@ const enquiryTexts = JSON.stringify({
         const target = incoming.querySelector<FieldControl>(`[name="${name}"]`);
         if (source && target) target.value = source.value;
       }
-      if (activeRequests.has(current)) {
+      if (current.getAttribute('aria-busy') === 'true') {
         const status = incoming.querySelector<HTMLElement>('[data-enquiry-status]');
         const texts = JSON.parse(incoming.dataset.texts || '{}') as EnquiryTexts;
         if (status) status.textContent = texts.failed;
