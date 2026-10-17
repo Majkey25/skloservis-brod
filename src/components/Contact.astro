@@ -392,7 +392,26 @@ const enquiryTexts = JSON.stringify({
   initializeEnquiryForm();
   document.addEventListener('astro:page-load', initializeContactCopy);
   document.addEventListener('astro:page-load', initializeEnquiryForm);
-  document.addEventListener('astro:before-swap', () => {
+  document.addEventListener('astro:before-swap', (event) => {
+    const current = document.querySelector<HTMLFormElement>('[data-enquiry-form]');
+    const incoming = event.newDocument.querySelector<HTMLFormElement>('[data-enquiry-form]');
+    if (
+      current &&
+      incoming &&
+      document.documentElement.lang !== event.newDocument.documentElement.lang
+    ) {
+      // Keep a language change from discarding an enquiry; never persist or resubmit it.
+      for (const name of ['name', 'email', 'message']) {
+        const source = current.querySelector<FieldControl>(`[name="${name}"]`);
+        const target = incoming.querySelector<FieldControl>(`[name="${name}"]`);
+        if (source && target) target.value = source.value;
+      }
+      if (activeRequests.has(current)) {
+        const status = incoming.querySelector<HTMLElement>('[data-enquiry-status]');
+        const texts = JSON.parse(incoming.dataset.texts || '{}') as EnquiryTexts;
+        if (status) status.textContent = texts.failed;
+      }
+    }
     activeRequests.forEach((controller) => controller.abort());
     activeRequests.clear();
   });
