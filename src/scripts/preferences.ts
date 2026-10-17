@@ -159,6 +159,10 @@ systemTheme.addEventListener('change', () => applyTheme());
 document.addEventListener('astro:before-swap', (event) => {
   // Keep incoming HTML in the current theme before Astro replaces the root attributes.
   applyTheme(event.newDocument);
+  // Skipping the visual transition intentionally rejects its ready promise.
+  void event.viewTransition.ready.catch((error: unknown) => {
+    if (!(error instanceof DOMException) || error.name !== 'AbortError') throw error;
+  });
   event.viewTransition.skipTransition();
   const language =
     event.sourceElement?.closest<HTMLAnchorElement>('a[data-language]')?.dataset.language;
