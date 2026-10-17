@@ -38,6 +38,6 @@ Uložení do repozitáře samo nepotvrzuje zveřejnění. Neplatná data, např�
 
 Oprávněný správce může spustit **Run workflow** nad větví `main` a zapnout volbu `publish`. Ruční publikace provede všechny stejné kontroly a použije jejich artefakt bez dalšího sestavení. Výchozí vypnutá volba `publish` spustí jen kontroly. Pull requesty a ruční běhy jiných větví nepublikují.
 
-Tento postup popisuje konfiguraci workflow. Přihlášení do CMS, oprávnění účtu a skutečný průchod uložením až po nasazení dosud nebyly ověřeny. Kontaktní e-mail je `skloservis.brod@gmail.com`; odkaz otevře poštovní aplikaci návštěvníka. Přímé odesílání poptávek z webu ani poštovní relay nejsou nakonfigurované a doručení do schránky nebylo ověřeno.
+Tento postup popisuje konfiguraci workflow. Přihlášení do CMS, oprávnění účtu a skutečný průchod uložením až po nasazení vyžadují oprávněný účet. Kontaktní formulář předává zprávy přes FormSubmit na `skloservis.brod@gmail.com`; tato schránka musí potvrdit aktivaci. Změna kontaktního e-mailu mění i příjemce formuláře a vyžaduje novou aktivaci a ověření. HTTP přijetí relé není důkaz doručení do schránky. Samostatný e-mailový odkaz otevírá poštovní aplikaci návštěvníka.
 
 Náhled na GitHub Pages se nemá indexovat ve vyhledávačích. Doména `skloservis-brod.cz` a současný WordPress zůstávají beze změny.

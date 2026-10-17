@@ -1,3 +1,5 @@
+import { navigate } from 'astro:transitions/client';
+
 // The first-paint theme script must use these same keys and { value, expires } format.
 // Only explicit choices are saved. A fixed 180-day lifetime avoids indefinite retention;
 // reading a preference never extends it. There are at most two site-owned storage entries.
@@ -60,11 +62,9 @@ function savePreference<T extends string>(key: string, value: T): Preference<T> 
 }
 
 const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let manualTheme = readPreference(THEME_KEY, isTheme);
 let manualLanguage = readPreference(LANGUAGE_KEY, isLanguage);
-let languageSuggestionDismissed = false;
-let transition: ReturnType<typeof document.startViewTransition> | undefined;
+let languageScroll: { left: number; top: number } | undefined;
 
 function unexpired<T extends string>(preference: Preference<T> | undefined): T | undefined {
   return preference && preference.expires > Date.now() ? preference.value : undefined;
@@ -74,61 +74,21 @@ function currentTheme(): Theme {
   return unexpired(manualTheme) ?? (systemTheme.matches ? 'dark' : 'light');
 }
 
-function applyTheme(animate = false, trigger?: HTMLElement) {
+function applyTheme(target = document) {
   const theme = currentTheme();
-  const root = document.documentElement;
-  document
+  const root = target.documentElement;
+  root.dataset.theme = theme;
+  root.style.colorScheme = theme;
+  target
     .querySelector('meta[name="theme-color"]')
     ?.setAttribute('content', theme === 'dark' ? '#071e28' : '#ffffff');
-  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+  target.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
     button.hidden = false;
     button.setAttribute('aria-pressed', String(theme === 'dark'));
   });
-  document.querySelectorAll<HTMLButtonElement>('[data-theme-system]').forEach((button) => {
+  target.querySelectorAll<HTMLButtonElement>('[data-theme-system]').forEach((button) => {
     button.hidden = !unexpired(manualTheme);
   });
-  transition?.skipTransition();
-  root.classList.remove('theme-switching');
-  if (root.dataset.theme === theme) {
-    root.style.colorScheme = theme;
-    return;
-  }
-  const update = () => {
-    // Transition callbacks can run after a newer click or a system-theme change.
-    const latest = currentTheme();
-    document.documentElement.dataset.theme = latest;
-    document.documentElement.style.colorScheme = latest;
-  };
-  if (animate && !reducedMotion.matches && typeof document.startViewTransition === 'function') {
-    try {
-      const rect = trigger?.getBoundingClientRect();
-      const x = rect ? rect.x + rect.width / 2 : innerWidth / 2;
-      const y = rect ? rect.y + rect.height / 2 : innerHeight / 2;
-      root.style.setProperty('--vt-x', `${x}px`);
-      root.style.setProperty('--vt-y', `${y}px`);
-      root.style.setProperty(
-        '--vt-r',
-        `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`,
-      );
-      root.classList.add('theme-switching');
-      transition = document.startViewTransition(update);
-      const current = transition;
-      void transition.ready.catch(() => undefined);
-      void transition.finished
-        .catch(() => undefined)
-        .then(() => {
-          if (transition === current) {
-            root.classList.remove('theme-switching');
-            transition = undefined;
-          }
-        });
-      return;
-    } catch {
-      root.classList.remove('theme-switching');
-      // Unsupported or interrupted transitions must not prevent a theme change.
-    }
-  }
-  update();
 }
 
 function preferredLanguage(): Language | undefined {
@@ -154,70 +114,65 @@ function selectInitialBrowserLanguage() {
     PerformanceNavigationTiming | undefined;
   if (navigation?.type === 'back_forward') return;
   if (document.referrer && new URL(document.referrer).origin === location.origin) return;
-  const link = document.querySelector<HTMLAnchorElement>(
-    '[data-language-suggestion] a[data-language="en"]',
-  );
+  const link = document.querySelector<HTMLAnchorElement>('.language-nav a[data-language="en"]');
   if (!link) return;
   const target = new URL(link.href, location.href);
   const currentPath = location.pathname.endsWith('/') ? location.pathname : `${location.pathname}/`;
   // Only the equivalent English homepage is eligible; never an arbitrary suggestion URL.
   if (target.origin === location.origin && target.pathname === `${currentPath}en/`) {
-    location.replace(target.href);
+    void navigate(target.href, { history: 'replace' });
   }
-}
-
-function updateLanguageSuggestion() {
-  const root = document.documentElement;
-  const preferred = preferredLanguage();
-  document.querySelectorAll<HTMLElement>('[data-language-suggestion]').forEach((suggestion) => {
-    const hasLink = preferred && suggestion.querySelector(`a[data-language="${preferred}"]`);
-    suggestion.hidden = !(
-      !languageSuggestionDismissed &&
-      root.dataset.page === 'home' &&
-      preferred &&
-      preferred !== root.dataset.language &&
-      hasLink
-    );
-  });
 }
 
 function initializePreferences() {
   applyTheme();
-  updateLanguageSuggestion();
 }
 
-document.addEventListener('click', (event) => {
-  if (!(event.target instanceof Element) || event.defaultPrevented || event.button !== 0) return;
-  if (event.target.closest('[data-language-suggestion-dismiss]')) {
-    languageSuggestionDismissed = true;
-    updateLanguageSuggestion();
-  }
-  const themeButton = event.target.closest<HTMLButtonElement>('button[data-theme-toggle]');
-  if (themeButton && !themeButton.disabled) {
-    manualTheme = savePreference(THEME_KEY, currentTheme() === 'dark' ? 'light' : 'dark');
-    applyTheme(true, themeButton);
-  }
-  if (event.target.closest('button[data-theme-system]')) {
-    manualTheme = undefined;
-    try {
-      localStorage.removeItem(THEME_KEY);
-    } catch {
-      // Reset applies for this page even when storage is unavailable.
+document.addEventListener(
+  'click',
+  (event) => {
+    if (!(event.target instanceof Element) || event.defaultPrevented || event.button !== 0) return;
+    const themeButton = event.target.closest<HTMLButtonElement>('button[data-theme-toggle]');
+    if (themeButton && !themeButton.disabled) {
+      manualTheme = savePreference(THEME_KEY, currentTheme() === 'dark' ? 'light' : 'dark');
+      applyTheme();
     }
-    applyTheme();
-  }
-  const languageLink = event.target.closest<HTMLAnchorElement>('a[data-language]');
-  const language = languageLink?.dataset.language;
-  if (isLanguage(language)) {
-    manualLanguage = savePreference(LANGUAGE_KEY, language);
-    // Native navigation keeps the link's equivalent route, query and fragment intact.
-    updateLanguageSuggestion();
-  }
-});
+    if (event.target.closest('button[data-theme-system]')) {
+      manualTheme = undefined;
+      try {
+        localStorage.removeItem(THEME_KEY);
+      } catch {
+        // Reset applies for this page even when storage is unavailable.
+      }
+      applyTheme();
+    }
+    const languageLink = event.target.closest<HTMLAnchorElement>('a[data-language]');
+    const language = languageLink?.dataset.language;
+    if (isLanguage(language)) {
+      manualLanguage = savePreference(LANGUAGE_KEY, language);
+    }
+  },
+  { capture: true },
+);
 
 systemTheme.addEventListener('change', () => applyTheme());
-reducedMotion.addEventListener('change', () => {
-  if (reducedMotion.matches) transition?.skipTransition();
+document.addEventListener('astro:before-swap', (event) => {
+  // Keep incoming HTML in the current theme before Astro replaces the root attributes.
+  applyTheme(event.newDocument);
+  event.viewTransition.skipTransition();
+  const language =
+    event.sourceElement?.closest<HTMLAnchorElement>('a[data-language]')?.dataset.language;
+  languageScroll =
+    isLanguage(language) && event.navigationType !== 'traverse'
+      ? { left: scrollX, top: scrollY }
+      : undefined;
+});
+document.addEventListener('astro:after-swap', () => {
+  initializePreferences();
+  const focusTarget = languageScroll ? '.language-nav [aria-current="page"]' : '#main';
+  if (languageScroll) window.scrollTo({ ...languageScroll, behavior: 'instant' });
+  document.querySelector<HTMLElement>(focusTarget)?.focus({ preventScroll: true });
+  languageScroll = undefined;
 });
 window.addEventListener('storage', (event) => {
   if (event.key === THEME_KEY || event.key === null) {

@@ -15,8 +15,6 @@ test('seed content validates and preserves confirmed contacts and historical rou
   const settings = schemas.settings.parse(await read('settings'));
   const contact = schemas.contact.parse(await read('contact'));
   assert.equal(settings.contact_email, 'skloservis.brod@gmail.com');
-  assert.equal(settings.relay_ready, false);
-  assert.equal(settings.relay_provider, 'unconfigured');
   assert.equal(contact.phone, '+420608031206');
   assert.equal(contact.address.street, 'Prakšická 281');
   assert.equal(contact.billing_address.street, 'Březnice 314');

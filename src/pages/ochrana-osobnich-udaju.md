@@ -15,9 +15,9 @@ S dotazy k soukromí a žádostmi o uplatnění práv se obraťte na [skloservis
 
 ## Návštěva webu
 
-Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani reklamní a analytické měření. Přímé odesílání zpráv z webu není aktivní.
+Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani reklamní a analytické měření.
 
-Na kontaktní stránce si můžete připravit e-mailovou poptávku. Zadané jméno, e-mail a zpráva se zpracují pouze v právě otevřené stránce, bez ukládání do místního úložiště nebo odesílání serveru. Až otevřete připravený e-mailový odkaz, údaje se předají vaší poštovní aplikaci. Odeslání potvrdíte v ní; web neověřuje odeslání ani doručení.
+Kontaktní formulář po vašem odeslání předá jméno, e-mail a zprávu službě **FormSubmit**, která zajišťuje předání do schránky `skloservis.brod@gmail.com`. FormSubmit obdrží také technické údaje požadavku, například IP adresu. Údaje z formuláře neukládáme do místního úložiště prohlížeče. Potvrzení formuláře znamená přijetí službou, nikoli ověření doručení do schránky. Odkaz „Napsat e-mail“ nadále otevírá vaši vlastní poštovní aplikaci.
 
 Při načtení stránek zpracovává GitHub Pages technické údaje požadavku, například IP adresu a údaje o spojení, mimo jiné pro zabezpečení služby. To není ukládání poptávky do firemní databáze. Další informace uvádí [prohlášení GitHubu o soukromí](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
@@ -41,9 +41,9 @@ Pokud vznikne zakázka, údaje potřebné k jejímu plnění se uchovávají po 
 
 ## Poskytovatelé služeb a předávání
 
-Stránky hostuje GitHub Pages. Kontaktní adresa využívá službu Gmail společnosti Google. Při odeslání e-mailu se zpráva zpracovává také v e-mailových službách odesílatele a příjemce. Žádný další provozovatel webového formuláře nyní není aktivní.
+Stránky hostuje GitHub Pages. Kontaktní adresa využívá službu Gmail společnosti Google. Při odeslání e-mailu se zpráva zpracovává také v e-mailových službách odesílatele a příjemce. Webový formulář využívá FormSubmit. Jeho [dokumentace](https://formsubmit.co/documentation) uvádí uchování přijatých formulářů v archivu po dobu 30 dnů od odeslání. Tato lhůta je odlišná od naší jednoměsíční lhůty po vyřízení poptávky; další informace poskytují [zásady FormSubmit](https://formsubmit.co/privacy.pdf).
 
-Poskytovatelé mohou zpracovávat údaje také mimo Evropský hospodářský prostor, včetně USA. Informace o jejich zpracování a popisovaných mechanismech předávání najdete v [prohlášení GitHubu](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement#international-data-transfers) a [zásadách Google](https://policies.google.com/privacy?hl=cs).
+Poskytovatelé mohou zpracovávat údaje také mimo Evropský hospodářský prostor, včetně USA. Informace o jejich zpracování a popisovaných mechanismech předávání najdete v [prohlášení GitHubu](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement#international-data-transfers) a [zásadách Google](https://policies.google.com/privacy?hl=cs). Zveřejněné zásady FormSubmit neupřesňují umístění všech zpracování ani konkrétní záruky případných mezinárodních přenosů. Na uvedeném firemním kontaktu si můžete vyžádat další informace nebo poptávku vyřídit telefonicky.
 
 ## Vaše práva
 

@@ -15,9 +15,9 @@ For privacy questions or rights requests, email [skloservis.brod@gmail.com](mail
 
 ## Visiting the website
 
-This website presents products and services. It has no enquiry database, user accounts, online shop, advertising or analytics measurement. Direct message sending from the website is not active.
+This website presents products and services. It has no enquiry database, user accounts, online shop, advertising or analytics measurement.
 
-The contact page can prepare an enquiry email. Your name, email address and message are processed only within the open page, without saving them to local storage or sending them to a server. Opening the prepared email link passes these details to your mail application. You confirm sending there; the website cannot verify sending or delivery.
+When you submit the contact form, your name, email address and message are sent to **FormSubmit**, which relays them to `skloservis.brod@gmail.com`. FormSubmit also receives technical request information, such as your IP address. We do not save form details in browser local storage. The form confirmation means acceptance by the service, not verified inbox delivery. The separate “Write an email” link still opens your own mail application.
 
 When serving pages, GitHub Pages processes technical request information, such as your IP address and connection details, including for service security. This is distinct from storing an enquiry in a company database. See the [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
@@ -41,9 +41,9 @@ If an enquiry becomes a project, information needed for performance is retained 
 
 ## Service providers and transfers
 
-GitHub Pages hosts the website. The contact address uses Google's Gmail service. Sending an email also involves the sender's and recipient's email services. No additional web-form relay is currently active.
+GitHub Pages hosts the website. The contact address uses Google's Gmail service. Sending an email also involves the sender's and recipient's email services. The web form uses FormSubmit. Its [documentation](https://formsubmit.co/documentation) states that received submissions are kept in its archive for 30 days after submission. This is separate from our one-month period after an enquiry is resolved; see the [FormSubmit privacy terms](https://formsubmit.co/privacy.pdf) for more information.
 
-Providers may process data outside the European Economic Area, including in the United States. Their processing and described transfer mechanisms are explained in the [GitHub statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement#international-data-transfers) and [Google privacy policy](https://policies.google.com/privacy?hl=en).
+Providers may process data outside the European Economic Area, including in the United States. Their processing and described transfer mechanisms are explained in the [GitHub statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement#international-data-transfers) and [Google privacy policy](https://policies.google.com/privacy?hl=en). FormSubmit's published terms do not specify every processing location or the particular safeguards for possible international transfers. You can request further information using the company contact above or make your enquiry by telephone.
 
 ## Your rights
 

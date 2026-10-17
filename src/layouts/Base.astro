@@ -1,7 +1,10 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import favicon from '../assets/brand/favicon.png';
+import logo from '../assets/brand/wordpress-logo.png';
 import { getSettings, getContact, getHours } from '../content.ts';
-import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
+import type { Language, PageId } from '../lib/urls.ts';
 import { seoContext, pageSeo, localBusiness, jsonLd } from '../lib/seo.ts';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -26,10 +29,19 @@ const business = metadata.business
 ---
 
 <!doctype html>
-<html lang={lang} data-language={lang} data-page={page}>
+<html lang={lang} data-language={lang} data-page={page} transition:animate="none">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes={`${favicon.width}x${favicon.height}`}
+      href={favicon.src}
+    />
+    <link rel="icon" type="image/png" sizes={`${logo.width}x${logo.height}`} href={logo.src} />
+    <link rel="apple-touch-icon" href={logo.src} />
+    <ClientRouter fallback="swap" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta name="robots" content={metadata.robots} />
@@ -45,6 +57,10 @@ const business = metadata.business
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'cs' ? 'cs_CZ' : 'en_GB'} />
     <meta property="og:site_name" content="Skloservis Brod" />
+    <meta property="og:image" content={new URL(logo.src, Astro.site).href} />
+    <meta property="og:image:width" content={String(logo.width)} />
+    <meta property="og:image:height" content={String(logo.height)} />
+    <meta property="og:image:alt" content="Skloservis Brod" />
     <script is:inline>
       (() => {
         const root = document.documentElement;
@@ -77,32 +93,15 @@ const business = metadata.business
     <a class="skip-link" href="#main">
       {lang === 'cs' ? 'Přeskočit na obsah' : 'Skip to content'}
     </a>
-    <div class="preference-suggestion" data-language-suggestion hidden>
-      <span data-language-suggestion-text>
-        {lang === 'cs' ? 'Preferujete angličtinu?' : 'Prefer Czech?'}
-      </span>{' '}
-      <a
-        href={pageUrl(page, lang === 'cs' ? 'en' : 'cs', base)}
-        data-language={lang === 'cs' ? 'en' : 'cs'}
-      >
-        {lang === 'cs' ? 'View in English' : 'Zobrazit česky'}
-      </a>
-      <button
-        type="button"
-        data-language-suggestion-dismiss
-        aria-label={lang === 'cs' ? 'Zavřít jazykové doporučení' : 'Dismiss language suggestion'}
-      >
-        ×
-      </button>
-    </div>
     <Header lang={lang} page={page} />
     <Notices lang={lang} />
-    <main id="main">
+    <main id="main" tabindex="-1">
       <slot />
     </main>
     <Footer lang={lang} />
     <script>
       import '../scripts/preferences.ts';
+      import '../scripts/motion.ts';
     </script>
   </body>
 </html>

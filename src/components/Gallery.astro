@@ -49,7 +49,15 @@ const serviceMap = new Map<ServiceSlug, string>(
   services.map((service) => [service.slug, service[`title_${lang}`]]),
 );
 
-const displayItems = compact ? gallery.slice(0, 6) : gallery;
+const displayItems = compact
+  ? gallery
+      .filter(
+        (item, index) => gallery.findIndex((photo) => photo.category === item.category) === index,
+      )
+      // Keep project examples distinct from the first photo used on product cards.
+      .map((item) => gallery.filter((photo) => photo.category === item.category)[1] ?? item)
+      .slice(0, 6)
+  : gallery;
 
 const itemsData = displayItems.map((item, index) => ({
   index,
@@ -83,24 +91,21 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
         const categoryName = serviceMap.get(item.category) ?? item.category;
         const caption = item[`caption_${lang}`];
         const altText = item[`alt_${lang}`];
-        const featured = compact && index === 0;
-        const sizes = featured
-          ? '(min-width: 64rem) 52rem, 100vw'
-          : compact
-            ? '(min-width: 64rem) 25rem, 47vw'
-            : '(min-width: 64rem) 25rem, (min-width: 40rem) 47vw, 100vw';
+        const sizes = compact
+          ? '(min-width: 64rem) 25rem, 47vw'
+          : '(min-width: 64rem) 25rem, (min-width: 40rem) 47vw, 100vw';
 
         return (
-          <div class:list={['gallery-item', featured && 'gallery-item--featured']} role="listitem">
-            <a
-              href={item.image.src}
-              class="gallery-card"
-              data-gallery-card
-              data-index={index}
-              aria-haspopup="dialog"
-              aria-label={`${altText} — ${categoryName}`}
-            >
-              <figure class="gallery-card__figure">
+          <div class="gallery-item" role="listitem">
+            <figure class="gallery-card__figure">
+              <a
+                href={item.image.src}
+                class="gallery-card"
+                data-gallery-card
+                data-index={index}
+                aria-haspopup="dialog"
+                aria-label={`${altText} — ${categoryName}`}
+              >
                 <div class="gallery-card__image-wrap">
                   <Picture
                     src={item.image}
@@ -108,16 +113,18 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
                     formats={['avif', 'webp']}
                     widths={[360, 540, 720, 960].filter((width) => width <= item.image.width)}
                     sizes={sizes}
-                    loading={index < 3 ? 'eager' : 'lazy'}
+                    loading={!compact && index < 3 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
                 </div>
-                <figcaption class="gallery-card__caption">
-                  <span class="gallery-card__category">{categoryName}</span>
-                  {caption && <span class="gallery-card__text">{caption}</span>}
-                </figcaption>
-              </figure>
-            </a>
+              </a>
+              <figcaption class="gallery-card__caption">
+                <a class="gallery-card__category" href={pageUrl(item.category, lang, base)}>
+                  {categoryName}
+                </a>
+                {caption && <span class="gallery-card__text">{caption}</span>}
+              </figcaption>
+            </figure>
           </div>
         );
       })}
@@ -335,7 +342,7 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
 
 <style>
   .gallery-header {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .gallery-header .lead {
@@ -373,30 +380,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.5rem;
     }
-
-    /* Compact Home mosaic: first photo covers a 2x2 block */
-    .gallery-item--featured {
-      grid-column: span 2;
-      grid-row: span 2;
-    }
-
-    .gallery-item--featured .gallery-card__image-wrap {
-      flex: 1 1 auto;
-      aspect-ratio: auto;
-      min-height: 16rem;
-    }
-  }
-
-  @media (max-width: 63.99rem) {
-    /* Compact mosaic on tablet and mobile: first photo spans full width */
-    .gallery-item--featured {
-      grid-column: 1 / -1;
-    }
-
-    /* Avoid a lone half-width photo at the end of the compact grid */
-    .gallery-grid--compact .gallery-item:last-child:nth-child(even) {
-      grid-column: 1 / -1;
-    }
   }
 
   @media (max-width: 39.99rem) {
@@ -407,7 +390,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
 
   .gallery-card {
     display: block;
-    height: 100%;
     color: inherit;
     text-decoration: none;
   }
@@ -460,13 +442,16 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
   }
 
   .gallery-card__category {
+    width: fit-content;
+    padding-block: 0.25rem;
+    color: var(--accent);
     font-weight: 600;
   }
 
   .gallery-action {
     display: flex;
     justify-content: center;
-    margin-top: 3rem;
+    margin-top: 1.5rem;
   }
 
   /* Photo viewer: always dark, so its controls use fixed light colours */
@@ -564,6 +549,10 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     height: auto;
     object-fit: contain;
     transition: opacity 0.2s ease;
+  }
+
+  .gallery-dialog__image[hidden] {
+    display: none;
   }
 
   .gallery-dialog__viewport.is-loading .gallery-dialog__image {

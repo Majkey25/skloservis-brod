@@ -2,6 +2,7 @@
 import { getContact, getSettings } from '../content';
 import { pageUrl, type Language } from '../lib/urls';
 import Hours from './Hours.astro';
+import Icon from './Icon.astro';
 
 interface Props {
   lang: Language;
@@ -20,18 +21,18 @@ const copy = {
     mailHelp: 'Odkaz otevře vaši e-mailovou aplikaci. Zprávu odešlete až v ní.',
     privacy: 'Jak zpracováváme osobní údaje',
     formNote:
-      'Přímé odeslání zprávy z webu zatím není k dispozici. Připravíme koncept e-mailu, který odešlete ve své e-mailové aplikaci. Pole označená * jsou povinná.',
+      'Formulář předá vaše jméno, e-mail a zprávu službě FormSubmit k přeposlání na náš e-mail. Pole označená * jsou povinná.',
     nameLabel: 'Jméno',
     emailLabel: 'E-mail',
     messageLabel: 'Zpráva',
     required: 'Vyplňte toto pole.',
     invalidEmail: 'Zadejte platnou e-mailovou adresu.',
     tooLong: 'Text je příliš dlouhý.',
-    prepare: 'Připravit e-mail',
-    openDraft: 'Otevřít připravený e-mail',
-    prepared:
-      'Koncept e-mailu je připraven. Zpráva ještě nebyla odeslána. Otevřete koncept ve své e-mailové aplikaci a odešlete ho tam.',
-    stale: 'Údaje se změnily, proto byl koncept zrušen. Připravte e-mail znovu.',
+    send: 'Odeslat poptávku',
+    sending: 'Odesíláme…',
+    accepted: 'Děkujeme. Poptávka byla přijata k odeslání.',
+    failed:
+      'Přijetí poptávky se nepodařilo potvrdit. Vyplněné údaje zůstaly ve formuláři. Kontaktujte nás e-mailem nebo telefonicky.',
     workshop: 'Provozovna',
     seat: 'Sídlo a fakturační adresa',
     companyId: 'IČO',
@@ -47,18 +48,18 @@ const copy = {
     mailHelp: 'The link opens your email application. You send the message from there.',
     privacy: 'How we process personal data',
     formNote:
-      'Sending messages directly from this website is not available. We prepare an email draft that you send from your email application. Fields marked * are required.',
+      'The form sends your name, email and message to FormSubmit for forwarding to our email address. Fields marked * are required.',
     nameLabel: 'Name',
     emailLabel: 'Email',
     messageLabel: 'Message',
     required: 'Please fill in this field.',
     invalidEmail: 'Enter a valid email address.',
     tooLong: 'This text is too long.',
-    prepare: 'Prepare email',
-    openDraft: 'Open prepared email',
-    prepared:
-      'Email draft prepared. The message has not been sent yet. Open the draft in your email application and send it there.',
-    stale: 'The details changed, so the draft was cleared. Prepare the email again.',
+    send: 'Send enquiry',
+    sending: 'Sending…',
+    accepted: 'Thank you. Your enquiry has been accepted for sending.',
+    failed:
+      'We could not confirm acceptance of your enquiry. Your details remain in the form. Contact us by email or phone.',
     workshop: 'Workshop',
     seat: 'Registered office and billing address',
     companyId: 'Company ID',
@@ -69,16 +70,14 @@ const copy = {
 const titleId = compact ? 'contact-enquiry-title' : 'contact-title';
 const Heading = compact ? 'h2' : 'h1';
 const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
-// Draft size is bounded; supported mailto lengths still vary between mail applications.
-const limits = { name: 100, email: 254, message: 1000 };
+const limits = { name: 100, email: 254, message: 5000 };
 const enquiryTexts = JSON.stringify({
   required: copy.required,
   invalidEmail: copy.invalidEmail,
   tooLong: copy.tooLong,
-  nameLabel: copy.nameLabel,
-  emailLabel: copy.emailLabel,
-  prepared: copy.prepared,
-  stale: copy.stale,
+  sending: copy.sending,
+  accepted: copy.accepted,
+  failed: copy.failed,
 });
 ---
 
@@ -112,9 +111,11 @@ const enquiryTexts = JSON.stringify({
         </div>
         <div class="contact__actions">
           <a class="button" href={`mailto:${settings.contact_email}`}>
+            <Icon name="mail" />
             {copy.email}
           </a>
           <a class="button button--secondary" href={`tel:${contact.phone}`}>
+            <Icon name="phone" />
             {copy.call}
           </a>
           <button
@@ -125,27 +126,35 @@ const enquiryTexts = JSON.stringify({
             data-copy-failed={copy.copyFailed}
             hidden
           >
+            <Icon name="copy" />
             {copy.copy}
           </button>
         </div>
         <p class="contact__help muted">{copy.mailHelp}</p>
-        <p class="contact__privacy">
-          <a class="text-link" href={pageUrl('privacy', lang, import.meta.env.BASE_URL)}>
-            {copy.privacy}
-          </a>
-        </p>
+        {compact && (
+          <p class="contact__privacy">
+            <a class="text-link" href={pageUrl('privacy', lang, import.meta.env.BASE_URL)}>
+              {copy.privacy}
+            </a>
+          </p>
+        )}
         <p class="contact__status" role="status" aria-live="polite" data-copy-status></p>
         {!compact && (
           <form
             class="contact__form"
-            hidden
-            novalidate
+            action={`https://formsubmit.co/${settings.contact_email}`}
+            method="POST"
+            data-astro-reload
             data-enquiry-form
-            data-email={settings.contact_email}
-            data-subject={contact[`enquiry_title_${lang}`]}
+            data-endpoint={`https://formsubmit.co/ajax/${settings.contact_email}`}
             data-texts={enquiryTexts}
           >
             <p class="contact__form-note muted">{copy.formNote}</p>
+            <p class="contact__privacy">
+              <a class="text-link" href={pageUrl('privacy', lang, import.meta.env.BASE_URL)}>
+                {copy.privacy}
+              </a>
+            </p>
             <div class="contact__field">
               <label for="contact-name">
                 {copy.nameLabel}{' '}
@@ -196,13 +205,26 @@ const enquiryTexts = JSON.stringify({
                 required
               ></textarea>
             </div>
+            <input
+              class="contact__trap"
+              type="text"
+              name="_honey"
+              tabindex="-1"
+              autocomplete="off"
+              aria-hidden="true"
+            />
+            <input
+              type="hidden"
+              name="_subject"
+              value={`SKLOSERVIS-BROD: ${contact[`enquiry_title_${lang}`]}`}
+            />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
             <div class="contact__actions">
               <button class="button" type="submit">
-                {copy.prepare}
+                <Icon name="send" />
+                <span data-send-label>{copy.send}</span>
               </button>
-              <a class="button button--secondary contact__draft" data-enquiry-draft hidden>
-                {copy.openDraft}
-              </a>
             </div>
             <p class="contact__status" role="status" aria-live="polite" data-enquiry-status></p>
           </form>
@@ -222,7 +244,9 @@ const enquiryTexts = JSON.stringify({
           </p>
           <dl class="contact__addresses">
             <div>
-              <dt>{copy.workshop}</dt>
+              <dt>
+                <Icon name="location" /> {copy.workshop}
+              </dt>
               <dd>
                 <address>
                   {contact.address.street}
@@ -254,17 +278,21 @@ const enquiryTexts = JSON.stringify({
 </section>
 
 <script>
+  import { sendEnquiry } from '../lib/enquiry';
+
   type FieldControl = HTMLInputElement | HTMLTextAreaElement;
 
   interface EnquiryTexts {
     required: string;
     invalidEmail: string;
     tooLong: string;
-    nameLabel: string;
-    emailLabel: string;
-    prepared: string;
-    stale: string;
+    sending: string;
+    accepted: string;
+    failed: string;
   }
+
+  const boundForms = new WeakSet<HTMLFormElement>();
+  const activeRequests = new Map<HTMLFormElement, AbortController>();
 
   function initializeContactCopy() {
     document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((button) => {
@@ -285,17 +313,18 @@ const enquiryTexts = JSON.stringify({
     });
   }
 
-  // Builds a mailto draft in the visitor's mail app. Nothing is stored or sent by the page.
   function initializeEnquiryForm() {
     document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach((form) => {
-      if (form.dataset.enquiryBound) return;
-      const recipient = form.dataset.email;
-      const draft = form.querySelector<HTMLAnchorElement>('[data-enquiry-draft]');
+      if (boundForms.has(form)) return;
+      const endpoint = form.dataset.endpoint;
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const label = button?.querySelector<HTMLElement>('[data-send-label]');
       const status = form.querySelector<HTMLElement>('[data-enquiry-status]');
-      if (!recipient || !draft || !status) return;
-      form.dataset.enquiryBound = 'true';
+      if (!endpoint || !button || !label || !status) return;
+      boundForms.add(form);
+      form.noValidate = true;
       const texts = JSON.parse(form.dataset.texts || '{}') as EnquiryTexts;
-      const controls = Array.from(form.querySelectorAll<FieldControl>('input, textarea'));
+      const controls = Array.from(form.querySelectorAll<FieldControl>('[required]'));
       const valueOf = (name: string) =>
         form.querySelector<FieldControl>(`[name="${name}"]`)?.value.trim() ?? '';
 
@@ -306,36 +335,56 @@ const enquiryTexts = JSON.stringify({
         return '';
       };
       const validate = (control: FieldControl) => control.setCustomValidity(messageFor(control));
-      // Edited fields make a prepared draft stale, so remove its link before it can send old data.
-      const invalidateDraft = () => {
-        if (!draft.hasAttribute('href')) return;
-        draft.removeAttribute('href');
-        draft.hidden = true;
-        status.textContent = texts.stale;
-      };
-
       controls.forEach((control) =>
         control.addEventListener('input', () => {
           validate(control);
-          invalidateDraft();
+          status.textContent = '';
         }),
       );
-      form.addEventListener('submit', (event) => {
+      form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (!form.isConnected || activeRequests.has(form)) return;
         controls.forEach(validate);
         if (!form.reportValidity()) return;
-        const body = [
-          `${texts.nameLabel}: ${valueOf('name')}`,
-          `${texts.emailLabel}: ${valueOf('email')}`,
-          '',
-          valueOf('message'),
-        ].join('\r\n');
-        const subject = encodeURIComponent(form.dataset.subject ?? '');
-        draft.href = `mailto:${recipient}?subject=${subject}&body=${encodeURIComponent(body)}`;
-        draft.hidden = false;
-        status.textContent = texts.prepared;
+        if (valueOf('_honey')) {
+          status.textContent = texts.failed;
+          return;
+        }
+        const controller = new AbortController();
+        activeRequests.set(form, controller);
+        const originalLabel = label.textContent;
+        button.disabled = true;
+        label.textContent = texts.sending;
+        controls.forEach((control) => (control.readOnly = true));
+        form.setAttribute('aria-busy', 'true');
+        status.textContent = texts.sending;
+        try {
+          await sendEnquiry(
+            endpoint,
+            {
+              name: valueOf('name'),
+              email: valueOf('email'),
+              message: valueOf('message'),
+              _honey: '',
+              _subject: valueOf('_subject'),
+              _template: 'table',
+              _captcha: 'false',
+            },
+            controller.signal,
+          );
+          if (!form.isConnected) return;
+          form.reset();
+          status.textContent = texts.accepted;
+        } catch {
+          if (form.isConnected) status.textContent = texts.failed;
+        } finally {
+          activeRequests.delete(form);
+          button.disabled = false;
+          label.textContent = originalLabel;
+          controls.forEach((control) => (control.readOnly = false));
+          form.removeAttribute('aria-busy');
+        }
       });
-      form.hidden = false;
     });
   }
 
@@ -343,6 +392,10 @@ const enquiryTexts = JSON.stringify({
   initializeEnquiryForm();
   document.addEventListener('astro:page-load', initializeContactCopy);
   document.addEventListener('astro:page-load', initializeEnquiryForm);
+  document.addEventListener('astro:before-swap', () => {
+    activeRequests.forEach((controller) => controller.abort());
+    activeRequests.clear();
+  });
 </script>
 
 <style>
@@ -404,6 +457,12 @@ const enquiryTexts = JSON.stringify({
     cursor: pointer;
   }
 
+  .contact__copy:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .contact__help,
   .contact__privacy,
   .contact__status,
@@ -421,9 +480,17 @@ const enquiryTexts = JSON.stringify({
     border-top: 1px solid var(--line);
   }
 
-  .contact__form[hidden],
-  .contact__draft[hidden] {
-    display: none;
+  .contact__trap {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .contact__form button:disabled {
+    opacity: 0.6;
+    cursor: progress;
   }
 
   .contact__form-note {

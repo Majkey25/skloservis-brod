@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import logo from '../assets/brand/wordpress-logo.png';
 import { getContact } from '../content.ts';
 import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
+import Icon from './Icon.astro';
 interface Props {
   lang: Language;
   page: PageId;
@@ -34,19 +35,21 @@ const nav = [
     </nav>
     <div class="tools">
       <a class="header-phone" href={`tel:${contact.phone}`}>
+        <Icon name="phone" />
         {phone}
       </a>
       <nav class="language-nav" aria-label={lang === 'cs' ? 'Jazyk' : 'Language'}>
-        {(['cs', 'en'] as const).map((language) => (
-          <a
-            href={pageUrl(page, language, base)}
-            data-language={language}
-            lang={language}
-            aria-current={language === lang ? 'page' : undefined}
-          >
-            {language === 'cs' ? 'CZ' : 'EN'}
-          </a>
-        ))}
+        {(['cs', 'en'] as const).map((language) =>
+          language === lang ? (
+            <span lang={language} aria-current="page" tabindex="-1">
+              {language === 'cs' ? 'CZ' : 'EN'}
+            </span>
+          ) : (
+            <a href={pageUrl(page, language, base)} data-language={language} lang={language}>
+              {language === 'cs' ? 'CZ' : 'EN'}
+            </a>
+          ),
+        )}
       </nav>
       <button
         class="theme-toggle"
@@ -111,9 +114,11 @@ const nav = [
             </a>
           ))}
           <a class="mobile-link" href={`tel:${contact.phone}`}>
+            <Icon name="phone" />
             {phone}
           </a>
           <a class="button mobile-enquiry" href={pageUrl('contact', lang, base)}>
+            <Icon name="mail" />
             {lang === 'cs' ? 'Napsat poptávku' : 'Send an enquiry'}
           </a>
         </nav>
@@ -176,7 +181,8 @@ const nav = [
     gap: 0.75rem;
   }
   .desktop-nav a,
-  .language-nav a {
+  .language-nav a,
+  .language-nav span {
     text-decoration: none;
     font-weight: 550;
     font-size: 0.92rem;
@@ -185,7 +191,8 @@ const nav = [
   .language-nav a:hover {
     color: var(--accent);
   }
-  .language-nav a {
+  .language-nav a,
+  .language-nav span {
     display: inline-grid;
     place-items: center;
     min-width: 44px;
@@ -194,6 +201,7 @@ const nav = [
   .header-phone {
     display: none;
     align-items: center;
+    gap: 0.5rem;
     min-height: 44px;
     font-size: 0.92rem;
     font-weight: 600;
@@ -201,7 +209,7 @@ const nav = [
     text-decoration: none;
     color: var(--accent);
   }
-  a[aria-current='page'] {
+  [aria-current='page'] {
     color: var(--accent);
     text-decoration: underline;
     text-underline-offset: 0.55rem;
@@ -216,15 +224,27 @@ const nav = [
     background: transparent;
     color: var(--text);
   }
+  .theme-toggle svg {
+    grid-area: 1 / 1;
+    transition:
+      transform var(--dur-fast) var(--ease),
+      opacity var(--dur-fast) var(--ease);
+  }
   .theme-toggle .icon-sun,
   .theme-toggle[aria-pressed='true'] .icon-moon {
-    display: none;
+    opacity: 0;
+    transform: rotate(-30deg) scale(0.7);
   }
   .theme-toggle[hidden] {
     display: none;
   }
+  :global(html[data-theme]) .theme-toggle[hidden] {
+    display: grid;
+    visibility: hidden;
+  }
   .theme-toggle[aria-pressed='true'] .icon-sun {
-    display: block;
+    opacity: 1;
+    transform: none;
   }
   .mobile-menu {
     display: none;
@@ -253,6 +273,7 @@ const nav = [
   .mobile-link {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     min-height: 48px;
     font-weight: 550;
     text-decoration: none;
@@ -298,11 +319,11 @@ const nav = [
 </style>
 <script>
   // Escape closes the mobile menu and returns focus to its toggle.
-  document.querySelectorAll<HTMLDetailsElement>('.mobile-menu').forEach((menu) => {
-    menu.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape' || !menu.open) return;
-      menu.open = false;
-      menu.querySelector('summary')?.focus();
-    });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !(event.target instanceof Element)) return;
+    const menu = event.target.closest<HTMLDetailsElement>('.mobile-menu');
+    if (!menu?.open) return;
+    menu.open = false;
+    menu.querySelector('summary')?.focus();
   });
 </script>

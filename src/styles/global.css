@@ -1,3 +1,8 @@
+/* Route swaps need no full-page bitmap; keep motion on individual controls and images. */
+html:root {
+  view-transition-name: none;
+}
+
 :root {
   color-scheme: light;
   --bg: #fff;
@@ -26,7 +31,6 @@
   --header-h: 72px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 160ms;
-  --dur-theme: 560ms;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -181,19 +185,46 @@ summary:focus-visible {
   color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
+  background-image: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.08),
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
   transition:
-    background-color var(--dur-fast),
-    color var(--dur-fast);
+    background-color var(--dur-fast) var(--ease),
+    background-position 360ms var(--ease),
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
 }
-.button:hover {
-  background: var(--accent-hover);
+.button:focus-visible {
+  background-color: var(--accent-hover);
+  background-position: 0 0;
+}
+.button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 .button--secondary {
-  background: transparent;
+  background-color: transparent;
   color: var(--accent);
 }
-.button--secondary:hover {
-  background: var(--surface);
+.button--secondary:focus-visible {
+  background-color: var(--surface);
+}
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    background-position: 0 0;
+    transform: translateY(-1px);
+  }
+  .button--secondary:hover:not(:disabled) {
+    background-color: var(--surface);
+  }
+  .button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
 }
 .text-link {
   color: var(--accent);
@@ -261,40 +292,6 @@ summary:focus-visible {
 .prose li + li {
   margin-top: 0.4rem;
 }
-.preference-suggestion {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem 1rem;
-  padding: 0.25rem 1rem;
-  font-size: var(--step--1);
-  text-align: center;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-.preference-suggestion[hidden] {
-  display: none !important;
-}
-.preference-suggestion a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--accent);
-  font-weight: 600;
-}
-.preference-suggestion button {
-  display: inline-grid;
-  place-items: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--muted);
-  font-size: 1.25rem;
-  line-height: 1;
-}
 @media (max-width: 950px) {
   :root {
     --header-h: 64px;
@@ -312,6 +309,10 @@ summary:focus-visible {
   html {
     scroll-behavior: auto;
   }
+  .button:hover:not(:disabled),
+  .button:active:not(:disabled) {
+    transform: none;
+  }
   *,
   *::before,
   *::after {
@@ -319,23 +320,5 @@ summary:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-@keyframes theme-reveal {
-  from {
-    clip-path: circle(0 at var(--vt-x) var(--vt-y));
-  }
-  to {
-    clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
-  }
-}
-/* preferences.ts sets --vt-* and the theme-switching class before a theme transition. */
-@supports (view-transition-name: root) {
-  :root.theme-switching::view-transition-old(root) {
-    animation: none;
-  }
-  :root.theme-switching::view-transition-new(root) {
-    animation: theme-reveal var(--dur-theme) var(--ease) both;
-    mix-blend-mode: normal;
   }
 }

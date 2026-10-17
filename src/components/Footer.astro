@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import logo from '../assets/brand/wordpress-logo.png';
 import { getSettings, getContact } from '../content.ts';
 import { pageUrl, type Language } from '../lib/urls.ts';
+import Icon from './Icon.astro';
 interface Props {
   lang: Language;
 }
@@ -23,10 +24,15 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       <p>{lang === 'cs' ? settings.footer_text_cs : settings.footer_text_en}</p>
     </div>
     <div class="footer-contact">
-      <a href={`tel:${contact.phone}`}>{phone}</a>
-      <a href={`mailto:${settings.contact_email}`}>{settings.contact_email}</a>
+      <a href={`tel:${contact.phone}`}>
+        <Icon name="phone" /> {phone}
+      </a>
+      <a href={`mailto:${settings.contact_email}`}>
+        <Icon name="mail" /> {settings.contact_email}
+      </a>
     </div>
     <address class="footer-address">
+      <Icon name="location" />
       {lang === 'cs' ? 'Provozovna' : 'Workshop'}
       <br />
       {contact.address.street}
@@ -93,6 +99,7 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
   }
   .footer-contact a {
     color: var(--accent);
+    overflow-wrap: anywhere;
   }
   .footer-bottom {
     border-top: 1px solid var(--line);

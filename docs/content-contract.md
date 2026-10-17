@@ -35,13 +35,13 @@ Objects reject unknown keys. Required strings must be nonblank. Optional string,
 date and image fields normalize CMS `''` / `null` to `undefined`. Missing/null nested
 slot and exception lists normalize to `[]`. Booleans are actual booleans.
 
-- `settings.yaml`: `name`, `contact_email` (email), `relay_ready: false`,
-  `relay_provider: unconfigured`; required bilingual pairs `hero_title`, `hero_text`,
+- `settings.yaml`: `name`, `contact_email` (email); required bilingual pairs `hero_title`, `hero_text`,
   `products_title`, `products_text`, `services_title`, `services_text`, `process`,
   `gallery_title`, `gallery_text`, `footer_text`, `seo_title`, `seo_description`.
   `seo_title` and `seo_description` describe the homepage. Other page titles/descriptions
   can use their matching editable heading/intro; product and contact descriptions
-  have dedicated fields. No form relay or endpoint is configured.
+  have dedicated fields. The contact form uses FormSubmit with the validated contact email;
+  changing that recipient requires its own activation and delivery verification.
 - `contact.yaml`: `phone` (`+420` plus nine digits), `company_id` (eight-character digit
   string), `address`, `billing_address`; required bilingual pairs `title`, `text`,
   `enquiry_title`, `enquiry_text`, `seo_description`. Each address has required `street`,

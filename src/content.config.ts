@@ -60,8 +60,6 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
   const settings = z.strictObject({
     name: text,
     contact_email: z.email(),
-    relay_ready: z.literal(false),
-    relay_provider: z.literal('unconfigured'),
     hero_title_cs: text,
     hero_title_en: text,
     hero_text_cs: text,

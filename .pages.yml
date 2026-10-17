@@ -71,19 +71,6 @@ content:
         label: Potvrzený kontaktní e-mail
         type: string
         required: true
-      - name: relay_ready
-        label: Odesílání formulářů připraveno (musí zůstat vypnuto)
-        type: boolean
-        required: true
-        default: false
-      - name: relay_provider
-        label: Doručování formulářů (dosud nezprovozněno)
-        type: select
-        required: true
-        default: unconfigured
-        options:
-          values:
-            - unconfigured
       - name: hero_title_cs
         label: Úvodní nadpis — česky
         type: string

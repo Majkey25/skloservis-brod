@@ -40,8 +40,8 @@ const labels = {
                 src={photo.image}
                 alt={photo[`alt_${lang}`]}
                 formats={['avif', 'webp']}
-                widths={[360, 600, 900].filter((width) => width <= photo.image.width)}
-                sizes="(min-width: 70rem) 37rem, (min-width: 40rem) 46vw, 100vw"
+                widths={[320, 480, 720].filter((width) => width <= photo.image.width)}
+                sizes="(min-width: 70rem) 24rem, (min-width: 60rem) 30vw, (min-width: 40rem) 46vw, 100vw"
                 loading="lazy"
                 decoding="async"
               />
@@ -51,7 +51,7 @@ const labels = {
                 {service[`title_${lang}`]}
               </a>
             </h2>
-            <p>{service[`text_${lang}`]}</p>
+            <p>{service[`seo_description_${lang}`]}</p>
             <a
               class="text-link product__detail"
               href={url(service.slug)}
@@ -84,7 +84,7 @@ const labels = {
 <style>
   .products-heading {
     max-width: 52rem;
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 2rem;
   }
 
   .products-heading h1 {
@@ -98,7 +98,7 @@ const labels = {
   .products-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(2.5rem, 5vw, 4.5rem) 2rem;
+    gap: 2rem 1.5rem;
   }
 
   .product {
@@ -114,21 +114,21 @@ const labels = {
   }
 
   .product__title {
-    margin: 1.25rem 0 0.75rem;
-    font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+    margin: 1rem 0 0.5rem;
+    font-size: clamp(1.2rem, 1.7vw, 1.5rem);
     line-height: 1.25;
     text-wrap: balance;
   }
 
-  /* Title panel takes the photo slot for products without a photo. */
+  /* Keep products without verified photos visible as compact text panels. */
   .product__title--panel {
     display: grid;
     align-content: end;
-    aspect-ratio: 3 / 2;
     margin: 0;
-    padding: clamp(1.25rem, 3vw, 2rem);
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
     background: var(--surface, #edf7fa);
-    font-size: clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem);
+    font-size: clamp(1.2rem, 1.7vw, 1.5rem);
     line-height: 1.15;
   }
 
@@ -169,6 +169,18 @@ const labels = {
     max-width: 62ch;
     margin-top: 0;
     margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 60rem) {
+    .products-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .product__detail:hover span {
+      transform: none;
+    }
   }
 
   @media (max-width: 39.99rem) {

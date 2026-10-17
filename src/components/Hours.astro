@@ -2,6 +2,7 @@
 import { getHours } from '../content';
 import { WEEKDAYS, type DayHours } from '../lib/schedule';
 import type { Language } from '../lib/urls';
+import Icon from './Icon.astro';
 
 interface Props {
   lang: Language;
@@ -28,7 +29,9 @@ const formatDate = (date: string) =>
 
 <business-hours data-hours={JSON.stringify(hours)} data-lang={lang} lang={lang}>
   <section aria-label={cs ? 'Otevírací doba' : 'Opening hours'}>
-    <h2>{cs ? 'Otevírací doba' : 'Opening hours'}</h2>
+    <h2>
+      <Icon name="clock" /> {cs ? 'Otevírací doba' : 'Opening hours'}
+    </h2>
     <p class="hours-live" data-hours-live role="status" aria-atomic="true" hidden></p>
     <table>
       <caption>

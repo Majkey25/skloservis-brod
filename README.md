@@ -20,7 +20,7 @@ The [source repository](https://github.com/Majkey25/skloservis-brod) publishes a
 - Build-time content validation and focused tests for dates, schedules and invalid content.
 - GitHub Actions checks for formatting, TypeScript, tests and the static build, followed by Pages publication for successful pushes to `main`.
 
-CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip have not been verified. Enquiries use phone and email links to `skloservis.brod@gmail.com`. The contact page validates enquiry details locally and prepares an email draft for the visitor's mail application. Direct web-form sending and a mail relay are not configured, and inbox delivery has not been verified.
+CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip require an authorized account. Enquiries can be submitted directly through FormSubmit to `skloservis.brod@gmail.com`, with validation, a sending state, timeout handling and preserved input on failure. Without JavaScript the form uses native POST; phone and email links remain available. Relay acceptance alone does not establish inbox delivery, and recipient activation is required.
 
 ## Stack
 
@@ -60,6 +60,6 @@ The [Czech deployment and domain handover guide](docs/nasazeni.md) lists the rem
 
 ## Privacy and legal information
 
-The repository includes Czech and English [privacy notices](src/pages/ochrana-osobnich-udaju.md), [cookies and storage information](src/pages/cookies.md), and [company and consumer information](src/pages/pravni-informace.md). No analytics, advertising or mail relay is configured. Legal notices describe the current implementation; account-specific provider arrangements and operational retention procedures require separate verification.
+The repository includes Czech and English [privacy notices](src/pages/ochrana-osobnich-udaju.md), [cookies and storage information](src/pages/cookies.md), and [company and consumer information](src/pages/pravni-informace.md). No analytics or advertising is configured. FormSubmit receives enquiry data only on submission. Legal notices describe the current implementation; account-specific provider arrangements and operational retention procedures require separate verification.
 
 Supplied photographs and branding belong to their respective rights holders. No open-source media license or stock-video rights are implied.

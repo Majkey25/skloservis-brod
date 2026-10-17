@@ -21,6 +21,8 @@ When you request a page, the hosting provider receives technical request informa
 
 ## External links
 
+Submitting the form sends its content and technical request information to FormSubmit. The website does not load its tracking script or an embedded CAPTCHA. The JavaScript request omits that service's cookies; submitting without JavaScript opens its own page with its own policies. See the [privacy notice](../privacy/).
+
 A map or other external link opens a separate service. After you open it, its operator may process information under its own policies. This page has no automatically loaded embedded map, third-party player or advertising measurement.
 
 ## Questions

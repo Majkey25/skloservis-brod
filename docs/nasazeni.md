@@ -12,7 +12,7 @@ Před skutečným přechodem ještě potřebujeme:
 - Potvrdit, že cílový hosting obslouží statické soubory, HTTPS, skutečné 404 a potřebná přesměrování. Možnosti současného tarifu nejsou ověřené.
 - Zálohu souborů a databáze WordPressu, kompletní export DNS a ověřený způsob návratu. Při tomto běhu se záloha ani obnova produkce neprovádí.
 - Přihlášeného oprávněného editora pro Pages CMS a jeden ověřený průchod uložení → commit → CI → veřejná změna. Prohlížeč nyní končí na přihlášení GitHubu.
-- Pro přímé odesílání z formuláře schválený relay, jeho podmínky a aktivaci příjemce. Zvlášť povolit testovací zprávu a ověřit přijetí ve schránce. Nic z toho není aktivní. Dosavadní formulář připravuje pouze místní e-mailový koncept; `mailto:` neprokazuje odeslání.
+- Ověřit aktivaci příjemce FormSubmit a přijetí konkrétní testovací zprávy ve schránce. Formulář používá přímé odesílání přes FormSubmit; majitel 17. října 2026 povolil aktivaci a jeden test. Před přechodem na jiný host znovu ověřit funkčnost. Potvrzení relé ani `mailto:` neprokazují doručení. Prověřit také podmínky poskytovatele popsané v právních poznámkách.
 - Dokončit inventuru starých adres a médií včetně případných `?page_id=…` aliasů. Kód zachovává 14 známých českých adres, to ale samo neprokazuje úplnost historických odkazů.
 - Před přechodem potvrdit aktuální firemní informace a provozní pravidla. Jednoměsíční uchování vyřízených poptávek zajišťuje majitel v e-mailu a papírových záznamech, nikoli tento web.
 

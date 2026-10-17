@@ -28,6 +28,7 @@ const labels = {
     process: 'Jak probíhá zakázka',
     steps: ['Návrh', 'Zaměření', 'Výroba', 'Montáž'],
     services: 'Více o našich službách',
+    about: 'Více o společnosti',
   },
   en: {
     enquiry: 'Project enquiry',
@@ -37,6 +38,7 @@ const labels = {
     process: 'How your project takes shape',
     steps: ['Planning', 'Measuring', 'Manufacture', 'Installation'],
     services: 'Explore our services',
+    about: 'More about us',
   },
 }[lang];
 const hero = gallery.find((item) => item.image.src.includes('office-glass-corridor')) ?? gallery[0];
@@ -51,6 +53,7 @@ const featured = featuredSlugs.map((slug) => {
   if (!service) throw new Error(`Missing validated service: ${slug}`);
   return { service, photo: gallery.find((item) => item.category === slug) };
 });
+const otherServices = services.filter((service) => !featuredSlugs.includes(service.slug));
 const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 ---
 
@@ -109,7 +112,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
                 alt={photo[`alt_${lang}`]}
                 formats={['avif', 'webp']}
                 widths={[280, 480, 640].filter((width) => width <= photo.image.width)}
-                sizes="(min-width: 70rem) 18rem, (min-width: 48rem) 23vw, (min-width: 30rem) 46vw, 100vw"
+                sizes="(min-width: 70rem) 18rem, (min-width: 48rem) 23vw, 46vw"
                 loading="lazy"
                 decoding="async"
               />
@@ -124,6 +127,15 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         </a>
       ))}
     </div>
+    <ul class="home-other-products">
+      {otherServices.map((service) => (
+        <li>
+          <a class="text-link" href={url(service.slug)}>
+            {service[`title_${lang}`]}
+          </a>
+        </li>
+      ))}
+    </ul>
     <a class="text-link home-all-products" href={url('products')}>
       {labels.products}
     </a>
@@ -139,9 +151,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         {about[`title_${lang}`]}
       </h2>
       <p class="lead">{about[`lead_${lang}`]}</p>
-      {paragraphs.map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
+      <details class="home-about-details">
+        <summary>{labels.about}</summary>
+        {paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </details>
     </div>
     <div class="home-process">
       <h2 class="section-title">{labels.process}</h2>
@@ -165,31 +180,14 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
-    min-height: 42rem;
-    min-height: min(42rem, 78svh);
+    min-height: 34rem;
+    min-height: min(34rem, 68svh);
   }
 
   .home-hero__copy {
     align-self: center;
-    padding: clamp(3rem, 6vw, 6rem) clamp(1.5rem, 4vw, 4rem) clamp(3rem, 6vw, 6rem)
+    padding: clamp(2.5rem, 4vw, 4rem) clamp(1.5rem, 4vw, 4rem) clamp(2.5rem, 4vw, 4rem)
       max(1.5rem, calc((100vw - 1240px) / 2));
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .home-hero__copy {
-      animation: home-hero-rise 480ms var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
-    }
-  }
-
-  @keyframes home-hero-rise {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
   }
 
   .home-hero h1 {
@@ -253,7 +251,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   .home-section-heading {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    gap: 2rem;
     align-items: start;
     margin-bottom: 2rem;
   }
@@ -281,11 +279,15 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     overflow: hidden;
   }
 
+  .home-product__media :global(picture) {
+    display: block;
+  }
+
   .home-product :global(img) {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     transition: transform 480ms var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
   }
@@ -318,7 +320,38 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 
   .home-all-products {
     display: inline-block;
-    margin-top: 2rem;
+    margin-top: 1rem;
+  }
+
+  .home-other-products {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem 2rem;
+    margin: 1.5rem 0 0;
+    padding: 1rem 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .home-other-products a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .home-about-details {
+    margin-top: 1rem;
+  }
+
+  .home-about-details summary {
+    width: fit-content;
+    padding-block: 0.5rem;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .home-about-details p {
+    margin-top: 1rem;
   }
 
   .home-company__grid {
@@ -340,7 +373,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
     gap: 1.5rem 1rem;
-    margin: 0 0 2rem;
+    margin: 0 0 1rem;
     padding: 0;
     list-style: none;
     counter-reset: step;
@@ -432,12 +465,15 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   }
 
   @media (max-width: 29.99rem) {
-    .home-product-grid {
+    .home-other-products {
       grid-template-columns: minmax(0, 1fr);
     }
+  }
 
-    .home-product :global(img) {
-      aspect-ratio: 4 / 3;
+  @media (prefers-reduced-motion: reduce) {
+    .home-product:hover :global(img),
+    .home-product:hover .home-product__arrow {
+      transform: none;
     }
   }
 </style>

@@ -1,0 +1,42 @@
+---
+const paths = {
+  phone:
+    'M8 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-4l-5-2-2 3a15 15 0 0 1-7-7l3-2-2-5Z',
+  mail: 'M3 5h18v14H3Z M3 6l9 7 9-7',
+  copy: 'M9 9h12v12H9Z M15 9V3H3v12h6',
+  send: 'm3 3 18 9-18 9 4-9-4-9Z M7 12h14',
+  location: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+  clock: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z M12 6v6l4 2',
+} as const;
+
+interface Props {
+  name: keyof typeof paths;
+}
+
+const { name } = Astro.props;
+---
+
+<svg
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[name]} />
+</svg>
+
+<style>
+  svg {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    flex: none;
+    vertical-align: -0.18em;
+  }
+</style>

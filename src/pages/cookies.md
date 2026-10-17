@@ -21,6 +21,8 @@ Při načtení stránek dostává poskytovatel hostingu technické údaje požad
 
 ## Externí odkazy
 
+Po odeslání formuláře dostane služba FormSubmit jeho obsah a technické údaje požadavku. Web nenačítá její sledovací skript ani vloženou CAPTCHA. JavaScriptový požadavek se odesílá bez cookies této služby; při odeslání bez JavaScriptu se otevře její vlastní stránka s vlastními pravidly. Podrobnosti uvádějí [zásady soukromí](../ochrana-osobnich-udaju/).
+
 Odkaz na mapu nebo jiný web otevře samostatnou službu. Její provozovatel může po otevření zpracovávat údaje podle vlastních pravidel. Tato stránka neobsahuje automaticky načítanou vloženou mapu, přehrávač třetí strany ani reklamní měření.
 
 ## Dotazy
