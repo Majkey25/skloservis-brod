@@ -1,5 +1,12 @@
 # Pages CMS: business copy is bilingual; build validation is authoritative.
 # No CMS account setup or form delivery is implied by this configuration.
+settings:
+  commit:
+    templates:
+      create: 'chore(content): create {path}'
+      update: 'chore(content): update {path}'
+      delete: 'chore(content): delete {path}'
+      rename: 'chore(content): rename {oldPath} to {newPath}'
 media:
   - name: gallery
     label: Fotografie realizací a výrobků
