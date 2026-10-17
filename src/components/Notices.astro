@@ -160,14 +160,16 @@ const formatDate = (date: string) =>
   li {
     padding: 1rem 1.25rem;
     background: var(--surface, #edf7fa);
-    border-left: 2px solid var(--line, #cedfe5);
+    border-left: 4px solid var(--accent);
     overflow-wrap: anywhere;
   }
   li[data-level='attention'] {
-    border-left: 3px solid var(--accent, #087fa0);
+    background: var(--attention-bg);
+    border-left-color: var(--attention-line);
   }
   li[data-level='warning'] {
-    border-left: 4px solid var(--text, #142f39);
+    background: var(--warning-bg);
+    border-left-color: var(--warning-line);
   }
   .notice-meta {
     display: flex;

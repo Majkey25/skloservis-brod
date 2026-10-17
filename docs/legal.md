@@ -22,6 +22,8 @@ The website does not configure the Gmail inbox or destroy physical records. The 
 
 Current host information and actual privacy practices can be documented independently. A website request exposes technical connection data to GitHub Pages. A mailto link opens the visitor's mail application; it is not a site mail relay. No FormSubmit processing is active or verified.
 
+The contact-page enquiry helper validates name, email and message locally and prepares a mailto draft for a separate user action. It does not POST, store drafts or confirm sending. The privacy notices describe that distinction. Direct delivery remains unconfigured.
+
 ## Runtime checks owed after frontend integration
 
 - Preference storage uses `skloservis-theme` and `skloservis-language` only after a manual choice, with a fixed 180-day expiry that visits do not renew. Automatic device defaults are not saved. Both cookie pages document the keys, expiry and browser clearing. Recheck this inventory whenever scripts or external services change.

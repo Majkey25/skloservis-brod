@@ -9,18 +9,18 @@
 
 Website for **SKLOSERVIS-BROD s.r.o.**, a custom glass workshop in Uherský Brod, Czech Republic. Built with static Astro pages, validated bilingual business content and a Pages CMS configuration.
 
-The [GitHub Pages preview](https://majkey25.github.io/skloservis-brod/) is separate from the current public website, [skloservis-brod.cz](https://www.skloservis-brod.cz/). Preview pages use `noindex`; this repository has not replaced the production website.
+The [source repository](https://github.com/Majkey25/skloservis-brod) publishes a [GitHub Pages preview](https://majkey25.github.io/skloservis-brod/). Preview pages use `noindex`. The current public website, [skloservis-brod.cz](https://www.skloservis-brod.cz/), remains separate.
 
 ## Included
 
 - Czech and English home, product, service, gallery, contact and legal pages, preserving existing Czech product addresses.
-- Responsive layouts, device-based light/dark theme and manual language and theme controls.
-- Editable weekly opening hours, dated exceptions and scheduled information, attention and warning notices.
-- A curated set of 18 supplied project photographs and CMS gallery fields.
+- Responsive layouts, system light/dark theme and persistent manual language and theme choices.
+- Editable weekly opening hours, dated exceptions and scheduled information, attention and warning notices, evaluated in the browser using Europe/Prague dates.
+- Local optimized project photographs, a keyboard-accessible gallery and CMS gallery fields.
 - Build-time content validation and focused tests for dates, schedules and invalid content.
-- A GitHub Actions workflow that checks formatting, TypeScript, tests and the static build before an explicitly requested Pages deployment.
+- GitHub Actions checks for formatting, TypeScript, tests and the static build, followed by Pages publication for successful pushes to `main`.
 
-CMS sign-in, a live editing round-trip and direct form delivery have not yet been verified. The enquiry address is `skloservis.brod@gmail.com`; a mail relay is not active.
+CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip have not been verified. Enquiries use phone and email links to `skloservis.brod@gmail.com`. The contact page validates enquiry details locally and prepares an email draft for the visitor's mail application. Direct web-form sending and a mail relay are not configured, and inbox delivery has not been verified.
 
 ## Stack
 
@@ -49,6 +49,14 @@ npm run build
 ## Editing content
 
 Business content lives in [`src/data`](src/data). The [Pages CMS configuration](.pages.yml) exposes editing forms. See the [Czech editing guide](docs/editace.md) for opening hours, notices and gallery updates. An authorized GitHub account and Pages CMS access are required.
+
+## Preview publication
+
+The [Site workflow](.github/workflows/site.yml) verifies pull requests and pushes to `main`. Every push to `main`, including a CMS save that creates a commit there, publishes only after all checks pass. An authorized manual run on `main` can also publish by enabling `publish`; its default is checks only.
+
+Both publication paths deploy the `dist` artifact produced by the same run's verification job, without a second build. Failed validation prevents artifact publication and deployment, leaving the previous successful preview online. Pull requests and manual runs on other branches cannot deploy. Future notices and opening-hour exceptions are already included in page data, so their date changes do not require daily scheduled builds. Without JavaScript, dated information remains readable with its validity dates.
+
+The [Czech deployment and domain handover guide](docs/nasazeni.md) lists the remaining access checks, production preparation, DNS and mail safeguards, verification and rollback. A custom-domain cutover is separate from this preview.
 
 ## Privacy and legal information
 

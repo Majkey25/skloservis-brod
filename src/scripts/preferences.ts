@@ -74,16 +74,21 @@ function currentTheme(): Theme {
   return unexpired(manualTheme) ?? (systemTheme.matches ? 'dark' : 'light');
 }
 
-function applyTheme(animate = false) {
+function applyTheme(animate = false, trigger?: HTMLElement) {
   const theme = currentTheme();
   const root = document.documentElement;
   document
     .querySelector('meta[name="theme-color"]')
     ?.setAttribute('content', theme === 'dark' ? '#071e28' : '#ffffff');
   document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+    button.hidden = false;
     button.setAttribute('aria-pressed', String(theme === 'dark'));
   });
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-system]').forEach((button) => {
+    button.hidden = !unexpired(manualTheme);
+  });
   transition?.skipTransition();
+  root.classList.remove('theme-switching');
   if (root.dataset.theme === theme) {
     root.style.colorScheme = theme;
     return;
@@ -96,11 +101,30 @@ function applyTheme(animate = false) {
   };
   if (animate && !reducedMotion.matches && typeof document.startViewTransition === 'function') {
     try {
+      const rect = trigger?.getBoundingClientRect();
+      const x = rect ? rect.x + rect.width / 2 : innerWidth / 2;
+      const y = rect ? rect.y + rect.height / 2 : innerHeight / 2;
+      root.style.setProperty('--vt-x', `${x}px`);
+      root.style.setProperty('--vt-y', `${y}px`);
+      root.style.setProperty(
+        '--vt-r',
+        `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`,
+      );
+      root.classList.add('theme-switching');
       transition = document.startViewTransition(update);
+      const current = transition;
       void transition.ready.catch(() => undefined);
-      void transition.finished.catch(() => undefined);
+      void transition.finished
+        .catch(() => undefined)
+        .then(() => {
+          if (transition === current) {
+            root.classList.remove('theme-switching');
+            transition = undefined;
+          }
+        });
       return;
     } catch {
+      root.classList.remove('theme-switching');
       // Unsupported or interrupted transitions must not prevent a theme change.
     }
   }
@@ -171,7 +195,16 @@ document.addEventListener('click', (event) => {
   const themeButton = event.target.closest<HTMLButtonElement>('button[data-theme-toggle]');
   if (themeButton && !themeButton.disabled) {
     manualTheme = savePreference(THEME_KEY, currentTheme() === 'dark' ? 'light' : 'dark');
-    applyTheme(true);
+    applyTheme(true, themeButton);
+  }
+  if (event.target.closest('button[data-theme-system]')) {
+    manualTheme = undefined;
+    try {
+      localStorage.removeItem(THEME_KEY);
+    } catch {
+      // Reset applies for this page even when storage is unavailable.
+    }
+    applyTheme();
   }
   const languageLink = event.target.closest<HTMLAnchorElement>('a[data-language]');
   const language = languageLink?.dataset.language;

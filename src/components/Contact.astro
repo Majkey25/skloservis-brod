@@ -19,6 +19,19 @@ const copy = {
     copyFailed: 'Adresu se nepodařilo zkopírovat. Označte a zkopírujte e-mailovou adresu výše.',
     mailHelp: 'Odkaz otevře vaši e-mailovou aplikaci. Zprávu odešlete až v ní.',
     privacy: 'Jak zpracováváme osobní údaje',
+    formNote:
+      'Přímé odeslání zprávy z webu zatím není k dispozici. Připravíme koncept e-mailu, který odešlete ve své e-mailové aplikaci. Pole označená * jsou povinná.',
+    nameLabel: 'Jméno',
+    emailLabel: 'E-mail',
+    messageLabel: 'Zpráva',
+    required: 'Vyplňte toto pole.',
+    invalidEmail: 'Zadejte platnou e-mailovou adresu.',
+    tooLong: 'Text je příliš dlouhý.',
+    prepare: 'Připravit e-mail',
+    openDraft: 'Otevřít připravený e-mail',
+    prepared:
+      'Koncept e-mailu je připraven. Zpráva ještě nebyla odeslána. Otevřete koncept ve své e-mailové aplikaci a odešlete ho tam.',
+    stale: 'Údaje se změnily, proto byl koncept zrušen. Připravte e-mail znovu.',
     workshop: 'Provozovna',
     seat: 'Sídlo a fakturační adresa',
     companyId: 'IČO',
@@ -33,6 +46,19 @@ const copy = {
     copyFailed: 'The address could not be copied. Select and copy the email address above.',
     mailHelp: 'The link opens your email application. You send the message from there.',
     privacy: 'How we process personal data',
+    formNote:
+      'Sending messages directly from this website is not available. We prepare an email draft that you send from your email application. Fields marked * are required.',
+    nameLabel: 'Name',
+    emailLabel: 'Email',
+    messageLabel: 'Message',
+    required: 'Please fill in this field.',
+    invalidEmail: 'Enter a valid email address.',
+    tooLong: 'This text is too long.',
+    prepare: 'Prepare email',
+    openDraft: 'Open prepared email',
+    prepared:
+      'Email draft prepared. The message has not been sent yet. Open the draft in your email application and send it there.',
+    stale: 'The details changed, so the draft was cleared. Prepare the email again.',
     workshop: 'Workshop',
     seat: 'Registered office and billing address',
     companyId: 'Company ID',
@@ -43,6 +69,17 @@ const copy = {
 const titleId = compact ? 'contact-enquiry-title' : 'contact-title';
 const Heading = compact ? 'h2' : 'h1';
 const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
+// Draft size is bounded; supported mailto lengths still vary between mail applications.
+const limits = { name: 100, email: 254, message: 1000 };
+const enquiryTexts = JSON.stringify({
+  required: copy.required,
+  invalidEmail: copy.invalidEmail,
+  tooLong: copy.tooLong,
+  nameLabel: copy.nameLabel,
+  emailLabel: copy.emailLabel,
+  prepared: copy.prepared,
+  stale: copy.stale,
+});
 ---
 
 <section
@@ -98,6 +135,78 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
           </a>
         </p>
         <p class="contact__status" role="status" aria-live="polite" data-copy-status></p>
+        {!compact && (
+          <form
+            class="contact__form"
+            hidden
+            novalidate
+            data-enquiry-form
+            data-email={settings.contact_email}
+            data-subject={contact[`enquiry_title_${lang}`]}
+            data-texts={enquiryTexts}
+          >
+            <p class="contact__form-note muted">{copy.formNote}</p>
+            <div class="contact__field">
+              <label for="contact-name">
+                {copy.nameLabel}{' '}
+                <span class="contact__required" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                class="contact__input"
+                id="contact-name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                maxlength={limits.name}
+                required
+              />
+            </div>
+            <div class="contact__field">
+              <label for="contact-email">
+                {copy.emailLabel}{' '}
+                <span class="contact__required" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                class="contact__input"
+                id="contact-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                maxlength={limits.email}
+                required
+              />
+            </div>
+            <div class="contact__field">
+              <label for="contact-message">
+                {copy.messageLabel}{' '}
+                <span class="contact__required" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <textarea
+                class="contact__input"
+                id="contact-message"
+                name="message"
+                rows="6"
+                maxlength={limits.message}
+                required
+              ></textarea>
+            </div>
+            <div class="contact__actions">
+              <button class="button" type="submit">
+                {copy.prepare}
+              </button>
+              <a class="button button--secondary contact__draft" data-enquiry-draft hidden>
+                {copy.openDraft}
+              </a>
+            </div>
+            <p class="contact__status" role="status" aria-live="polite" data-enquiry-status></p>
+          </form>
+        )}
         {compact && (
           <a class="text-link" href={pageUrl('contact', lang, import.meta.env.BASE_URL)}>
             {copy.allContact} <span aria-hidden="true">→</span>
@@ -145,6 +254,18 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
 </section>
 
 <script>
+  type FieldControl = HTMLInputElement | HTMLTextAreaElement;
+
+  interface EnquiryTexts {
+    required: string;
+    invalidEmail: string;
+    tooLong: string;
+    nameLabel: string;
+    emailLabel: string;
+    prepared: string;
+    stale: string;
+  }
+
   function initializeContactCopy() {
     document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((button) => {
       if (button.dataset.copyBound) return;
@@ -164,8 +285,64 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
     });
   }
 
+  // Builds a mailto draft in the visitor's mail app. Nothing is stored or sent by the page.
+  function initializeEnquiryForm() {
+    document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach((form) => {
+      if (form.dataset.enquiryBound) return;
+      const recipient = form.dataset.email;
+      const draft = form.querySelector<HTMLAnchorElement>('[data-enquiry-draft]');
+      const status = form.querySelector<HTMLElement>('[data-enquiry-status]');
+      if (!recipient || !draft || !status) return;
+      form.dataset.enquiryBound = 'true';
+      const texts = JSON.parse(form.dataset.texts || '{}') as EnquiryTexts;
+      const controls = Array.from(form.querySelectorAll<FieldControl>('input, textarea'));
+      const valueOf = (name: string) =>
+        form.querySelector<FieldControl>(`[name="${name}"]`)?.value.trim() ?? '';
+
+      const messageFor = (control: FieldControl) => {
+        if (control.required && !control.value.trim()) return texts.required;
+        if (control.validity.typeMismatch) return texts.invalidEmail;
+        if (control.maxLength > 0 && control.value.length > control.maxLength) return texts.tooLong;
+        return '';
+      };
+      const validate = (control: FieldControl) => control.setCustomValidity(messageFor(control));
+      // Edited fields make a prepared draft stale, so remove its link before it can send old data.
+      const invalidateDraft = () => {
+        if (!draft.hasAttribute('href')) return;
+        draft.removeAttribute('href');
+        draft.hidden = true;
+        status.textContent = texts.stale;
+      };
+
+      controls.forEach((control) =>
+        control.addEventListener('input', () => {
+          validate(control);
+          invalidateDraft();
+        }),
+      );
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        controls.forEach(validate);
+        if (!form.reportValidity()) return;
+        const body = [
+          `${texts.nameLabel}: ${valueOf('name')}`,
+          `${texts.emailLabel}: ${valueOf('email')}`,
+          '',
+          valueOf('message'),
+        ].join('\r\n');
+        const subject = encodeURIComponent(form.dataset.subject ?? '');
+        draft.href = `mailto:${recipient}?subject=${subject}&body=${encodeURIComponent(body)}`;
+        draft.hidden = false;
+        status.textContent = texts.prepared;
+      });
+      form.hidden = false;
+    });
+  }
+
   initializeContactCopy();
+  initializeEnquiryForm();
   document.addEventListener('astro:page-load', initializeContactCopy);
+  document.addEventListener('astro:page-load', initializeEnquiryForm);
 </script>
 
 <style>
@@ -176,12 +353,19 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
 
   .contact__layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
   }
 
   .contact--compact .contact__layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contact__enquiry {
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+    background: var(--surface);
+    border-radius: var(--radius, 6px);
   }
 
   .contact__direct {
@@ -193,8 +377,9 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
 
   .contact__phone {
     color: inherit;
-    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-size: var(--step-3, clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem));
     font-weight: 650;
+    line-height: 1.2;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
   }
@@ -221,12 +406,54 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
 
   .contact__help,
   .contact__privacy,
-  .contact__status {
+  .contact__status,
+  .contact__form-note {
     font-size: 0.9375rem;
   }
 
   .contact__status:empty {
     margin: 0;
+  }
+
+  .contact__form {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .contact__form[hidden],
+  .contact__draft[hidden] {
+    display: none;
+  }
+
+  .contact__form-note {
+    margin-bottom: 1.5rem;
+  }
+
+  .contact__field {
+    display: grid;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .contact__field label {
+    font-weight: 600;
+  }
+
+  .contact__input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--muted);
+    border-radius: var(--radius, 6px);
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+  }
+
+  textarea.contact__input {
+    min-height: 9rem;
+    resize: vertical;
   }
 
   .contact__business {
@@ -257,6 +484,10 @@ const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 
   @media (max-width: 48rem) {
     .contact__layout {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .contact__enquiry {
+      padding: 1.5rem;
     }
 
     .contact__business {

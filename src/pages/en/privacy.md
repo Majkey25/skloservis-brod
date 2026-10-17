@@ -15,7 +15,9 @@ For privacy questions or rights requests, email [skloservis.brod@gmail.com](mail
 
 ## Visiting the website
 
-This website presents products and services. It has no enquiry database, user accounts, online shop, advertising or analytics measurement. A direct web enquiry form is not currently active.
+This website presents products and services. It has no enquiry database, user accounts, online shop, advertising or analytics measurement. Direct message sending from the website is not active.
+
+The contact page can prepare an enquiry email. Your name, email address and message are processed only within the open page, without saving them to local storage or sending them to a server. Opening the prepared email link passes these details to your mail application. You confirm sending there; the website cannot verify sending or delivery.
 
 When serving pages, GitHub Pages processes technical request information, such as your IP address and connection details, including for service security. This is distinct from storing an enquiry in a company database. See the [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 

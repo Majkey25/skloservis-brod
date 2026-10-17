@@ -4,11 +4,29 @@
   --surface: #edf7fa;
   --text: #142f39;
   --muted: #52666f;
-  --accent: #087fa0;
+  --accent: #07728f;
   --accent-hover: #06617a;
   --line: #cedfe5;
   --on-accent: #fff;
-  --font-body: 'Segoe UI', Arial, sans-serif;
+  --attention-bg: #fdf3d8;
+  --attention-line: #a86b00;
+  --warning-bg: #fde8e6;
+  --warning-line: #b42318;
+  --font-body: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  --font-display:
+    'Segoe UI Variable Display', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --step-2: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --step-3: clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem);
+  --step-4: clamp(2.5rem, 1.5rem + 4.2vw, 4.75rem);
+  --section: clamp(4rem, 8vw, 7rem);
+  --radius: 6px;
+  --header-h: 72px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 160ms;
+  --dur-theme: 560ms;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -20,6 +38,28 @@
   --accent-hover: #94e5f5;
   --line: #34505c;
   --on-accent: #071e28;
+  --attention-bg: #33290f;
+  --attention-line: #f0b44c;
+  --warning-bg: #3b1714;
+  --warning-line: #ff8a7a;
+}
+/* Without JS there is no data-theme, so the device setting applies here. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #071e28;
+    --surface: #102e3b;
+    --text: #f2f8fb;
+    --muted: #afc8d2;
+    --accent: #64d1ec;
+    --accent-hover: #94e5f5;
+    --line: #34505c;
+    --on-accent: #071e28;
+    --attention-bg: #33290f;
+    --attention-line: #f0b44c;
+    --warning-bg: #3b1714;
+    --warning-line: #ff8a7a;
+  }
 }
 * {
   box-sizing: border-box;
@@ -33,7 +73,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: var(--step-0);
   line-height: 1.65;
 }
 a {
@@ -74,19 +114,22 @@ p {
 h1,
 h2,
 h3 {
+  font-family: var(--font-display);
   line-height: 1.13;
   letter-spacing: -0.035em;
   font-weight: 650;
+  text-wrap: balance;
 }
 h1 {
-  font-size: clamp(2.6rem, 6vw, 5.6rem);
+  font-size: var(--step-4);
+  letter-spacing: -0.045em;
   max-width: 16ch;
 }
 h2 {
-  font-size: clamp(1.9rem, 3.2vw, 3rem);
+  font-size: var(--step-3);
 }
 h3 {
-  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-size: var(--step-2);
 }
 p + p {
   margin-top: 1rem;
@@ -98,7 +141,8 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+summary:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 5px;
 }
@@ -111,13 +155,13 @@ select:focus-visible {
   margin-inline: auto;
 }
 .section {
-  padding-block: clamp(3.5rem, 7vw, 6.5rem);
+  padding-block: var(--section);
 }
 .section-title {
   margin-bottom: 2rem;
 }
 .lead {
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-size: var(--step-1);
   line-height: 1.5;
   color: var(--muted);
 }
@@ -132,18 +176,17 @@ select:focus-visible {
   min-height: 48px;
   padding: 0.8rem 1.4rem;
   border: 1px solid var(--accent);
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--accent);
   color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
   transition:
-    background 0.18s,
-    transform 0.18s;
+    background-color var(--dur-fast),
+    color var(--dur-fast);
 }
 .button:hover {
   background: var(--accent-hover);
-  transform: translateY(-2px);
 }
 .button--secondary {
   background: transparent;
@@ -219,7 +262,13 @@ select:focus-visible {
   margin-top: 0.4rem;
 }
 .preference-suggestion {
-  padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  padding: 0.25rem 1rem;
+  font-size: var(--step--1);
   text-align: center;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
@@ -228,21 +277,32 @@ select:focus-visible {
   display: none !important;
 }
 .preference-suggestion a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--accent);
   font-weight: 600;
 }
 .preference-suggestion button {
-  margin-left: 1rem;
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
   border: 0;
   background: none;
   color: var(--muted);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+@media (max-width: 950px) {
+  :root {
+    --header-h: 64px;
+  }
 }
 @media (max-width: 640px) {
   .wrap {
     width: calc(100% - 2rem);
-  }
-  .section {
-    padding-block: 3.5rem;
   }
   .page-intro {
     padding-block: 3rem 1.5rem;
@@ -261,12 +321,21 @@ select:focus-visible {
     scroll-behavior: auto !important;
   }
 }
-@supports (view-transition-name: root) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 0.35s;
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x) var(--vt-y));
   }
-  ::view-transition-new(root) {
+  to {
+    clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
+  }
+}
+/* preferences.ts sets --vt-* and the theme-switching class before a theme transition. */
+@supports (view-transition-name: root) {
+  :root.theme-switching::view-transition-old(root) {
+    animation: none;
+  }
+  :root.theme-switching::view-transition-new(root) {
+    animation: theme-reveal var(--dur-theme) var(--ease) both;
     mix-blend-mode: normal;
   }
 }

@@ -40,7 +40,7 @@ const formatDate = (date: string) =>
         {WEEKDAYS.map((day, index) => {
           const row = hours.weekly.find((item) => item.day === day)!;
           return (
-            <tr>
+            <tr data-day={day}>
               <th scope="row">{days[index]}</th>
               <td>
                 {row.slots.length > 0 && <span class="hours-intervals">{intervals(row)}</span>}
@@ -122,6 +122,11 @@ const formatDate = (date: string) =>
       const cs = this.dataset.lang === 'cs';
       const now = new Date();
       const current = scheduleAt(this.hours, now);
+      // Highlight the weekly row only; a dated exception replaces the regular day.
+      const today = current.source === 'weekly' ? current.day : '';
+      this.querySelectorAll<HTMLElement>('[data-day]').forEach((element) =>
+        element.toggleAttribute('data-today', element.dataset.day === today),
+      );
       const date = new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', {
         timeZone: 'Europe/Prague',
         day: 'numeric',
@@ -130,6 +135,8 @@ const formatDate = (date: string) =>
       const row = current.row;
       const note = row[cs ? 'note_cs' : 'note_en'];
       const intervals = row.slots.map((slot) => `${slot.opens}–${slot.closes}`).join(', ');
+      target.dataset.state =
+        !row.assumed && row.slots.length ? (current.isOpen ? 'open' : 'closed') : '';
       const status = row.assumed
         ? ''
         : row.slots.length
@@ -210,6 +217,22 @@ const formatDate = (date: string) =>
   }
   .hours-live[hidden] {
     display: none;
+  }
+  .hours-live::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 0.5rem;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .hours-live[data-state='open']::before {
+    background: var(--accent);
+  }
+  tr[data-today] {
+    background: var(--surface);
+    font-weight: 650;
   }
   .hours-general-note {
     color: var(--muted, #52666f);

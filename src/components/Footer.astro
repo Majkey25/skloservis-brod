@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/wordpress-logo.png';
 import { getSettings, getContact } from '../content.ts';
 import { pageUrl, type Language } from '../lib/urls.ts';
 interface Props {
@@ -8,25 +10,39 @@ const { lang } = Astro.props;
 const settings = await getSettings();
 const contact = await getContact();
 const base = import.meta.env.BASE_URL;
+const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
 ---
 
 <footer class="site-footer">
   <div class="wrap footer-main">
     <div>
       <a class="footer-brand" href={pageUrl('home', lang, base)}>
-        Skloservis Brod
+        <Image src={logo} alt="" width={80} height={80} class="footer-logo" />
+        <span>Skloservis Brod</span>
       </a>
       <p>{lang === 'cs' ? settings.footer_text_cs : settings.footer_text_en}</p>
     </div>
     <div class="footer-contact">
-      <a href={`tel:${contact.phone}`}>+420 608 031 206</a>
+      <a href={`tel:${contact.phone}`}>{phone}</a>
       <a href={`mailto:${settings.contact_email}`}>{settings.contact_email}</a>
     </div>
+    <address class="footer-address">
+      {lang === 'cs' ? 'Provozovna' : 'Workshop'}
+      <br />
+      {contact.address.street}
+      <br />
+      {contact.address.postal_code} {contact.address.city}
+    </address>
   </div>
   <div class="wrap footer-bottom">
-    <p>
-      {settings.name} · IČO {contact.company_id}
-    </p>
+    <div class="footer-legal">
+      <p>
+        {settings.name} · IČO {contact.company_id}
+      </p>
+      <button type="button" class="footer-theme-system" data-theme-system hidden>
+        {lang === 'cs' ? 'Použít nastavení zařízení' : 'Use device theme'}
+      </button>
+    </div>
     <nav aria-label={lang === 'cs' ? 'Právní informace' : 'Legal information'}>
       <a href={pageUrl('privacy', lang, base)}>{lang === 'cs' ? 'Soukromí' : 'Privacy'}</a>
       <a href={pageUrl('cookies', lang, base)}>
@@ -44,22 +60,31 @@ const base = import.meta.env.BASE_URL;
     padding-top: 3rem;
   }
   .footer-main {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
     gap: 2rem;
     padding-bottom: 3rem;
   }
   .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
     font-weight: 700;
     font-size: 1.4rem;
     text-decoration: none;
     letter-spacing: -0.03em;
   }
-  .footer-main p {
+  .footer-logo {
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+  .footer-main p,
+  .footer-address {
     max-width: 45ch;
     margin-top: 0.6rem;
     color: var(--muted);
-    font-size: 0.92rem;
+    font-size: var(--step--1);
+    font-style: normal;
   }
   .footer-contact {
     display: grid;
@@ -73,15 +98,35 @@ const base = import.meta.env.BASE_URL;
     border-top: 1px solid var(--line);
     padding-block: 1.5rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 1rem;
-    font-size: 0.82rem;
+    gap: 1rem 2rem;
+    font-size: var(--step--1);
     color: var(--muted);
+  }
+  .footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1rem;
+  }
+  .footer-legal p {
+    max-width: none;
+  }
+  .footer-theme-system {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font-size: var(--step--1);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
   }
   .footer-bottom nav {
     display: flex;
-    gap: 1.5rem;
     flex-wrap: wrap;
+    gap: 1rem 1.5rem;
   }
   .footer-bottom a {
     text-decoration: none;
@@ -89,16 +134,9 @@ const base = import.meta.env.BASE_URL;
   .footer-bottom a:hover {
     text-decoration: underline;
   }
-  @media (max-width: 760px) {
-    .footer-main,
-    .footer-bottom {
-      flex-direction: column;
-    }
-    .footer-contact {
-      gap: 0.7rem;
-    }
-    .footer-bottom nav {
-      gap: 1rem;
+  @media (min-width: 48rem) {
+    .footer-main {
+      grid-template-columns: 1.4fr 1fr 1fr;
     }
   }
 </style>

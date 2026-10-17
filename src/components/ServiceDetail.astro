@@ -152,11 +152,21 @@ const related = services.filter((item) => item.slug !== slug);
       <a class="text-link" href={url('products')}>
         {labels.products}
       </a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{service[`title_${lang}`]}</span>
     </nav>
     <div class:list={['service-hero', { 'service-hero--text': !hero }]}>
       <div class="service-hero__copy">
         <h1 id="service-title">{service[`title_${lang}`]}</h1>
         <p class="lead">{service[`text_${lang}`]}</p>
+        <div class="service-prompts">
+          <h2>{labels.prepare}</h2>
+          <ul>
+            {prompts[slug][lang].map((prompt) => (
+              <li>{prompt}</li>
+            ))}
+          </ul>
+        </div>
         <a class="button" href={url('contact')}>
           {labels.enquiry}
         </a>
@@ -177,28 +187,6 @@ const related = services.filter((item) => item.slug !== slug);
           />
         </figure>
       )}
-    </div>
-  </div>
-</section>
-
-<section class="section service-planning" aria-labelledby="service-planning-title">
-  <div class="wrap service-planning__grid">
-    <div>
-      <h2 class="section-title" id="service-planning-title">
-        {isEngraved ? contact[`enquiry_title_${lang}`] : labels.process}
-      </h2>
-      <p>{isEngraved ? contact[`enquiry_text_${lang}`] : settings[`process_${lang}`]}</p>
-      <a class="text-link" href={url('contact')}>
-        {labels.contact}
-      </a>
-    </div>
-    <div class="service-prompts">
-      <h2>{labels.prepare}</h2>
-      <ul>
-        {prompts[slug][lang].map((prompt) => (
-          <li>{prompt}</li>
-        ))}
-      </ul>
     </div>
   </div>
 </section>
@@ -251,8 +239,26 @@ const related = services.filter((item) => item.slug !== slug);
   </div>
 </section>
 
+<section class="section service-contact" aria-labelledby="service-contact-title">
+  <div class="wrap service-contact__grid">
+    <div>
+      <h2 class="section-title" id="service-contact-title">
+        {isEngraved ? contact[`enquiry_title_${lang}`] : labels.process}
+      </h2>
+      <p>{isEngraved ? contact[`enquiry_text_${lang}`] : settings[`process_${lang}`]}</p>
+    </div>
+    <a class="button" href={url('contact')}>
+      {labels.contact}
+    </a>
+  </div>
+</section>
+
 <style>
   .service-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
     margin-bottom: 2rem;
   }
 
@@ -269,15 +275,36 @@ const related = services.filter((item) => item.slug !== slug);
 
   .service-hero h1 {
     margin: 0 0 1.5rem;
-    font-size: clamp(2.4rem, 4.5vw, 4.1rem);
+    max-width: 20ch;
+    font-size: clamp(2.2rem, 1.5rem + 2.6vw, 3.6rem);
     letter-spacing: -0.04em;
     line-height: 1.1;
     text-wrap: balance;
+    overflow-wrap: break-word;
   }
 
   .service-hero .lead {
     max-width: 60ch;
-    margin-bottom: 2rem;
+  }
+
+  .service-prompts {
+    max-width: 60ch;
+    margin: 2rem 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line, #cedfe5);
+  }
+
+  .service-prompts h2 {
+    font-size: 1.1rem;
+  }
+
+  .service-prompts ul {
+    margin: 0.75rem 0 0;
+    padding-left: 1.25rem;
+  }
+
+  .service-prompts li + li {
+    margin-top: 0.5rem;
   }
 
   .service-hero__media,
@@ -289,43 +316,10 @@ const related = services.filter((item) => item.slug !== slug);
   .service-hero__media :global(img) {
     display: block;
     width: 100%;
-    max-height: 36rem;
     height: auto;
-    object-fit: contain;
-  }
-
-  .service-planning {
-    background: var(--surface, #edf7fa);
-  }
-
-  .service-planning__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(2rem, 6vw, 6rem);
-  }
-
-  .service-planning p {
-    max-width: 65ch;
-    margin-bottom: 1.5rem;
-  }
-
-  .service-prompts {
-    border-left: 1px solid var(--line, #cedfe5);
-    padding-left: clamp(1.5rem, 4vw, 4rem);
-  }
-
-  .service-prompts h2 {
-    margin-top: 0;
-    font-size: 1.3rem;
-  }
-
-  .service-prompts ul {
-    margin: 1.25rem 0 0;
-    padding-left: 1.25rem;
-  }
-
-  .service-prompts li + li {
-    margin-top: 0.75rem;
+    max-height: 44rem;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
   }
 
   .service-section-heading {
@@ -348,7 +342,7 @@ const related = services.filter((item) => item.slug !== slug);
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
   }
 
@@ -363,29 +357,42 @@ const related = services.filter((item) => item.slug !== slug);
   }
 
   .service-related__links {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
     margin: 2rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (max-width: 47.99rem) {
-    .service-hero,
-    .service-planning__grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .service-prompts {
-      border-left: 0;
-      border-top: 1px solid var(--line, #cedfe5);
-      padding: 1.5rem 0 0;
-    }
+  .service-related__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
-  @media (max-width: 31.99rem) {
-    .service-related__links {
+  .service-contact {
+    background: var(--surface, #edf7fa);
+  }
+
+  .service-contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 2rem clamp(2rem, 6vw, 6rem);
+  }
+
+  .service-contact .section-title {
+    margin-bottom: 1rem;
+  }
+
+  .service-contact p {
+    max-width: 65ch;
+  }
+
+  @media (max-width: 47.99rem) {
+    .service-hero,
+    .service-contact__grid {
       grid-template-columns: minmax(0, 1fr);
     }
   }

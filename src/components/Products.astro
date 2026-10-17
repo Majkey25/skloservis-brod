@@ -15,8 +15,12 @@ const [settings, services, gallery] = await Promise.all([
 ]);
 const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
 const labels = {
-  cs: { enquiry: 'Nezávazná poptávka', process: 'Jak probíhá zakázka' },
-  en: { enquiry: 'Project enquiry', process: 'How your project takes shape' },
+  cs: { detail: 'Detail', enquiry: 'Nezávazná poptávka', process: 'Jak probíhá zakázka' },
+  en: {
+    detail: 'Details',
+    enquiry: 'Project enquiry',
+    process: 'How your project takes shape',
+  },
 }[lang];
 ---
 
@@ -30,7 +34,7 @@ const labels = {
       {services.map((service) => {
         const photo = gallery.find((item) => item.category === service.slug);
         return (
-          <article class:list={['product', { 'product--text': !photo }]}>
+          <article class="product">
             {photo && (
               <Picture
                 src={photo.image}
@@ -42,12 +46,20 @@ const labels = {
                 decoding="async"
               />
             )}
-            <h2>
+            <h2 class:list={['product__title', { 'product__title--panel': !photo }]}>
               <a class="text-link" href={url(service.slug)}>
                 {service[`title_${lang}`]}
               </a>
             </h2>
             <p>{service[`text_${lang}`]}</p>
+            <a
+              class="text-link product__detail"
+              href={url(service.slug)}
+              aria-label={`${labels.detail}: ${service[`title_${lang}`]}`}
+            >
+              {labels.detail}
+              <span aria-hidden="true">→</span>
+            </a>
           </article>
         );
       })}
@@ -97,15 +109,27 @@ const labels = {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
   }
 
-  .product h2 {
+  .product__title {
     margin: 1.25rem 0 0.75rem;
     font-size: clamp(1.4rem, 2.5vw, 1.85rem);
     line-height: 1.25;
     text-wrap: balance;
+  }
+
+  /* Title panel takes the photo slot for products without a photo. */
+  .product__title--panel {
+    display: grid;
+    align-content: end;
+    aspect-ratio: 3 / 2;
+    margin: 0;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    background: var(--surface, #edf7fa);
+    font-size: clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem);
+    line-height: 1.15;
   }
 
   .product p {
@@ -114,13 +138,21 @@ const labels = {
     color: var(--muted, #52666f);
   }
 
-  .product--text {
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line, #cedfe5);
+  .product__detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    margin-top: 0.5rem;
   }
 
-  .product--text h2 {
-    margin-top: 0;
+  .product__detail span {
+    display: inline-block;
+    transition: transform 160ms ease;
+  }
+
+  .product__detail:hover span {
+    transform: translateX(3px);
   }
 
   .products-process {

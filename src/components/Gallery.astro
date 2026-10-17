@@ -78,14 +78,20 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
       </div>
     )}
 
-    <div class="gallery-grid" role="list">
+    <div class:list={['gallery-grid', compact && 'gallery-grid--compact']} role="list">
       {displayItems.map((item, index) => {
         const categoryName = serviceMap.get(item.category) ?? item.category;
         const caption = item[`caption_${lang}`];
         const altText = item[`alt_${lang}`];
+        const featured = compact && index === 0;
+        const sizes = featured
+          ? '(min-width: 64rem) 52rem, 100vw'
+          : compact
+            ? '(min-width: 64rem) 25rem, 47vw'
+            : '(min-width: 64rem) 25rem, (min-width: 40rem) 47vw, 100vw';
 
         return (
-          <div class="gallery-item" role="listitem">
+          <div class:list={['gallery-item', featured && 'gallery-item--featured']} role="listitem">
             <a
               href={item.image.src}
               class="gallery-card"
@@ -101,7 +107,7 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
                     alt={altText}
                     formats={['avif', 'webp']}
                     widths={[360, 540, 720, 960].filter((width) => width <= item.image.width)}
-                    sizes="(min-width: 70rem) 24rem, (min-width: 48rem) 31vw, (min-width: 30rem) 47vw, 100vw"
+                    sizes={sizes}
                     loading={index < 3 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
@@ -336,14 +342,67 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     max-width: 55ch;
   }
 
+  @media (min-width: 48rem) {
+    .gallery-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+      gap: 1rem 3rem;
+      align-items: end;
+    }
+  }
+
+  /* Two columns by default; full gallery drops to one column below 40rem */
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
   }
 
   .gallery-item {
     min-width: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .gallery-grid {
+      gap: 1.25rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Compact Home mosaic: first photo covers a 2x2 block */
+    .gallery-item--featured {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .gallery-item--featured .gallery-card__image-wrap {
+      flex: 1 1 auto;
+      aspect-ratio: auto;
+      min-height: 16rem;
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    /* Compact mosaic on tablet and mobile: first photo spans full width */
+    .gallery-item--featured {
+      grid-column: 1 / -1;
+    }
+
+    /* Avoid a lone half-width photo at the end of the compact grid */
+    .gallery-grid--compact .gallery-item:last-child:nth-child(even) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 39.99rem) {
+    .gallery-grid:not(.gallery-grid--compact) {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .gallery-card {
@@ -351,20 +410,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     height: 100%;
     color: inherit;
     text-decoration: none;
-    background: var(--surface, #edf7fa);
-    border: 1px solid var(--line, #cedfe5);
-    border-radius: 6px;
-    overflow: hidden;
-    transition:
-      transform 0.2s ease,
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
-  }
-
-  .gallery-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent, #087fa0);
-    box-shadow: 0 6px 16px rgba(8, 127, 160, 0.08);
   }
 
   .gallery-card:focus-visible {
@@ -379,42 +424,43 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     margin: 0;
   }
 
+  /* Square photos, no radius; the 3:2 crop keeps every card in one rhythm */
   .gallery-card__image-wrap {
-    aspect-ratio: 4 / 3;
+    position: relative;
+    aspect-ratio: 3 / 2;
     overflow: hidden;
-    background: var(--line, #cedfe5);
+    background: var(--surface, #edf7fa);
+  }
+
+  .gallery-card__image-wrap :global(picture) {
+    position: absolute;
+    inset: 0;
   }
 
   .gallery-card__image-wrap :global(img) {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s var(--ease, ease);
   }
 
   .gallery-card:hover .gallery-card__image-wrap :global(img) {
-    transform: scale(1.02);
+    transform: scale(1.03);
   }
 
   .gallery-card__caption {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    padding: 1rem 1.15rem;
-    flex-grow: 1;
+    gap: 0.2rem;
+    padding-top: 0.75rem;
+    font-size: var(--step--1, 0.875rem);
+    line-height: 1.4;
+    color: var(--muted, #52666f);
   }
 
   .gallery-card__category {
-    font-size: 0.85rem;
     font-weight: 600;
-    color: var(--accent, #087fa0);
-    letter-spacing: -0.01em;
-  }
-
-  .gallery-card__text {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    color: var(--text, #142f39);
   }
 
   .gallery-action {
@@ -423,109 +469,81 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     margin-top: 3rem;
   }
 
-  /* Accessible Modal Dialog */
+  /* Photo viewer: always dark, so its controls use fixed light colours */
   .gallery-dialog {
-    max-width: min(94vw, 1040px);
-    width: 100%;
-    max-height: 92vh;
+    width: min(94vw, 72rem);
+    max-height: 86vh;
+    max-height: 86svh;
     padding: 0;
-    border: 1px solid var(--line, #cedfe5);
-    border-radius: 8px;
-    background: var(--bg, #ffffff);
-    color: var(--text, #142f39);
-    box-shadow: 0 24px 48px rgba(7, 30, 40, 0.35);
-    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius, 6px);
+    background: #041016;
+    color: #f2f8fb;
+    box-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
+    overflow: auto;
   }
 
   .gallery-dialog::backdrop {
-    background: rgba(7, 30, 40, 0.8);
-    backdrop-filter: blur(4px);
+    background: rgb(4 16 22 / 0.92);
   }
 
   .gallery-dialog__container {
     display: flex;
     flex-direction: column;
-    max-height: 92vh;
   }
 
   .gallery-dialog__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 1.25rem;
-    border-bottom: 1px solid var(--line, #cedfe5);
-    background: var(--surface, #edf7fa);
+    padding: 0.75rem 1rem;
   }
 
   .gallery-dialog__counter {
-    font-size: 0.92rem;
+    font-size: var(--step--1, 0.875rem);
     font-weight: 600;
-    color: var(--muted, #52666f);
+    color: #afc8d2;
     font-variant-numeric: tabular-nums;
   }
 
-  .gallery-dialog__close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    padding: 0;
-    border: 1px solid var(--line, #cedfe5);
-    border-radius: 6px;
-    background: var(--bg, #ffffff);
-    color: var(--text, #142f39);
-    font-size: 1.4rem;
-    line-height: 1;
-    transition:
-      background 0.15s,
-      color 0.15s;
-  }
-
-  .gallery-dialog__close:hover {
-    background: var(--accent, #087fa0);
-    color: var(--on-accent, #ffffff);
-    border-color: var(--accent, #087fa0);
-  }
-
-  .gallery-dialog__body {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    gap: 0.75rem;
-    flex: 1 1 auto;
-    min-height: 280px;
-    background: var(--bg, #ffffff);
-  }
-
+  .gallery-dialog__close,
   .gallery-dialog__nav {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     padding: 0;
     flex-shrink: 0;
-    border: 1px solid var(--line, #cedfe5);
-    border-radius: 6px;
-    background: var(--surface, #edf7fa);
-    color: var(--text, #142f39);
+    border: 1px solid rgb(242 248 251 / 0.55);
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
     font-size: 1.5rem;
     line-height: 1;
     transition:
-      background 0.15s,
-      color 0.15s,
-      transform 0.15s;
-    z-index: 2;
+      background-color 0.16s ease,
+      color 0.16s ease;
   }
 
+  .gallery-dialog__close:hover,
   .gallery-dialog__nav:hover {
-    background: var(--accent, #087fa0);
-    color: var(--on-accent, #ffffff);
-    border-color: var(--accent, #087fa0);
-    transform: scale(1.05);
+    background: #f2f8fb;
+    color: #041016;
+  }
+
+  .gallery-dialog__close:focus-visible,
+  .gallery-dialog__nav:focus-visible {
+    outline: 3px solid #64d1ec;
+    outline-offset: 3px;
+  }
+
+  .gallery-dialog__body {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 1rem 0.5rem;
   }
 
   .gallery-dialog__viewport {
@@ -533,19 +551,18 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
-    min-height: 240px;
-    max-height: 65vh;
+    min-width: 0;
+    min-height: 12rem;
   }
 
+  /* Original file, no fixed crop: contain inside the space left by the dialog chrome */
   .gallery-dialog__image {
     max-width: 100%;
-    max-height: 65vh;
+    max-height: calc(86vh - 12rem);
+    max-height: calc(86svh - 12rem);
     width: auto;
     height: auto;
     object-fit: contain;
-    border-radius: 4px;
     transition: opacity 0.2s ease;
   }
 
@@ -558,8 +575,8 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     position: absolute;
     width: 36px;
     height: 36px;
-    border: 3px solid var(--line, #cedfe5);
-    border-top-color: var(--accent, #087fa0);
+    border: 3px solid rgb(242 248 251 / 0.25);
+    border-top-color: #f2f8fb;
     border-radius: 50%;
     animation: gallery-spin 0.8s linear infinite;
     z-index: 1;
@@ -576,16 +593,15 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
   }
 
   .gallery-dialog__error {
+    max-width: 28rem;
+    padding: 1.5rem;
     text-align: center;
-    padding: 2rem 1.5rem;
-    background: var(--surface, #edf7fa);
-    border: 1px solid var(--line, #cedfe5);
-    border-radius: 6px;
+    border: 1px solid rgb(242 248 251 / 0.3);
+    border-radius: var(--radius, 6px);
   }
 
   .gallery-dialog__error p {
     margin: 0 0 1rem;
-    color: var(--text, #142f39);
     font-weight: 500;
   }
 
@@ -593,74 +609,73 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    padding: 0.85rem 1.25rem;
-    border-top: 1px solid var(--line, #cedfe5);
-    background: var(--surface, #edf7fa);
+    padding: 0.5rem 1rem 1rem;
   }
 
   .gallery-dialog__category {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--accent, #087fa0);
     margin: 0;
+    font-size: var(--step--1, 0.875rem);
+    font-weight: 600;
+    color: #afc8d2;
   }
 
   .gallery-dialog__caption {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    color: var(--text, #142f39);
     margin: 0;
+    font-size: var(--step-0, 1.0625rem);
+    line-height: 1.4;
+    color: #f2f8fb;
+    overflow-wrap: anywhere;
   }
 
-  @media (max-width: 69.99rem) {
-    .gallery-grid {
-      gap: 1.25rem;
-    }
-  }
-
-  @media (max-width: 47.99rem) {
-    .gallery-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
-    }
-
+  @media (max-width: 39.99rem) {
     .gallery-dialog {
-      max-width: 96vw;
+      width: 96vw;
     }
 
+    /* Arrows move to a bottom bar: prev on the left, next on the right */
     .gallery-dialog__body {
-      padding: 0.5rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.75rem;
+      padding: 0.25rem 0.75rem 0.5rem;
     }
 
-    .gallery-dialog__nav {
-      width: 38px;
-      height: 38px;
-      font-size: 1.2rem;
-    }
-  }
-
-  @media (max-width: 29.99rem) {
-    .gallery-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .gallery-dialog__body {
-      flex-direction: column;
-    }
-
-    .gallery-dialog__nav--prev,
-    .gallery-dialog__nav--next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+    .gallery-dialog__viewport {
+      grid-column: 1 / -1;
+      grid-row: 1;
     }
 
     .gallery-dialog__nav--prev {
-      left: 0.5rem;
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: start;
     }
 
     .gallery-dialog__nav--next {
-      right: 0.5rem;
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: end;
+    }
+
+    .gallery-dialog__image {
+      max-height: calc(86vh - 15rem);
+      max-height: calc(86svh - 15rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-card__image-wrap :global(img),
+    .gallery-dialog__image,
+    .gallery-dialog__close,
+    .gallery-dialog__nav {
+      transition: none;
+    }
+
+    .gallery-card:hover .gallery-card__image-wrap :global(img) {
+      transform: none;
+    }
+
+    .gallery-dialog__loader {
+      animation: none;
     }
   }
 </style>

@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
-import { getSettings } from '../content.ts';
+import { getSettings, getContact, getHours } from '../content.ts';
 import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
+import { seoContext, pageSeo, localBusiness, jsonLd } from '../lib/seo.ts';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Notices from '../components/Notices.astro';
@@ -17,6 +18,11 @@ const pageTitle = title ?? (lang === 'cs' ? settings.seo_title_cs : settings.seo
 const pageDescription =
   description ?? (lang === 'cs' ? settings.seo_description_cs : settings.seo_description_en);
 const base = import.meta.env.BASE_URL;
+const seo = seoContext(import.meta.env.SITE_BUILD_TARGET, Astro.site, base);
+const metadata = pageSeo(seo, Astro.url.pathname, lang);
+const business = metadata.business
+  ? localBusiness(seo, settings, await getContact(), await getHours())
+  : undefined;
 ---
 
 <!doctype html>
@@ -26,7 +32,13 @@ const base = import.meta.env.BASE_URL;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
-    <meta name="robots" content="noindex, follow" />
+    <meta name="robots" content={metadata.robots} />
+    {metadata.canonical && <link rel="canonical" href={metadata.canonical} />}
+    {metadata.canonical && <meta property="og:url" content={metadata.canonical} />}
+    {metadata.alternates.map((alternate) => (
+      <link rel="alternate" hreflang={alternate.lang} href={alternate.href} />
+    ))}
+    {business && <script type="application/ld+json" is:inline set:html={jsonLd(business)} />}
     <meta name="theme-color" content="#ffffff" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />

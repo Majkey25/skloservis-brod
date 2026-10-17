@@ -10,13 +10,15 @@ V části otevírací doby upravte příslušný den. Časy zapisujte jako `08:0
 
 Pondělí až čtvrtek jsou podle současné kontaktní stránky otevřené od 8:00 do 15:00. V pátek probíhají montáže. Víkendové hodiny nejsou v původním zdroji uvedené; nepotvrzené hodnoty nepovažujte za ověřenou dostupnost.
 
-Výjimka pro dovolenou nebo svátek nahrazuje běžnou otevírací dobu ve vybraném období. Prázdné intervaly ve výjimce znamenají zavřeno. Období výjimek se nesmí překrývat.
+Výjimka pro dovolenou nebo svátek nahrazuje běžnou otevírací dobu i poznámky ve vybraném období. Vyplňte obě data jako `RRRR-MM-DD`; první i poslední den do období patří. Prázdné intervaly znamenají, že nejsou uvedené návštěvní hodiny. Pro dovolenou proto doplňte výslovnou poznámku o uzavření česky i anglicky. Období výjimek se nesmí překrývat ani společným krajním dnem. Poznámky k otevírací době vyplňujte vždy v obou jazycích.
 
 ## Informační hlášky
 
 Přidejte oznámení, zapněte jeho zobrazování a vyberte závažnost `info`, `attention` nebo `warning`. Napište český i anglický text. Datum „od“ i „do“ zahrnuje celý uvedený den podle českého času.
 
 Například dovolená od 20. do 27. prosince zahrnuje oba tyto dny. Samotná hláška nemění otevírací dobu. Pro zavřenou provozovnu doplňte také výjimku otevírací doby.
+
+Prázdné datum „od“ nebo „do“ znamená neomezený začátek nebo konec. Bez obou dat platí zapnutá hláška trvale. Budoucí hlášky a výjimky se ukládají do veřejných dat stránky už při zveřejnění, nepoužívejte je pro neveřejné informace. Prohlížeč jejich platnost přepočítává podle pásma `Europe/Prague` při načtení, návratu na stránku a každých 30 sekund, když je stránka viditelná. Není potřeba každodenní nasazení. Bez JavaScriptu zůstávají dostupné rozpisy a zapnuté hlášky s uvedenými daty; aktuální stav se automaticky nefiltruje. Vyhodnocení závisí na správném čase zařízení návštěvníka.
 
 ## Galerie a obsah
 
@@ -28,6 +30,14 @@ V části „Soukromí a právní informace“ lze upravit české i anglické d
 
 ## Zveřejnění
 
-Uložení v CMS vytvoří změnu v GitHubu. Finální nasazovací postup musí před zveřejněním ověřit obsah, typy, testy a sestavení. Při chybě zůstává poslední úspěšná verze. Během přípravy je publikace záměrně ruční; automatické publikování změn zapne dokončovací běh po 21:05.
+1. Uložte změnu v CMS do větve `main`. Uložení, které vytvoří commit v této větvi, automaticky spustí [workflow Site](https://github.com/Majkey25/skloservis-brod/actions/workflows/site.yml). Změna v jiné větvi se sama nezveřejní.
+2. V GitHub Actions otevřete běh odpovídající uloženému commitu. Úloha **Verify and build** nainstaluje závislosti a ověří formátování, typy, testy a sestavení včetně schémat obsahu a obrázků.
+3. Teprve po úspěchu všech kontrol úloha **Publish preview** zveřejní tentýž sestavený artefakt na [GitHub Pages](https://majkey25.github.io/skloservis-brod/). Po dokončení zkontrolujte českou i anglickou stránku s úpravou; případně ji znovu načtěte.
+
+Uložení do repozitáře samo nepotvrzuje zveřejnění. Neplatná data, například neexistující datum, překrývající se výjimky, chybějící povinný překlad nebo neplatná adresa produktu, zastaví kontroly. Při selhání kontrol se nový artefakt nepublikuje a nasazení se nespustí; dostupná zůstává poslední úspěšná verze. V protokolu neúspěšné úlohy zjistěte příčinu, opravte obsah a znovu uložte do `main`. Také chyba formátování, typů nebo sestavení zveřejnění zablokuje.
+
+Oprávněný správce může spustit **Run workflow** nad větví `main` a zapnout volbu `publish`. Ruční publikace provede všechny stejné kontroly a použije jejich artefakt bez dalšího sestavení. Výchozí vypnutá volba `publish` spustí jen kontroly. Pull requesty a ruční běhy jiných větví nepublikují.
+
+Tento postup popisuje konfiguraci workflow. Přihlášení do CMS, oprávnění účtu a skutečný průchod uložením až po nasazení dosud nebyly ověřeny. Kontaktní e-mail je `skloservis.brod@gmail.com`; odkaz otevře poštovní aplikaci návštěvníka. Přímé odesílání poptávek z webu ani poštovní relay nejsou nakonfigurované a doručení do schránky nebylo ověřeno.
 
 Náhled na GitHub Pages se nemá indexovat ve vyhledávačích. Doména `skloservis-brod.cz` a současný WordPress zůstávají beze změny.

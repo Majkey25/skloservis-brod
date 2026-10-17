@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: Publish the verified preview to GitHub Pages
+        description: Publish the verified preview to GitHub Pages (main only)
         type: boolean
         default: false
 
@@ -43,7 +43,9 @@ jobs:
 
   deploy:
     name: Publish preview
-    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish))
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10

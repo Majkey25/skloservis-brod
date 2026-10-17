@@ -15,6 +15,8 @@ When you manually select a language or light/dark theme, the browser saves that 
 
 Each manual choice lasts at most **180 days from the time it is saved**. Loading a page does not extend this period. The website removes expired or invalid choices when next loaded. Automatic device defaults are not saved. You can remove the entries at any time by clearing this site's browser data; device defaults will then apply again. If storage is blocked, the controls work for the current page without persistence.
 
+The footer's "Use device theme" button removes the saved theme choice. It does not change the language preference.
+
 When you request a page, the hosting provider receives technical request information such as your IP address. GitHub Pages also processes this information for service security. See the [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
 ## External links

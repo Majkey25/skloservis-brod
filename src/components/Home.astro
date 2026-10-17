@@ -1,6 +1,6 @@
 ---
 import { Picture } from 'astro:assets';
-import { getAbout, getGallery, getServices, getSettings } from '../content';
+import { getAbout, getContact, getGallery, getServices, getSettings } from '../content';
 import { pageUrl, type Language, type ServiceSlug } from '../lib/urls';
 import Contact from './Contact.astro';
 import Gallery from './Gallery.astro';
@@ -10,26 +10,32 @@ interface Props {
 }
 
 const { lang } = Astro.props;
-const [settings, services, gallery, about] = await Promise.all([
+const [settings, services, gallery, about, contact] = await Promise.all([
   getSettings(),
   getServices(),
   getGallery(),
   getAbout(),
+  getContact(),
 ]);
 const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
+const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
 const labels = {
   cs: {
     enquiry: 'Nezávazná poptávka',
     projects: 'Ukázky naší práce',
+    call: 'Zavolejte',
     products: 'Všechny produkty',
     process: 'Jak probíhá zakázka',
+    steps: ['Návrh', 'Zaměření', 'Výroba', 'Montáž'],
     services: 'Více o našich službách',
   },
   en: {
     enquiry: 'Project enquiry',
     projects: 'View our work',
+    call: 'Call us',
     products: 'All products',
     process: 'How your project takes shape',
+    steps: ['Planning', 'Measuring', 'Manufacture', 'Installation'],
     services: 'Explore our services',
   },
 }[lang];
@@ -48,7 +54,7 @@ const featured = featuredSlugs.map((slug) => {
 const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 ---
 
-<section class="wrap home-hero" aria-labelledby="home-title">
+<section class="home-hero" aria-labelledby="home-title">
   <div class="home-hero__copy">
     <h1 id="home-title">{settings[`hero_title_${lang}`]}</h1>
     <p class="lead">{settings[`hero_text_${lang}`]}</p>
@@ -60,6 +66,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         {labels.projects}
       </a>
     </div>
+    <p class="home-call muted">
+      {labels.call}
+      <a class="text-link" href={`tel:${contact.phone}`}>
+        {phone}
+      </a>
+    </p>
   </div>
   {hero && (
     <figure class="home-hero__media">
@@ -70,7 +82,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         widths={[400, 720, 1000, hero.image.width].filter(
           (width, index, all) => width <= hero.image.width && all.indexOf(width) === index,
         )}
-        sizes="(min-width: 70rem) 38rem, (min-width: 48rem) 50vw, 100vw"
+        sizes="(min-width: 48rem) 50vw, 100vw"
         loading="eager"
         fetchpriority="high"
         decoding="async"
@@ -91,17 +103,24 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
       {featured.map(({ service, photo }) => (
         <a class="home-product" href={url(service.slug)} aria-labelledby={`home-${service.slug}`}>
           {photo && (
-            <Picture
-              src={photo.image}
-              alt={photo[`alt_${lang}`]}
-              formats={['avif', 'webp']}
-              widths={[280, 480, 640].filter((width) => width <= photo.image.width)}
-              sizes="(min-width: 70rem) 18rem, (min-width: 48rem) 23vw, (min-width: 30rem) 46vw, 100vw"
-              loading="lazy"
-              decoding="async"
-            />
+            <span class="home-product__media">
+              <Picture
+                src={photo.image}
+                alt={photo[`alt_${lang}`]}
+                formats={['avif', 'webp']}
+                widths={[280, 480, 640].filter((width) => width <= photo.image.width)}
+                sizes="(min-width: 70rem) 18rem, (min-width: 48rem) 23vw, (min-width: 30rem) 46vw, 100vw"
+                loading="lazy"
+                decoding="async"
+              />
+            </span>
           )}
-          <h3 id={`home-${service.slug}`}>{service[`title_${lang}`]}</h3>
+          <h3 id={`home-${service.slug}`}>
+            {service[`title_${lang}`]}
+            <span class="home-product__arrow" aria-hidden="true">
+              →
+            </span>
+          </h3>
         </a>
       ))}
     </div>
@@ -126,6 +145,11 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     </div>
     <div class="home-process">
       <h2 class="section-title">{labels.process}</h2>
+      <ol class="home-steps">
+        {labels.steps.map((step) => (
+          <li>{step}</li>
+        ))}
+      </ol>
       <p>{settings[`process_${lang}`]}</p>
       <a class="text-link" href={url('services')}>
         {labels.services}
@@ -141,12 +165,31 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
-    min-height: 36rem;
+    min-height: 42rem;
+    min-height: min(42rem, 78svh);
   }
 
   .home-hero__copy {
     align-self: center;
-    padding: clamp(3rem, 6vw, 6rem) clamp(1.5rem, 4vw, 4rem) clamp(3rem, 6vw, 6rem) 0;
+    padding: clamp(3rem, 6vw, 6rem) clamp(1.5rem, 4vw, 4rem) clamp(3rem, 6vw, 6rem)
+      max(1.5rem, calc((100vw - 1240px) / 2));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .home-hero__copy {
+      animation: home-hero-rise 480ms var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
+    }
+  }
+
+  @keyframes home-hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   .home-hero h1 {
@@ -168,6 +211,20 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     flex-wrap: wrap;
     gap: 0.8rem;
     margin-top: 2rem;
+  }
+
+  .home-call {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.6rem;
+    margin-top: 1.5rem;
+  }
+
+  .home-call .text-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   .home-hero__media {
@@ -219,23 +276,39 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     text-decoration: none;
   }
 
+  .home-product__media {
+    display: block;
+    overflow: hidden;
+  }
+
   .home-product :global(img) {
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 4 / 5;
     object-fit: cover;
+    transition: transform 480ms var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+  }
+
+  .home-product:hover :global(img) {
+    transform: scale(1.03);
   }
 
   .home-product h3 {
     margin: 1rem 0 0;
     font-size: 1.1rem;
     line-height: 1.4;
+    text-wrap: balance;
   }
 
-  .home-product:hover h3 {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+  .home-product__arrow {
+    display: inline-block;
+    margin-left: 0.4em;
+    transition: transform var(--dur-fast, 160ms) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+  }
+
+  .home-product:hover .home-product__arrow {
+    transform: translateX(3px);
   }
 
   .home-product:focus-visible {
@@ -263,6 +336,35 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     padding-left: clamp(1.5rem, 3vw, 3rem);
   }
 
+  .home-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    gap: 1.5rem 1rem;
+    margin: 0 0 2rem;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .home-steps li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    counter-increment: step;
+  }
+
+  .home-steps li::before {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--accent, #087fa0);
+    border-radius: 50%;
+    content: counter(step);
+    color: var(--accent, #087fa0);
+    font-weight: 600;
+  }
+
   .home-process .text-link {
     display: inline-block;
     margin-top: 1rem;
@@ -286,12 +388,16 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     }
 
     .home-hero__copy {
-      padding: 3rem 0;
+      padding: 3rem 1.5rem;
     }
 
     .home-hero h1 {
       max-width: 17ch;
-      font-size: clamp(2.5rem, 8vw, 3.8rem);
+      font-size: clamp(2.25rem, 9vw, 3rem);
+    }
+
+    .home-hero__media :global(picture) {
+      height: auto;
     }
 
     .home-hero__media :global(img) {
@@ -316,6 +422,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
       border-left: 0;
       border-top: 1px solid var(--line, #cedfe5);
       padding: 2rem 0 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .home-hero__copy {
+      padding-inline: 1rem;
     }
   }
 

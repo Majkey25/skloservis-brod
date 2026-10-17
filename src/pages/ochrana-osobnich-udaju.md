@@ -15,7 +15,9 @@ S dotazy k soukromí a žádostmi o uplatnění práv se obraťte na [skloservis
 
 ## Návštěva webu
 
-Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani reklamní a analytické měření. Přímý webový formulář pro odesílání zpráv nyní není aktivní.
+Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani reklamní a analytické měření. Přímé odesílání zpráv z webu není aktivní.
+
+Na kontaktní stránce si můžete připravit e-mailovou poptávku. Zadané jméno, e-mail a zpráva se zpracují pouze v právě otevřené stránce, bez ukládání do místního úložiště nebo odesílání serveru. Až otevřete připravený e-mailový odkaz, údaje se předají vaší poštovní aplikaci. Odeslání potvrdíte v ní; web neověřuje odeslání ani doručení.
 
 Při načtení stránek zpracovává GitHub Pages technické údaje požadavku, například IP adresu a údaje o spojení, mimo jiné pro zabezpečení služby. To není ukládání poptávky do firemní databáze. Další informace uvádí [prohlášení GitHubu o soukromí](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 

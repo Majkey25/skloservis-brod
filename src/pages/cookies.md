@@ -15,6 +15,8 @@ Pokud ručně přepnete jazyk nebo světlý/tmavý motiv, uloží prohlížeč t
 
 Každá ruční volba platí nejvýše **180 dní od svého uložení**. Pouhé načtení stránky tuto dobu neprodlužuje. Prošlou nebo neplatnou volbu web odstraní při dalším načtení. Automatická volba podle zařízení se neukládá. Záznamy můžete kdykoli odstranit vymazáním dat tohoto webu v prohlížeči; potom se opět použije nastavení zařízení. Pokud je úložiště blokované, ovládání funguje pro právě otevřenou stránku bez zapamatování.
 
+Tlačítko „Použít nastavení zařízení“ v patičce odstraní uloženou volbu motivu. Jazykovou volbu tím nemění.
+
 Při načtení stránek dostává poskytovatel hostingu technické údaje požadavku, například IP adresu. GitHub Pages zpracovává tyto údaje i pro zabezpečení služby. Podrobnosti uvádí [prohlášení GitHubu o soukromí](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
 ## Externí odkazy
