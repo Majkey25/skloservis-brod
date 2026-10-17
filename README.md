@@ -9,7 +9,7 @@
 
 Website for **SKLOSERVIS-BROD s.r.o.**, a custom glass workshop in Uherský Brod, Czech Republic. Built with static Astro pages, validated bilingual business content and a Pages CMS configuration.
 
-The current public website is [skloservis-brod.cz](https://www.skloservis-brod.cz/). This repository has not replaced it.
+The [GitHub Pages preview](https://majkey25.github.io/skloservis-brod/) is separate from the current public website, [skloservis-brod.cz](https://www.skloservis-brod.cz/). Preview pages use `noindex`; this repository has not replaced the production website.
 
 ## Included
 
