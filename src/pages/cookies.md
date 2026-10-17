@@ -9,7 +9,11 @@ Aktualizováno 17. října 2026.
 
 ## Současný web
 
-Tento náhled nepoužívá analytické ani reklamní skripty. Neukládá vlastní cookies ani údaje do místního úložiště prohlížeče.
+Tento web nepoužívá analytické ani reklamní skripty a neukládá vlastní cookies.
+
+Pokud ručně přepnete jazyk nebo světlý/tmavý motiv, uloží prohlížeč tuto volbu do místního úložiště (`localStorage`). Záznam `skloservis-language` obsahuje jazyk a `skloservis-theme` motiv; oba obsahují také datum vypršení. Slouží pouze k zapamatování vámi zvolené funkce, neposílají se na server a nepoužívají se ke sledování návštěv.
+
+Každá ruční volba platí nejvýše **180 dní od svého uložení**. Pouhé načtení stránky tuto dobu neprodlužuje. Prošlou nebo neplatnou volbu web odstraní při dalším načtení. Automatická volba podle zařízení se neukládá. Záznamy můžete kdykoli odstranit vymazáním dat tohoto webu v prohlížeči; potom se opět použije nastavení zařízení. Pokud je úložiště blokované, ovládání funguje pro právě otevřenou stránku bez zapamatování.
 
 Při načtení stránek dostává poskytovatel hostingu technické údaje požadavku, například IP adresu. GitHub Pages zpracovává tyto údaje i pro zabezpečení služby. Podrobnosti uvádí [prohlášení GitHubu o soukromí](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 

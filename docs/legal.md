@@ -12,7 +12,7 @@ The official [ARES record](https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/eko
 - Cookies/storage: `/cookies/` and `/en/cookies/`.
 - Company, complaints and consumer ADR: `/pravni-informace/` and `/en/legal/`.
 - Every public layout needs visible links to these pages, plus legal name and IČO. Enquiry actions must link the relevant privacy notice before personal data is collected.
-- The neutral `Legal.astro` layout is temporary presentation. Final styling must use the site's shared design without changing the facts or hiding disclosures.
+- `Legal.astro` uses the shared layout, navigation, theme and footer without changing the legal facts or hiding disclosures.
 
 ## Confirmed retention policy and remaining supplier checks
 
@@ -24,7 +24,7 @@ Current host information and actual privacy practices can be documented independ
 
 ## Runtime checks owed after frontend integration
 
-- Inventory actual network destinations and storage after a fresh visit, theme/language selection and returning visit. Disclose exact keys, trigger, persistence and clearing. Update the cookie pages when preference storage is implemented.
+- Preference storage uses `skloservis-theme` and `skloservis-language` only after a manual choice, with a fixed 180-day expiry that visits do not renew. Automatic device defaults are not saved. Both cookie pages document the keys, expiry and browser clearing. Recheck this inventory whenever scripts or external services change.
 - Functional preference storage must remain limited to the visitor's requested choice. Do not treat every localStorage use as exempt. No analytics, advertising or embedded third-party media without appropriate assessment and prior choice when required.
 - Confirm the selected email/relay provider's real terms, recipients, retention and international-transfer arrangements. No SMTP/API secrets in browser output.
 - An ordinary quote request does not automatically require a forced consent checkbox. Select the appropriate legal basis for its actual purpose and show the privacy information.

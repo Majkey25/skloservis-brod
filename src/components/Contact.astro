@@ -1,0 +1,269 @@
+---
+import { getContact, getSettings } from '../content';
+import { pageUrl, type Language } from '../lib/urls';
+import Hours from './Hours.astro';
+
+interface Props {
+  lang: Language;
+  compact?: boolean;
+}
+
+const { lang, compact = false } = Astro.props;
+const [contact, settings] = await Promise.all([getContact(), getSettings()]);
+const copy = {
+  cs: {
+    call: 'Zavolat',
+    email: 'Napsat e-mail',
+    copy: 'Kopírovat e-mail',
+    copied: 'E-mailová adresa zkopírována.',
+    copyFailed: 'Adresu se nepodařilo zkopírovat. Označte a zkopírujte e-mailovou adresu výše.',
+    mailHelp: 'Odkaz otevře vaši e-mailovou aplikaci. Zprávu odešlete až v ní.',
+    privacy: 'Jak zpracováváme osobní údaje',
+    workshop: 'Provozovna',
+    seat: 'Sídlo a fakturační adresa',
+    companyId: 'IČO',
+    country: 'Česká republika',
+    allContact: 'Všechny kontakty a provozní doba',
+  },
+  en: {
+    call: 'Call us',
+    email: 'Write an email',
+    copy: 'Copy email address',
+    copied: 'Email address copied.',
+    copyFailed: 'The address could not be copied. Select and copy the email address above.',
+    mailHelp: 'The link opens your email application. You send the message from there.',
+    privacy: 'How we process personal data',
+    workshop: 'Workshop',
+    seat: 'Registered office and billing address',
+    companyId: 'Company ID',
+    country: 'Czech Republic',
+    allContact: 'All contact details and opening hours',
+  },
+}[lang];
+const titleId = compact ? 'contact-enquiry-title' : 'contact-title';
+const Heading = compact ? 'h2' : 'h1';
+const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
+---
+
+<section
+  class:list={['section', 'contact', { 'contact--compact': compact }]}
+  aria-labelledby={titleId}
+>
+  <div class="wrap">
+    <div class="contact__intro">
+      <Heading class="section-title" id={titleId}>
+        {compact ? contact[`enquiry_title_${lang}`] : contact[`title_${lang}`]}
+      </Heading>
+      <p class="lead">{compact ? contact[`enquiry_text_${lang}`] : contact[`text_${lang}`]}</p>
+    </div>
+
+    <div class="contact__layout">
+      <div class="contact__enquiry" data-contact>
+        {!compact && (
+          <>
+            <h2>{contact[`enquiry_title_${lang}`]}</h2>
+            <p>{contact[`enquiry_text_${lang}`]}</p>
+          </>
+        )}
+        <div class="contact__direct">
+          <a class="contact__phone" href={`tel:${contact.phone}`}>
+            {phone}
+          </a>
+          <a class="text-link contact__email" href={`mailto:${settings.contact_email}`}>
+            {settings.contact_email}
+          </a>
+        </div>
+        <div class="contact__actions">
+          <a class="button" href={`mailto:${settings.contact_email}`}>
+            {copy.email}
+          </a>
+          <a class="button button--secondary" href={`tel:${contact.phone}`}>
+            {copy.call}
+          </a>
+          <button
+            class="text-link contact__copy"
+            type="button"
+            data-copy-email={settings.contact_email}
+            data-copied={copy.copied}
+            data-copy-failed={copy.copyFailed}
+            hidden
+          >
+            {copy.copy}
+          </button>
+        </div>
+        <p class="contact__help muted">{copy.mailHelp}</p>
+        <p class="contact__privacy">
+          <a class="text-link" href={pageUrl('privacy', lang, import.meta.env.BASE_URL)}>
+            {copy.privacy}
+          </a>
+        </p>
+        <p class="contact__status" role="status" aria-live="polite" data-copy-status></p>
+        {compact && (
+          <a class="text-link" href={pageUrl('contact', lang, import.meta.env.BASE_URL)}>
+            {copy.allContact} <span aria-hidden="true">→</span>
+          </a>
+        )}
+      </div>
+
+      {!compact && (
+        <div class="contact__business">
+          <h2>{settings.name}</h2>
+          <p>
+            {copy.companyId}: {contact.company_id}
+          </p>
+          <dl class="contact__addresses">
+            <div>
+              <dt>{copy.workshop}</dt>
+              <dd>
+                <address>
+                  {contact.address.street}
+                  <br />
+                  {contact.address.postal_code} {contact.address.city}
+                  <br />
+                  {copy.country}
+                </address>
+              </dd>
+            </div>
+            <div>
+              <dt>{copy.seat}</dt>
+              <dd>
+                <address>
+                  {contact.billing_address.street}
+                  <br />
+                  {contact.billing_address.postal_code} {contact.billing_address.city}
+                  <br />
+                  {copy.country}
+                </address>
+              </dd>
+            </div>
+          </dl>
+          <Hours lang={lang} />
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<script>
+  function initializeContactCopy() {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((button) => {
+      if (button.dataset.copyBound) return;
+      button.dataset.copyBound = 'true';
+      button.hidden = false;
+      button.addEventListener('click', async () => {
+        const email = button.dataset.copyEmail;
+        const status = button.closest('[data-contact]')?.querySelector('[data-copy-status]');
+        if (!email || !status) return;
+        try {
+          await navigator.clipboard.writeText(email);
+          status.textContent = button.dataset.copied ?? '';
+        } catch {
+          status.textContent = button.dataset.copyFailed ?? '';
+        }
+      });
+    });
+  }
+
+  initializeContactCopy();
+  document.addEventListener('astro:page-load', initializeContactCopy);
+</script>
+
+<style>
+  .contact__intro {
+    max-width: 48rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .contact__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+
+  .contact--compact .contact__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contact__direct {
+    display: grid;
+    justify-items: start;
+    gap: 0.75rem;
+    margin-block: 1.5rem;
+  }
+
+  .contact__phone {
+    color: inherit;
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 650;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .contact__email {
+    overflow-wrap: anywhere;
+  }
+
+  .contact__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+  }
+
+  .contact__copy {
+    min-height: 2.75rem;
+    padding: 0.5rem 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .contact__help,
+  .contact__privacy,
+  .contact__status {
+    font-size: 0.9375rem;
+  }
+
+  .contact__status:empty {
+    margin: 0;
+  }
+
+  .contact__business {
+    border-inline-start: 1px solid var(--line, currentColor);
+    padding-inline-start: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .contact__addresses {
+    display: grid;
+    gap: 1.5rem;
+    margin-block: 1.5rem 2rem;
+  }
+
+  .contact__addresses dt {
+    font-weight: 650;
+    margin-bottom: 0.375rem;
+  }
+
+  .contact__addresses dd {
+    margin: 0;
+  }
+
+  .contact__addresses address {
+    font-style: normal;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 48rem) {
+    .contact__layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .contact__business {
+      border-inline-start: 0;
+      border-top: 1px solid var(--line, currentColor);
+      padding-inline-start: 0;
+      padding-top: 2rem;
+    }
+  }
+</style>

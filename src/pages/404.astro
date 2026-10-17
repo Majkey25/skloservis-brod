@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { pageUrl } from '../lib/urls.ts';
+---
+
+<Base lang="cs" page="legal" title="Stránka nenalezena | Skloservis Brod">
+  <div class="wrap section prose">
+    <h1>Stránka nenalezena</h1>
+    <p>Tato adresa neexistuje. This page could not be found.</p>
+    <a class="button" href={pageUrl('home', 'cs', import.meta.env.BASE_URL)}>
+      Přejít na úvod
+    </a>
+    <a class="button button--secondary" href={pageUrl('home', 'en', import.meta.env.BASE_URL)}>
+      English homepage
+    </a>
+  </div>
+</Base>

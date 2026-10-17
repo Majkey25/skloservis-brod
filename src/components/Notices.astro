@@ -1,0 +1,187 @@
+---
+import { getNotices } from '../content';
+import type { Language } from '../lib/urls';
+
+interface Props {
+  lang: Language;
+}
+
+const { lang } = Astro.props;
+const notices = await getNotices();
+const cs = lang === 'cs';
+const labels = cs
+  ? { info: 'Informace', attention: 'Upozornění', warning: 'Důležité upozornění' }
+  : { info: 'Information', attention: 'Please note', warning: 'Important notice' };
+const priorities = { warning: 0, attention: 1, info: 2 };
+const ordered = notices
+  .map((notice, index) => ({ notice, index }))
+  .sort((a, b) => priorities[a.notice.level] - priorities[b.notice.level]);
+const formatDate = (date: string) =>
+  new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', {
+    dateStyle: 'long',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(`${date}T12:00:00Z`));
+---
+
+<business-notices data-notices={JSON.stringify(notices)} data-lang={lang} lang={lang}>
+  <section
+    class="notices wrap"
+    data-notices-section
+    hidden={!notices.some((notice) => notice.enabled)}
+    aria-label={cs ? 'Oznámení' : 'Notices'}
+  >
+    <h2 data-notices-heading>{cs ? 'Oznámení a jejich platnost' : 'Notices and their dates'}</h2>
+    <p class="notices-intro" data-notices-fallback>
+      {cs
+        ? 'Zprávy platí pouze v uvedených termínech, včetně prvního a posledního dne. Časové pásmo: Praha.'
+        : 'Messages apply only within the dates shown, including the first and last day. Time zone: Prague.'}
+    </p>
+    <ul>
+      {ordered.map(({ notice, index }) => (
+        <li data-notice-index={index} data-level={notice.level} hidden={!notice.enabled}>
+          <p class="notice-meta">
+            <strong>{labels[notice.level]}</strong>
+            <span class="notice-dates">
+              {notice.from && (
+                <>
+                  {cs ? 'Od ' : 'From '}
+                  <time datetime={notice.from}>{formatDate(notice.from)}</time>
+                </>
+              )}
+              {notice.from && notice.to && ' · '}
+              {notice.to && (
+                <>
+                  {cs ? 'Do ' : 'Until '}
+                  <time datetime={notice.to}>{formatDate(notice.to)}</time>
+                </>
+              )}
+              {!notice.from && !notice.to && (cs ? 'Bez časového omezení' : 'No date restriction')}
+            </span>
+          </p>
+          <p class="notice-text">{notice[cs ? 'text_cs' : 'text_en']}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+  <p class="sr-only" data-notices-status role="status" aria-atomic="true"></p>
+</business-notices>
+
+<script>
+  import { activeNotices, type Notice } from '../lib/schedule';
+
+  class BusinessNotices extends HTMLElement {
+    private notices: Notice[] = [];
+    private timer?: number;
+    private events?: AbortController;
+
+    connectedCallback() {
+      this.notices = JSON.parse(this.dataset.notices || '[]') as Notice[];
+      this.events?.abort();
+      this.events = new AbortController();
+      const options = { signal: this.events.signal };
+      window.addEventListener('load', this.resume, options);
+      window.addEventListener('pageshow', this.resume, options);
+      window.addEventListener('pagehide', this.pause, options);
+      document.addEventListener('visibilitychange', this.resume, options);
+      this.resume();
+    }
+
+    disconnectedCallback() {
+      this.pause();
+      this.events?.abort();
+      this.notices = [];
+    }
+
+    private pause = () => {
+      window.clearInterval(this.timer);
+      this.timer = undefined;
+    };
+
+    private resume = () => {
+      this.pause();
+      if (document.visibilityState === 'hidden') return;
+      this.update();
+      this.timer = window.setInterval(() => this.update(), 30_000);
+    };
+
+    private update() {
+      const active = activeNotices(this.notices, new Date());
+      const section = this.querySelector<HTMLElement>('[data-notices-section]');
+      const heading = this.querySelector<HTMLElement>('[data-notices-heading]');
+      const fallback = this.querySelector<HTMLElement>('[data-notices-fallback]');
+      const status = this.querySelector<HTMLElement>('[data-notices-status]');
+      const cs = this.dataset.lang === 'cs';
+      this.querySelectorAll<HTMLElement>('[data-notice-index]').forEach((element) => {
+        const notice = this.notices[Number(element.dataset.noticeIndex)];
+        element.hidden = !notice || !active.includes(notice);
+      });
+      if (section) section.hidden = active.length === 0;
+      if (heading) heading.textContent = cs ? 'Aktuální oznámení' : 'Current notices';
+      if (fallback) fallback.hidden = true;
+      const announcement =
+        active.map((notice) => notice[cs ? 'text_cs' : 'text_en']).join(' ') ||
+        (cs ? 'Žádná aktuální oznámení.' : 'No current notices.');
+      if (status && status.textContent !== announcement) {
+        status.textContent = announcement;
+      }
+    }
+  }
+
+  if (!customElements.get('business-notices'))
+    customElements.define('business-notices', BusinessNotices);
+</script>
+
+<style>
+  business-notices {
+    display: block;
+    color: var(--text, #142f39);
+  }
+  [hidden] {
+    display: none !important;
+  }
+  .notices {
+    padding-block: 1.25rem;
+  }
+  h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+  }
+  .notices-intro {
+    color: var(--muted, #52666f);
+    font-size: 0.9rem;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  li {
+    padding: 1rem 1.25rem;
+    background: var(--surface, #edf7fa);
+    border-left: 2px solid var(--line, #cedfe5);
+    overflow-wrap: anywhere;
+  }
+  li[data-level='attention'] {
+    border-left: 3px solid var(--accent, #087fa0);
+  }
+  li[data-level='warning'] {
+    border-left: 4px solid var(--text, #142f39);
+  }
+  .notice-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 1rem;
+    margin: 0;
+  }
+  .notice-dates {
+    color: var(--muted, #52666f);
+    font-size: 0.9rem;
+  }
+  .notice-text {
+    margin: 0.5rem 0 0;
+    white-space: pre-line;
+  }
+</style>

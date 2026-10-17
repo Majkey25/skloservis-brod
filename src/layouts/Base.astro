@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+import { getSettings } from '../content.ts';
+import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Notices from '../components/Notices.astro';
+interface Props {
+  lang: Language;
+  page: PageId;
+  title?: string;
+  description?: string;
+}
+const { lang, page, title, description } = Astro.props;
+const settings = await getSettings();
+const pageTitle = title ?? (lang === 'cs' ? settings.seo_title_cs : settings.seo_title_en);
+const pageDescription =
+  description ?? (lang === 'cs' ? settings.seo_description_cs : settings.seo_description_en);
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang={lang} data-language={lang} data-page={page}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={lang === 'cs' ? 'cs_CZ' : 'en_GB'} />
+    <meta property="og:site_name" content="Skloservis Brod" />
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        try {
+          const raw = localStorage.getItem('skloservis-theme');
+          if (raw) {
+            const saved = JSON.parse(raw);
+            const now = Date.now();
+            if (
+              saved &&
+              typeof saved.expires === 'number' &&
+              Number.isFinite(saved.expires) &&
+              saved.expires > now &&
+              saved.expires <= now + 180 * 24 * 60 * 60 * 1000 &&
+              (saved.value === 'dark' || saved.value === 'light')
+            )
+              theme = saved.value;
+            else localStorage.removeItem('skloservis-theme');
+          }
+        } catch {}
+        root.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute('content', theme === 'dark' ? '#071e28' : '#ffffff');
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      {lang === 'cs' ? 'Přeskočit na obsah' : 'Skip to content'}
+    </a>
+    <div class="preference-suggestion" data-language-suggestion hidden>
+      <span data-language-suggestion-text>
+        {lang === 'cs' ? 'Preferujete angličtinu?' : 'Prefer Czech?'}
+      </span>{' '}
+      <a
+        href={pageUrl(page, lang === 'cs' ? 'en' : 'cs', base)}
+        data-language={lang === 'cs' ? 'en' : 'cs'}
+      >
+        {lang === 'cs' ? 'View in English' : 'Zobrazit česky'}
+      </a>
+      <button
+        type="button"
+        data-language-suggestion-dismiss
+        aria-label={lang === 'cs' ? 'Zavřít jazykové doporučení' : 'Dismiss language suggestion'}
+      >
+        ×
+      </button>
+    </div>
+    <Header lang={lang} page={page} />
+    <Notices lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <script>
+      import '../scripts/preferences.ts';
+    </script>
+  </body>
+</html>

@@ -7,13 +7,14 @@
 [![Pages CMS](https://img.shields.io/badge/Pages_CMS-configured-111827)](.pages.yml)
 [![Last commit](https://img.shields.io/github/last-commit/Majkey25/skloservis-brod)](https://github.com/Majkey25/skloservis-brod/commits/main)
 
-Website for **SKLOSERVIS-BROD s.r.o.**, a custom glass workshop in Uherský Brod, Czech Republic. The repository contains a static Astro foundation, validated bilingual business content and a Pages CMS configuration. Frontend implementation is in progress.
+Website for **SKLOSERVIS-BROD s.r.o.**, a custom glass workshop in Uherský Brod, Czech Republic. Built with static Astro pages, validated bilingual business content and a Pages CMS configuration.
 
 The current public website is [skloservis-brod.cz](https://www.skloservis-brod.cz/). This repository has not replaced it.
 
 ## Included
 
-- Czech and English business and product content, with the existing Czech product addresses preserved in the content contract.
+- Czech and English home, product, service, gallery, contact and legal pages, preserving existing Czech product addresses.
+- Responsive layouts, device-based light/dark theme and manual language and theme controls.
 - Editable weekly opening hours, dated exceptions and scheduled information, attention and warning notices.
 - A curated set of 18 supplied project photographs and CMS gallery fields.
 - Build-time content validation and focused tests for dates, schedules and invalid content.

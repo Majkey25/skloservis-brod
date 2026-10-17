@@ -1,0 +1,233 @@
+---
+import { getHours } from '../content';
+import { WEEKDAYS, type DayHours } from '../lib/schedule';
+import type { Language } from '../lib/urls';
+
+interface Props {
+  lang: Language;
+}
+
+const { lang } = Astro.props;
+const hours = await getHours();
+const cs = lang === 'cs';
+const days = cs
+  ? ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
+  : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const note = (row: Pick<DayHours, 'note_cs' | 'note_en'>) => row[cs ? 'note_cs' : 'note_en'];
+const intervals = (row: DayHours) =>
+  row.slots.map((slot) => `${slot.opens}–${slot.closes}`).join(', ');
+const empty = cs
+  ? 'Návštěvní hodiny nejsou uvedeny. Zavolejte nám prosím.'
+  : 'No visiting hours listed. Please call us.';
+const formatDate = (date: string) =>
+  new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', {
+    dateStyle: 'long',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(`${date}T12:00:00Z`));
+---
+
+<business-hours data-hours={JSON.stringify(hours)} data-lang={lang} lang={lang}>
+  <section aria-label={cs ? 'Otevírací doba' : 'Opening hours'}>
+    <h2>{cs ? 'Otevírací doba' : 'Opening hours'}</h2>
+    <p class="hours-live" data-hours-live role="status" aria-atomic="true" hidden></p>
+    <table>
+      <caption>
+        {cs
+          ? 'Běžná týdenní doba · místní čas v Praze'
+          : 'Regular weekly hours · Prague local time'}
+      </caption>
+      <tbody>
+        {WEEKDAYS.map((day, index) => {
+          const row = hours.weekly.find((item) => item.day === day)!;
+          return (
+            <tr>
+              <th scope="row">{days[index]}</th>
+              <td>
+                {row.slots.length > 0 && <span class="hours-intervals">{intervals(row)}</span>}
+                {note(row) && <span class="hours-note">{note(row)}</span>}
+                {!row.slots.length && !note(row) && <span class="hours-note">{empty}</span>}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    {note(hours) && <p class="hours-general-note">{note(hours)}</p>}
+    {hours.exceptions.length > 0 && (
+      <div class="hours-exceptions">
+        <h3>{cs ? 'Změny pro uvedené termíny' : 'Changes for the dates shown'}</h3>
+        <ul>
+          {hours.exceptions.map((row) => (
+            <li>
+              <p class="hours-dates">
+                <time datetime={row.from}>{formatDate(row.from)}</time>
+                {row.from !== row.to && (
+                  <>
+                    {' '}
+                    – <time datetime={row.to}>{formatDate(row.to)}</time>
+                  </>
+                )}
+              </p>
+              {row.slots.length > 0 && <p class="hours-intervals">{intervals(row)}</p>}
+              <p class="hours-note">{note(row) || (!row.slots.length ? empty : '')}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+</business-hours>
+
+<script>
+  import { scheduleAt, type Hours } from '../lib/schedule';
+
+  class BusinessHours extends HTMLElement {
+    private hours?: Hours;
+    private timer?: number;
+    private events?: AbortController;
+
+    connectedCallback() {
+      this.hours = JSON.parse(this.dataset.hours || 'null') as Hours | undefined;
+      this.events?.abort();
+      this.events = new AbortController();
+      const options = { signal: this.events.signal };
+      window.addEventListener('load', this.resume, options);
+      window.addEventListener('pageshow', this.resume, options);
+      window.addEventListener('pagehide', this.pause, options);
+      document.addEventListener('visibilitychange', this.resume, options);
+      this.resume();
+    }
+
+    disconnectedCallback() {
+      this.pause();
+      this.events?.abort();
+      this.hours = undefined;
+    }
+
+    private pause = () => {
+      window.clearInterval(this.timer);
+      this.timer = undefined;
+    };
+
+    private resume = () => {
+      this.pause();
+      if (document.visibilityState === 'hidden') return;
+      this.update();
+      this.timer = window.setInterval(() => this.update(), 30_000);
+    };
+
+    private update() {
+      const target = this.querySelector<HTMLElement>('[data-hours-live]');
+      if (!this.hours || !target) return;
+      const cs = this.dataset.lang === 'cs';
+      const now = new Date();
+      const current = scheduleAt(this.hours, now);
+      const date = new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', {
+        timeZone: 'Europe/Prague',
+        day: 'numeric',
+        month: 'long',
+      }).format(now);
+      const row = current.row;
+      const note = row[cs ? 'note_cs' : 'note_en'];
+      const intervals = row.slots.map((slot) => `${slot.opens}–${slot.closes}`).join(', ');
+      const status = row.assumed
+        ? ''
+        : row.slots.length
+          ? current.isOpen
+            ? cs
+              ? 'Právě je čas pro návštěvu podle rozpisu.'
+              : 'Currently within listed visiting hours.'
+            : cs
+              ? 'Právě je mimo uvedené návštěvní hodiny.'
+              : 'Currently outside listed visiting hours.'
+          : note
+            ? ''
+            : cs
+              ? 'Návštěvní hodiny nejsou uvedeny. Zavolejte nám prosím.'
+              : 'No visiting hours listed. Please call us.';
+      const text = [`${cs ? 'Dnes' : 'Today'} (${date}):`, intervals, note, status]
+        .filter(Boolean)
+        .join(' ');
+      // Avoid repeating unchanged screen-reader announcements every 30 seconds.
+      if (target.textContent !== text) target.textContent = text;
+      target.hidden = false;
+    }
+  }
+
+  if (!customElements.get('business-hours')) customElements.define('business-hours', BusinessHours);
+</script>
+
+<style>
+  business-hours {
+    display: block;
+    color: var(--text, #142f39);
+  }
+  h2 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+  }
+  h3 {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1.1rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  caption {
+    padding-bottom: 0.75rem;
+    color: var(--muted, #52666f);
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  th,
+  td {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--line, #cedfe5);
+    vertical-align: top;
+  }
+  th {
+    width: 31%;
+    padding-right: 1rem;
+    font-weight: 600;
+  }
+  td {
+    overflow-wrap: anywhere;
+  }
+  .hours-intervals {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+  .hours-note {
+    display: block;
+    color: var(--muted, #52666f);
+  }
+  .hours-live {
+    padding: 0.85rem 1rem;
+    background: var(--surface, #edf7fa);
+    border-left: 3px solid var(--accent, #087fa0);
+  }
+  .hours-live[hidden] {
+    display: none;
+  }
+  .hours-general-note {
+    color: var(--muted, #52666f);
+    margin: 1rem 0 0;
+  }
+  .hours-exceptions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .hours-exceptions li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line, #cedfe5);
+  }
+  .hours-exceptions p {
+    margin: 0.25rem 0;
+  }
+  .hours-dates {
+    font-weight: 600;
+  }
+</style>

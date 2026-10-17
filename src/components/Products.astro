@@ -1,0 +1,152 @@
+---
+import { Picture } from 'astro:assets';
+import { getGallery, getServices, getSettings } from '../content';
+import { pageUrl, type Language } from '../lib/urls';
+
+interface Props {
+  lang: Language;
+}
+
+const { lang } = Astro.props;
+const [settings, services, gallery] = await Promise.all([
+  getSettings(),
+  getServices(),
+  getGallery(),
+]);
+const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
+const labels = {
+  cs: { enquiry: 'Nezávazná poptávka', process: 'Jak probíhá zakázka' },
+  en: { enquiry: 'Project enquiry', process: 'How your project takes shape' },
+}[lang];
+---
+
+<section class="section" aria-labelledby="products-title">
+  <div class="wrap">
+    <header class="products-heading">
+      <h1 id="products-title">{settings[`products_title_${lang}`]}</h1>
+      <p class="lead">{settings[`products_text_${lang}`]}</p>
+    </header>
+    <div class="products-grid">
+      {services.map((service) => {
+        const photo = gallery.find((item) => item.category === service.slug);
+        return (
+          <article class:list={['product', { 'product--text': !photo }]}>
+            {photo && (
+              <Picture
+                src={photo.image}
+                alt={photo[`alt_${lang}`]}
+                formats={['avif', 'webp']}
+                widths={[360, 600, 900].filter((width) => width <= photo.image.width)}
+                sizes="(min-width: 70rem) 37rem, (min-width: 40rem) 46vw, 100vw"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+            <h2>
+              <a class="text-link" href={url(service.slug)}>
+                {service[`title_${lang}`]}
+              </a>
+            </h2>
+            <p>{service[`text_${lang}`]}</p>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<section class="section products-process" aria-labelledby="products-process-title">
+  <div class="wrap products-process__layout">
+    <h2 class="section-title" id="products-process-title">
+      {labels.process}
+    </h2>
+    <div>
+      <p>{settings[`process_${lang}`]}</p>
+      <a class="button" href={url('contact')}>
+        {labels.enquiry}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .products-heading {
+    max-width: 52rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .products-heading h1 {
+    margin: 0 0 1.25rem;
+    font-size: clamp(2.4rem, 5vw, 4.3rem);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2.5rem, 5vw, 4.5rem) 2rem;
+  }
+
+  .product {
+    min-width: 0;
+  }
+
+  .product :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .product h2 {
+    margin: 1.25rem 0 0.75rem;
+    font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .product p {
+    max-width: 65ch;
+    margin: 0;
+    color: var(--muted, #52666f);
+  }
+
+  .product--text {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line, #cedfe5);
+  }
+
+  .product--text h2 {
+    margin-top: 0;
+  }
+
+  .products-process {
+    background: var(--surface, #edf7fa);
+  }
+
+  .products-process__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .products-process p {
+    max-width: 62ch;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 39.99rem) {
+    .products-grid,
+    .products-process__layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .products-process__layout {
+      gap: 1rem;
+    }
+  }
+</style>

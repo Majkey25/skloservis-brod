@@ -1,0 +1,666 @@
+---
+import { Picture } from 'astro:assets';
+import { getGallery, getServices, getSettings } from '../content.ts';
+import { pageUrl, type Language, type ServiceSlug } from '../lib/urls.ts';
+
+interface Props {
+  lang: Language;
+  compact?: boolean;
+}
+
+const { lang, compact = false } = Astro.props;
+
+const [settings, services, gallery] = await Promise.all([
+  getSettings(),
+  getServices(),
+  getGallery(),
+]);
+
+const base = import.meta.env.BASE_URL;
+
+const labels = {
+  cs: {
+    heading: settings.gallery_title_cs,
+    lead: settings.gallery_text_cs,
+    viewAll: 'Prohlédnout celou galerii',
+    close: 'Zavřít prohlížeč',
+    prev: 'Předchozí fotografie',
+    next: 'Další fotografie',
+    dialogLabel: 'Fotogalerie realizací',
+    loading: 'Načítání fotografie…',
+    error: 'Fotografii se nepodařilo načíst.',
+    openDirectly: 'Otevřít původní soubor',
+  },
+  en: {
+    heading: settings.gallery_title_en,
+    lead: settings.gallery_text_en,
+    viewAll: 'View complete gallery',
+    close: 'Close gallery viewer',
+    prev: 'Previous photo',
+    next: 'Next photo',
+    dialogLabel: 'Project photo gallery',
+    loading: 'Loading photo…',
+    error: 'Failed to load photo.',
+    openDirectly: 'Open original file',
+  },
+}[lang];
+
+const serviceMap = new Map<ServiceSlug, string>(
+  services.map((service) => [service.slug, service[`title_${lang}`]]),
+);
+
+const displayItems = compact ? gallery.slice(0, 6) : gallery;
+
+const itemsData = displayItems.map((item, index) => ({
+  index,
+  src: item.image.src,
+  alt: item[`alt_${lang}`],
+  caption: item[`caption_${lang}`] ?? '',
+  category: serviceMap.get(item.category) ?? item.category,
+}));
+
+const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
+---
+
+<section
+  class="section gallery-section"
+  aria-labelledby={compact ? 'gallery-heading' : undefined}
+  aria-label={!compact ? labels.heading : undefined}
+  data-gallery-root
+>
+  <div class="wrap">
+    {compact && (
+      <div class="gallery-header">
+        <h2 class="section-title" id="gallery-heading">
+          {labels.heading}
+        </h2>
+        <p class="lead">{labels.lead}</p>
+      </div>
+    )}
+
+    <div class="gallery-grid" role="list">
+      {displayItems.map((item, index) => {
+        const categoryName = serviceMap.get(item.category) ?? item.category;
+        const caption = item[`caption_${lang}`];
+        const altText = item[`alt_${lang}`];
+
+        return (
+          <div class="gallery-item" role="listitem">
+            <a
+              href={item.image.src}
+              class="gallery-card"
+              data-gallery-card
+              data-index={index}
+              aria-haspopup="dialog"
+              aria-label={`${altText} — ${categoryName}`}
+            >
+              <figure class="gallery-card__figure">
+                <div class="gallery-card__image-wrap">
+                  <Picture
+                    src={item.image}
+                    alt={altText}
+                    formats={['avif', 'webp']}
+                    widths={[360, 540, 720, 960].filter((width) => width <= item.image.width)}
+                    sizes="(min-width: 70rem) 24rem, (min-width: 48rem) 31vw, (min-width: 30rem) 47vw, 100vw"
+                    loading={index < 3 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                </div>
+                <figcaption class="gallery-card__caption">
+                  <span class="gallery-card__category">{categoryName}</span>
+                  {caption && <span class="gallery-card__text">{caption}</span>}
+                </figcaption>
+              </figure>
+            </a>
+          </div>
+        );
+      })}
+    </div>
+
+    {compact && (
+      <div class="gallery-action">
+        <a class="button button--secondary" href={pageUrl('gallery', lang, base)}>
+          {labels.viewAll}
+        </a>
+      </div>
+    )}
+
+    <dialog class="gallery-dialog" data-dialog aria-label={labels.dialogLabel}>
+      <div class="gallery-dialog__container">
+        <header class="gallery-dialog__header">
+          <span class="gallery-dialog__counter" data-counter aria-live="polite"></span>
+          <button type="button" class="gallery-dialog__close" data-close aria-label={labels.close}>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </header>
+
+        <div class="gallery-dialog__body">
+          <button
+            type="button"
+            class="gallery-dialog__nav gallery-dialog__nav--prev"
+            data-prev
+            aria-label={labels.prev}
+          >
+            <span aria-hidden="true">&#8592;</span>
+          </button>
+
+          <div class="gallery-dialog__viewport" data-viewport>
+            <div class="gallery-dialog__loader" data-loader aria-hidden="true">
+              <span class="sr-only">{labels.loading}</span>
+            </div>
+            <img class="gallery-dialog__image" data-dialog-image alt="" />
+            <div class="gallery-dialog__error" data-dialog-error hidden>
+              <p>{labels.error}</p>
+              <a
+                class="button button--secondary"
+                data-fallback-link
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {labels.openDirectly}
+              </a>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="gallery-dialog__nav gallery-dialog__nav--next"
+            data-next
+            aria-label={labels.next}
+          >
+            <span aria-hidden="true">&#8594;</span>
+          </button>
+        </div>
+
+        <footer class="gallery-dialog__footer">
+          <p class="gallery-dialog__category" data-dialog-category></p>
+          <p class="gallery-dialog__caption" data-dialog-caption></p>
+        </footer>
+      </div>
+    </dialog>
+
+    <script type="application/json" data-gallery-data set:html={safeJsonData} />
+  </div>
+</section>
+
+<script>
+  function initGalleries() {
+    const roots = document.querySelectorAll<HTMLElement>('[data-gallery-root]');
+
+    roots.forEach((root) => {
+      if (root.dataset.initialized === 'true') return;
+      root.dataset.initialized = 'true';
+
+      const dataScript = root.querySelector<HTMLScriptElement>('[data-gallery-data]');
+      if (!dataScript) return;
+
+      interface GalleryItemData {
+        index: number;
+        src: string;
+        alt: string;
+        caption: string;
+        category: string;
+      }
+
+      let items: GalleryItemData[] = [];
+      try {
+        items = JSON.parse(dataScript.textContent || '[]');
+      } catch {
+        return;
+      }
+      if (items.length === 0) return;
+
+      const modalDialog = root.querySelector<HTMLDialogElement>('[data-dialog]');
+      const modalImage = root.querySelector<HTMLImageElement>('[data-dialog-image]');
+      if (!modalDialog || !modalImage) return;
+
+      const activeDialog: HTMLDialogElement = modalDialog;
+      const activeImage: HTMLImageElement = modalImage;
+
+      const closeBtn = root.querySelector<HTMLButtonElement>('[data-close]');
+      const prevBtn = root.querySelector<HTMLButtonElement>('[data-prev]');
+      const nextBtn = root.querySelector<HTMLButtonElement>('[data-next]');
+      const counter = root.querySelector<HTMLElement>('[data-counter]');
+      const viewport = root.querySelector<HTMLElement>('[data-viewport]');
+      const errorBox = root.querySelector<HTMLElement>('[data-dialog-error]');
+      const fallbackLink = root.querySelector<HTMLAnchorElement>('[data-fallback-link]');
+      const categoryEl = root.querySelector<HTMLElement>('[data-dialog-category]');
+      const captionEl = root.querySelector<HTMLElement>('[data-dialog-caption]');
+      const cards = root.querySelectorAll<HTMLAnchorElement>('[data-gallery-card]');
+
+      let activeIndex = 0;
+      let requestId = 0;
+      let triggerElement: HTMLElement | null = null;
+
+      const renderSlide = (index: number) => {
+        activeIndex = (index + items.length) % items.length;
+        const currentReq = ++requestId;
+        const item = items[activeIndex];
+        if (!item) return;
+
+        if (counter) counter.textContent = `${activeIndex + 1} / ${items.length}`;
+        if (categoryEl) categoryEl.textContent = item.category || '';
+        if (captionEl) captionEl.textContent = item.caption || item.alt || '';
+        if (fallbackLink) fallbackLink.href = item.src;
+
+        if (viewport) viewport.classList.add('is-loading');
+        if (errorBox) errorBox.hidden = true;
+
+        // Clear previous image during loading to avoid showing old image with new alt/caption
+        activeImage.hidden = true;
+        activeImage.removeAttribute('src');
+        activeImage.alt = item.alt;
+
+        const preloader = new Image();
+        preloader.onload = () => {
+          if (currentReq !== requestId) return;
+          if (viewport) viewport.classList.remove('is-loading');
+          activeImage.src = item.src;
+          activeImage.hidden = false;
+          if (errorBox) errorBox.hidden = true;
+        };
+
+        preloader.onerror = () => {
+          if (currentReq !== requestId) return;
+          if (viewport) viewport.classList.remove('is-loading');
+          activeImage.hidden = true;
+          if (errorBox) errorBox.hidden = false;
+        };
+
+        preloader.src = item.src;
+      };
+
+      const openDialog = (index: number, trigger: HTMLElement) => {
+        triggerElement = trigger;
+        renderSlide(index);
+        activeDialog.showModal();
+        closeBtn?.focus();
+      };
+
+      const closeDialog = () => {
+        activeDialog.close();
+        triggerElement?.focus();
+      };
+
+      cards.forEach((card) => {
+        card.addEventListener('click', (e) => {
+          if (typeof activeDialog.showModal !== 'function') {
+            // Native showModal unsupported: do not prevent default full-image link navigation
+            return;
+          }
+          e.preventDefault();
+          const idx = parseInt(card.getAttribute('data-index') || '0', 10);
+          openDialog(idx, card);
+        });
+      });
+
+      closeBtn?.addEventListener('click', closeDialog);
+      prevBtn?.addEventListener('click', () => renderSlide(activeIndex - 1));
+      nextBtn?.addEventListener('click', () => renderSlide(activeIndex + 1));
+
+      activeDialog.addEventListener('click', (e) => {
+        if (e.target === activeDialog) {
+          closeDialog();
+        }
+      });
+
+      activeDialog.addEventListener('close', () => {
+        triggerElement?.focus();
+      });
+
+      activeDialog.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeDialog();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          renderSlide(activeIndex - 1);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          renderSlide(activeIndex + 1);
+        }
+      });
+    });
+  }
+
+  initGalleries();
+  document.addEventListener('astro:page-load', initGalleries);
+</script>
+
+<style>
+  .gallery-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .gallery-header .lead {
+    max-width: 55ch;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery-item {
+    min-width: 0;
+  }
+
+  .gallery-card {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    background: var(--surface, #edf7fa);
+    border: 1px solid var(--line, #cedfe5);
+    border-radius: 6px;
+    overflow: hidden;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .gallery-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent, #087fa0);
+    box-shadow: 0 6px 16px rgba(8, 127, 160, 0.08);
+  }
+
+  .gallery-card:focus-visible {
+    outline: 3px solid var(--accent, #087fa0);
+    outline-offset: 4px;
+  }
+
+  .gallery-card__figure {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+  }
+
+  .gallery-card__image-wrap {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--line, #cedfe5);
+  }
+
+  .gallery-card__image-wrap :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .gallery-card:hover .gallery-card__image-wrap :global(img) {
+    transform: scale(1.02);
+  }
+
+  .gallery-card__caption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.15rem;
+    flex-grow: 1;
+  }
+
+  .gallery-card__category {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent, #087fa0);
+    letter-spacing: -0.01em;
+  }
+
+  .gallery-card__text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--text, #142f39);
+  }
+
+  .gallery-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+  }
+
+  /* Accessible Modal Dialog */
+  .gallery-dialog {
+    max-width: min(94vw, 1040px);
+    width: 100%;
+    max-height: 92vh;
+    padding: 0;
+    border: 1px solid var(--line, #cedfe5);
+    border-radius: 8px;
+    background: var(--bg, #ffffff);
+    color: var(--text, #142f39);
+    box-shadow: 0 24px 48px rgba(7, 30, 40, 0.35);
+    overflow: hidden;
+  }
+
+  .gallery-dialog::backdrop {
+    background: rgba(7, 30, 40, 0.8);
+    backdrop-filter: blur(4px);
+  }
+
+  .gallery-dialog__container {
+    display: flex;
+    flex-direction: column;
+    max-height: 92vh;
+  }
+
+  .gallery-dialog__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--line, #cedfe5);
+    background: var(--surface, #edf7fa);
+  }
+
+  .gallery-dialog__counter {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--muted, #52666f);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gallery-dialog__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--line, #cedfe5);
+    border-radius: 6px;
+    background: var(--bg, #ffffff);
+    color: var(--text, #142f39);
+    font-size: 1.4rem;
+    line-height: 1;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .gallery-dialog__close:hover {
+    background: var(--accent, #087fa0);
+    color: var(--on-accent, #ffffff);
+    border-color: var(--accent, #087fa0);
+  }
+
+  .gallery-dialog__body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    gap: 0.75rem;
+    flex: 1 1 auto;
+    min-height: 280px;
+    background: var(--bg, #ffffff);
+  }
+
+  .gallery-dialog__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    flex-shrink: 0;
+    border: 1px solid var(--line, #cedfe5);
+    border-radius: 6px;
+    background: var(--surface, #edf7fa);
+    color: var(--text, #142f39);
+    font-size: 1.5rem;
+    line-height: 1;
+    transition:
+      background 0.15s,
+      color 0.15s,
+      transform 0.15s;
+    z-index: 2;
+  }
+
+  .gallery-dialog__nav:hover {
+    background: var(--accent, #087fa0);
+    color: var(--on-accent, #ffffff);
+    border-color: var(--accent, #087fa0);
+    transform: scale(1.05);
+  }
+
+  .gallery-dialog__viewport {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 240px;
+    max-height: 65vh;
+  }
+
+  .gallery-dialog__image {
+    max-width: 100%;
+    max-height: 65vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+    transition: opacity 0.2s ease;
+  }
+
+  .gallery-dialog__viewport.is-loading .gallery-dialog__image {
+    opacity: 0.4;
+  }
+
+  .gallery-dialog__loader {
+    display: none;
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--line, #cedfe5);
+    border-top-color: var(--accent, #087fa0);
+    border-radius: 50%;
+    animation: gallery-spin 0.8s linear infinite;
+    z-index: 1;
+  }
+
+  .gallery-dialog__viewport.is-loading .gallery-dialog__loader {
+    display: block;
+  }
+
+  @keyframes gallery-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .gallery-dialog__error {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: var(--surface, #edf7fa);
+    border: 1px solid var(--line, #cedfe5);
+    border-radius: 6px;
+  }
+
+  .gallery-dialog__error p {
+    margin: 0 0 1rem;
+    color: var(--text, #142f39);
+    font-weight: 500;
+  }
+
+  .gallery-dialog__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--line, #cedfe5);
+    background: var(--surface, #edf7fa);
+  }
+
+  .gallery-dialog__category {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent, #087fa0);
+    margin: 0;
+  }
+
+  .gallery-dialog__caption {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--text, #142f39);
+    margin: 0;
+  }
+
+  @media (max-width: 69.99rem) {
+    .gallery-grid {
+      gap: 1.25rem;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .gallery-dialog {
+      max-width: 96vw;
+    }
+
+    .gallery-dialog__body {
+      padding: 0.5rem;
+    }
+
+    .gallery-dialog__nav {
+      width: 38px;
+      height: 38px;
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (max-width: 29.99rem) {
+    .gallery-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .gallery-dialog__body {
+      flex-direction: column;
+    }
+
+    .gallery-dialog__nav--prev,
+    .gallery-dialog__nav--next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .gallery-dialog__nav--prev {
+      left: 0.5rem;
+    }
+
+    .gallery-dialog__nav--next {
+      right: 0.5rem;
+    }
+  }
+</style>
