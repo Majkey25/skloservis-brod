@@ -167,6 +167,7 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
               <a
                 class="button button--secondary"
                 data-fallback-link
+                href={displayItems[0]?.image.src ?? pageUrl('gallery', lang, base)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
