@@ -1,5 +1,3 @@
-import { navigate } from 'astro:transitions/client';
-
 // The first-paint theme script must use these same keys and { value, expires } format.
 // Only explicit choices are saved. A fixed 180-day lifetime avoids indefinite retention;
 // reading a preference never extends it. There are at most two site-owned storage entries.
@@ -63,7 +61,6 @@ function savePreference<T extends string>(key: string, value: T): Preference<T> 
 
 const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
 let manualTheme = readPreference(THEME_KEY, isTheme);
-let manualLanguage = readPreference(LANGUAGE_KEY, isLanguage);
 let languageScroll: { left: number; top: number } | undefined;
 
 function unexpired<T extends string>(preference: Preference<T> | undefined): T | undefined {
@@ -91,38 +88,6 @@ function applyTheme(target = document) {
   });
 }
 
-function preferredLanguage(): Language | undefined {
-  const manual = unexpired(manualLanguage);
-  if (manual) return manual;
-  const locale = navigator.languages?.[0] || navigator.language;
-  if (locale) return locale.toLowerCase().split('-')[0] === 'cs' ? 'cs' : 'en';
-}
-
-function selectInitialBrowserLanguage() {
-  const root = document.documentElement;
-  if (
-    root.dataset.page !== 'home' ||
-    root.dataset.language !== 'cs' ||
-    preferredLanguage() !== 'en' ||
-    location.search ||
-    location.hash
-  ) {
-    return;
-  }
-  const navigation = performance.getEntriesByType('navigation')[0] as
-    PerformanceNavigationTiming | undefined;
-  if (navigation?.type === 'back_forward') return;
-  if (document.referrer && new URL(document.referrer).origin === location.origin) return;
-  const link = document.querySelector<HTMLAnchorElement>('.language-nav a[data-language="en"]');
-  if (!link) return;
-  const target = new URL(link.href, location.href);
-  const currentPath = location.pathname.endsWith('/') ? location.pathname : `${location.pathname}/`;
-  // Only the equivalent English homepage is eligible; never an arbitrary suggestion URL.
-  if (target.origin === location.origin && target.pathname === `${currentPath}en/`) {
-    void navigate(target.href, { history: 'replace' });
-  }
-}
-
 function initializePreferences() {
   applyTheme();
 }
@@ -148,7 +113,7 @@ document.addEventListener(
     const languageLink = event.target.closest<HTMLAnchorElement>('a[data-language]');
     const language = languageLink?.dataset.language;
     if (isLanguage(language)) {
-      manualLanguage = savePreference(LANGUAGE_KEY, language);
+      savePreference(LANGUAGE_KEY, language);
     }
   },
   { capture: true },
@@ -181,9 +146,6 @@ window.addEventListener('storage', (event) => {
   if (event.key === THEME_KEY || event.key === null) {
     manualTheme = readPreference(THEME_KEY, isTheme);
   }
-  if (event.key === LANGUAGE_KEY || event.key === null) {
-    manualLanguage = readPreference(LANGUAGE_KEY, isLanguage);
-  }
   initializePreferences();
 });
 window.addEventListener('pageshow', initializePreferences);
@@ -192,4 +154,3 @@ document.addEventListener('visibilitychange', () => {
 });
 document.addEventListener('astro:page-load', initializePreferences);
 initializePreferences();
-selectInitialBrowserLanguage();
