@@ -1,0 +1,23 @@
+# Page 1393 takes precedence over the obsolete privacy page. Email lives in settings.yaml.
+phone: '+420608031206'
+address:
+  street: Prakšická 281
+  city: Uherský Brod
+  postal_code: '688 01'
+  country: CZ
+billing_address:
+  street: Březnice 314
+  city: Březnice
+  postal_code: '760 01'
+  country: CZ
+company_id: '02596491'
+title_cs: Kontakt
+title_en: Contact
+text_cs: Máte dotaz nebo plánujete sklo na míru? Zavolejte nám nebo napište e-mail. Provozovnu najdete v Uherském Brodě na Prakšické 281.
+text_en: Have a question or a made-to-measure glass project in mind? Call or email us. Our workshop is at Prakšická 281 in Uherský Brod.
+enquiry_title_cs: Nezávazná poptávka
+enquiry_title_en: Project enquiry
+enquiry_text_cs: Popište nám svou představu, přibližné rozměry a místo realizace. Podle zadání s vámi probereme další postup a nabídku.
+enquiry_text_en: Describe your idea, approximate dimensions and project location. We will discuss the next steps and a quotation based on your requirements.
+seo_description_cs: Kontakt na SKLOSERVIS-BROD s.r.o., Prakšická 281, Uherský Brod. Telefon +420 608 031 206. Provozní a fakturační údaje.
+seo_description_en: Contact SKLOSERVIS-BROD s.r.o. at Prakšická 281, Uherský Brod. Phone +420 608 031 206. Workshop and billing details.

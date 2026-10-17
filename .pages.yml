@@ -1,0 +1,541 @@
+# Pages CMS: business copy is bilingual; build validation is authoritative.
+# No CMS account setup or form delivery is implied by this configuration.
+media:
+  - name: gallery
+    label: Fotografie realizací a výrobků
+    input: src/assets/gallery
+    output: ../assets/gallery
+    extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+      - avif
+content:
+  - name: settings
+    label: Nastavení a texty webu
+    type: file
+    path: src/data/settings.yaml
+    format: yaml
+    fields:
+      - name: name
+        label: Název společnosti
+        type: string
+        required: true
+      - name: contact_email
+        label: Potvrzený kontaktní e-mail
+        type: string
+        required: true
+      - name: relay_ready
+        label: Odesílání formulářů připraveno (musí zůstat vypnuto)
+        type: boolean
+        required: true
+        default: false
+      - name: relay_provider
+        label: Doručování formulářů (dosud nezprovozněno)
+        type: select
+        required: true
+        default: unconfigured
+        options:
+          values:
+            - unconfigured
+      - name: hero_title_cs
+        label: Úvodní nadpis — česky
+        type: string
+        required: true
+      - name: hero_title_en
+        label: Úvodní nadpis — anglicky
+        type: string
+        required: true
+      - name: hero_text_cs
+        label: Úvodní text — česky
+        type: text
+        required: true
+      - name: hero_text_en
+        label: Úvodní text — anglicky
+        type: text
+        required: true
+      - name: products_title_cs
+        label: Nadpis nabídky výrobků — česky
+        type: string
+        required: true
+      - name: products_title_en
+        label: Nadpis nabídky výrobků — anglicky
+        type: string
+        required: true
+      - name: products_text_cs
+        label: Úvod nabídky výrobků — česky
+        type: text
+        required: true
+      - name: products_text_en
+        label: Úvod nabídky výrobků — anglicky
+        type: text
+        required: true
+      - name: services_title_cs
+        label: Nadpis služeb — česky
+        type: string
+        required: true
+      - name: services_title_en
+        label: Nadpis služeb — anglicky
+        type: string
+        required: true
+      - name: services_text_cs
+        label: Popis služeb — česky
+        type: text
+        required: true
+      - name: services_text_en
+        label: Popis služeb — anglicky
+        type: text
+        required: true
+      - name: process_cs
+        label: Jak probíhá spolupráce — česky
+        type: text
+        required: true
+      - name: process_en
+        label: Jak probíhá spolupráce — anglicky
+        type: text
+        required: true
+      - name: gallery_title_cs
+        label: Nadpis galerie — česky
+        type: string
+        required: true
+      - name: gallery_title_en
+        label: Nadpis galerie — anglicky
+        type: string
+        required: true
+      - name: gallery_text_cs
+        label: Úvod galerie — česky
+        type: text
+        required: true
+      - name: gallery_text_en
+        label: Úvod galerie — anglicky
+        type: text
+        required: true
+      - name: footer_text_cs
+        label: Text patičky — česky
+        type: text
+        required: true
+      - name: footer_text_en
+        label: Text patičky — anglicky
+        type: text
+        required: true
+      - name: seo_title_cs
+        label: SEO titulek úvodní stránky — česky
+        type: string
+        required: true
+      - name: seo_title_en
+        label: SEO titulek úvodní stránky — anglicky
+        type: string
+        required: true
+      - name: seo_description_cs
+        label: SEO popis úvodní stránky — česky
+        type: text
+        required: true
+      - name: seo_description_en
+        label: SEO popis úvodní stránky — anglicky
+        type: text
+        required: true
+  - name: contact
+    label: Kontakt a firemní údaje
+    type: file
+    path: src/data/contact.yaml
+    format: yaml
+    fields:
+      - name: phone
+        label: Telefon (+420 a devět číslic)
+        type: string
+        required: true
+        pattern:
+          regex: ^\+420\d{9}$
+          message: Například +420608031206
+      - name: address
+        label: Provozovna
+        type: object
+        required: true
+        fields:
+          - name: street
+            label: Ulice a číslo
+            type: string
+            required: true
+          - name: city
+            label: Obec
+            type: string
+            required: true
+          - name: postal_code
+            label: PSČ
+            type: string
+            required: true
+            pattern:
+              regex: ^\d{3} \d{2}$
+              message: PSČ jako 688 01
+          - name: country
+            label: Země
+            type: select
+            required: true
+            default: CZ
+            options:
+              values:
+                - CZ
+      - name: billing_address
+        label: Fakturační adresa (není pobočka)
+        type: object
+        required: true
+        fields:
+          - name: street
+            label: Ulice a číslo
+            type: string
+            required: true
+          - name: city
+            label: Obec
+            type: string
+            required: true
+          - name: postal_code
+            label: PSČ
+            type: string
+            required: true
+            pattern:
+              regex: ^\d{3} \d{2}$
+              message: PSČ jako 688 01
+          - name: country
+            label: Země
+            type: select
+            required: true
+            default: CZ
+            options:
+              values:
+                - CZ
+      - name: company_id
+        label: IČO (osm číslic včetně počáteční nuly)
+        type: string
+        required: true
+        pattern:
+          regex: ^\d{8}$
+          message: Osm číslic; zachovat počáteční nulu.
+      - name: title_cs
+        label: Nadpis kontaktu — česky
+        type: string
+        required: true
+      - name: title_en
+        label: Nadpis kontaktu — anglicky
+        type: string
+        required: true
+      - name: text_cs
+        label: Kontaktní text — česky
+        type: text
+        required: true
+      - name: text_en
+        label: Kontaktní text — anglicky
+        type: text
+        required: true
+      - name: enquiry_title_cs
+        label: Nadpis poptávky — česky
+        type: string
+        required: true
+      - name: enquiry_title_en
+        label: Nadpis poptávky — anglicky
+        type: string
+        required: true
+      - name: enquiry_text_cs
+        label: Text poptávky — česky
+        type: text
+        required: true
+      - name: enquiry_text_en
+        label: Text poptávky — anglicky
+        type: text
+        required: true
+      - name: seo_description_cs
+        label: SEO popis kontaktu — česky
+        type: text
+        required: true
+      - name: seo_description_en
+        label: SEO popis kontaktu — anglicky
+        type: text
+        required: true
+  - name: about
+    label: O společnosti
+    type: file
+    path: src/data/about.yaml
+    format: yaml
+    fields:
+      - name: title_cs
+        label: Nadpis — česky
+        type: string
+        required: true
+      - name: title_en
+        label: Nadpis — anglicky
+        type: string
+        required: true
+      - name: lead_cs
+        label: Úvod — česky
+        type: text
+        required: true
+      - name: lead_en
+        label: Úvod — anglicky
+        type: text
+        required: true
+      - name: body_cs
+        label: Text (odstavce oddělte prázdným řádkem) — česky
+        type: text
+        required: true
+      - name: body_en
+        label: Text (odstavce oddělte prázdným řádkem) — anglicky
+        type: text
+        required: true
+      - name: photo
+        label: Fotografie společnosti
+        type: image
+        options:
+          media: gallery
+  - name: hours
+    label: Otevírací doba a výjimky
+    type: file
+    path: src/data/hours.yaml
+    format: yaml
+    fields:
+      - name: weekly
+        label: Běžný týden — přesně jeden řádek pro každý den
+        type: object
+        required: true
+        list:
+          min: 7
+          max: 7
+        fields:
+          - name: day
+            label: Den (mon=Po, tue=Út, wed=St, thu=Čt, fri=Pá, sat=So, sun=Ne)
+            type: select
+            required: true
+            options:
+              values:
+                - mon
+                - tue
+                - wed
+                - thu
+                - fri
+                - sat
+                - sun
+          - name: slots
+            label: Časové úseky návštěv (prázdné = žádný zveřejněný interval)
+            type: object
+            list: true
+            fields:
+              - name: opens
+                label: Od
+                type: string
+                required: true
+                pattern:
+                  regex: ^([01]\d|2[0-3]):[0-5]\d$
+                  message: Čas HH:MM, začátek musí být před koncem.
+              - name: closes
+                label: Do
+                type: string
+                required: true
+                pattern:
+                  regex: ^([01]\d|2[0-3]):[0-5]\d$
+                  message: Čas HH:MM, začátek musí být před koncem.
+          - name: note_cs
+            label: Poznámka (vyplňte oba jazyky) — česky
+            type: text
+          - name: note_en
+            label: Poznámka (vyplňte oba jazyky) — anglicky
+            type: text
+          - name: assumed
+            label: Nepotvrzený předpoklad (vysvětlete v obou poznámkách)
+            type: boolean
+            default: false
+      - name: exceptions
+        label: Datované výjimky — nahrazují celý den, rozsahy se nesmí překrývat
+        type: object
+        list: true
+        fields:
+          - name: from
+            label: Od (včetně)
+            type: date
+            required: true
+            default: ''
+            options:
+              time: false
+              format: yyyy-MM-dd
+          - name: to
+            label: Do (včetně)
+            type: date
+            required: true
+            default: ''
+            options:
+              time: false
+              format: yyyy-MM-dd
+          - name: slots
+            label: Časové úseky návštěv (prázdné = žádný zveřejněný interval)
+            type: object
+            list: true
+            fields:
+              - name: opens
+                label: Od
+                type: string
+                required: true
+                pattern:
+                  regex: ^([01]\d|2[0-3]):[0-5]\d$
+                  message: Čas HH:MM, začátek musí být před koncem.
+              - name: closes
+                label: Do
+                type: string
+                required: true
+                pattern:
+                  regex: ^([01]\d|2[0-3]):[0-5]\d$
+                  message: Čas HH:MM, začátek musí být před koncem.
+          - name: note_cs
+            label: Poznámka (vyplňte oba jazyky) — česky
+            type: text
+          - name: note_en
+            label: Poznámka (vyplňte oba jazyky) — anglicky
+            type: text
+          - name: assumed
+            label: Nepotvrzený předpoklad (vysvětlete v obou poznámkách)
+            type: boolean
+            default: false
+      - name: note_cs
+        label: Celková poznámka (oba jazyky) — česky
+        type: text
+      - name: note_en
+        label: Celková poznámka (oba jazyky) — anglicky
+        type: text
+  - name: banners
+    label: Oznámení
+    type: file
+    path: src/data/banners.yaml
+    format: yaml
+    list: true
+    fields:
+      - name: enabled
+        label: Zobrazovat
+        type: boolean
+        required: true
+        default: false
+      - name: level
+        label: Závažnost (info / upozornění / varování)
+        type: select
+        required: true
+        default: info
+        options:
+          values:
+            - info
+            - attention
+            - warning
+      - name: from
+        label: Od (včetně, prázdné = bez počátku)
+        type: date
+        default: ''
+        options:
+          time: false
+          format: yyyy-MM-dd
+      - name: to
+        label: Do (včetně, prázdné = bez konce)
+        type: date
+        default: ''
+        options:
+          time: false
+          format: yyyy-MM-dd
+      - name: text_cs
+        label: Text oznámení — česky
+        type: text
+        required: true
+      - name: text_en
+        label: Text oznámení — anglicky
+        type: text
+        required: true
+  - name: services
+    label: Výrobky — osm stálých stránek
+    type: file
+    path: src/data/services.yaml
+    format: yaml
+    list:
+      min: 8
+      max: 8
+    fields:
+      - name: slug
+        label: Stálý český slug — neměnit při přejmenování nadpisu
+        type: select
+        required: true
+        options:
+          values:
+            - sklenene-dvere
+            - sklenene-zabradli
+            - skleneny-sprchovy-kout
+            - sklenena-stena
+            - skleneny-obklad-do-kuchyne
+            - sklenene-strisky-zaskleni-pergol-zastreseni
+            - sklenene-dekorace-gravirovani-fotek
+            - sklenene-nahrobni-desky
+      - name: slug_en
+        label: Stálý anglický slug — zachovat schválený pár
+        type: string
+        required: true
+      - name: title_cs
+        label: Název výrobku — česky
+        type: string
+        required: true
+      - name: title_en
+        label: Název výrobku — anglicky
+        type: string
+        required: true
+      - name: text_cs
+        label: Popis — česky
+        type: text
+        required: true
+      - name: text_en
+        label: Popis — anglicky
+        type: text
+        required: true
+      - name: seo_description_cs
+        label: SEO popis — česky
+        type: text
+        required: true
+      - name: seo_description_en
+        label: SEO popis — anglicky
+        type: text
+        required: true
+      - name: image
+        label: Úvodní fotografie
+        type: image
+        options:
+          media: gallery
+  - name: gallery
+    label: Galerie
+    type: file
+    path: src/data/gallery.yaml
+    format: yaml
+    list: true
+    fields:
+      - name: image
+        label: Fotografie
+        type: image
+        required: true
+        options:
+          media: gallery
+      - name: alt_cs
+        label: Věcný alternativní popis — česky
+        type: text
+        required: true
+      - name: alt_en
+        label: Věcný alternativní popis — anglicky
+        type: text
+        required: true
+      - name: category
+        label: Výrobek (český slug)
+        type: select
+        required: true
+        options:
+          values:
+            - sklenene-dvere
+            - sklenene-zabradli
+            - skleneny-sprchovy-kout
+            - sklenena-stena
+            - skleneny-obklad-do-kuchyne
+            - sklenene-strisky-zaskleni-pergol-zastreseni
+            - sklenene-dekorace-gravirovani-fotek
+            - sklenene-nahrobni-desky
+      - name: caption_cs
+        label: Popisek — česky
+        type: text
+      - name: caption_en
+        label: Popisek — anglicky
+        type: text

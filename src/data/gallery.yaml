@@ -1,0 +1,72 @@
+- image: ../assets/gallery/interior-glass-railing.jpg
+  alt_cs: 'Skleněné zábradlí v otevřeném interiéru'
+  alt_en: 'Glass railing in an open interior'
+  category: sklenene-zabradli
+- image: ../assets/gallery/stair-glass-detail.jpg
+  alt_cs: 'Detail skleněného zábradlí u dřevěného schodiště'
+  alt_en: 'Glass railing detail beside a wooden staircase'
+  category: sklenene-zabradli
+- image: ../assets/gallery/staircase-glass-wall.jpg
+  alt_cs: 'Skleněné zábradlí a stěna podél schodiště'
+  alt_en: 'Glass railing and partition alongside a staircase'
+  category: sklenene-zabradli
+- image: ../assets/gallery/shower-clear-glass.jpg
+  alt_cs: 'Čiré skleněné dveře sprchového koutu'
+  alt_en: 'Clear glass shower enclosure door'
+  category: skleneny-sprchovy-kout
+- image: ../assets/gallery/shower-corner-glass.jpg
+  alt_cs: 'Rohový sprchový kout ze skla'
+  alt_en: 'Corner glass shower enclosure'
+  category: skleneny-sprchovy-kout
+- image: ../assets/gallery/shower-black-fittings.jpg
+  alt_cs: 'Skleněná sprchová zástěna s černým kováním'
+  alt_en: 'Glass shower screen with black fittings'
+  category: skleneny-sprchovy-kout
+- image: ../assets/gallery/partition-patterned-glass.jpg
+  alt_cs: 'Skleněná stěna s pruhovaným vzorem'
+  alt_en: 'Glass partition with a striped pattern'
+  category: sklenena-stena
+- image: ../assets/gallery/office-glass-partition.jpg
+  alt_cs: 'Kancelářská skleněná příčka s dveřmi'
+  alt_en: 'Office glass partition with a door'
+  category: sklenena-stena
+- image: ../assets/gallery/office-glass-corridor.jpg
+  alt_cs: 'Prosvětlená chodba se skleněnými příčkami'
+  alt_en: 'Bright corridor with glass partitions'
+  category: sklenena-stena
+- image: ../assets/gallery/entrance-glass-canopy.jpg
+  alt_cs: 'Skleněná stříška nad vstupem'
+  alt_en: 'Glass canopy above an entrance'
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+- image: ../assets/gallery/canopy-steel-ties.jpg
+  alt_cs: 'Detail skleněné stříšky s táhly'
+  alt_en: 'Glass canopy detail with support rods'
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+- image: ../assets/gallery/terrace-glass-roof.jpg
+  alt_cs: 'Skleněné zastřešení terasy'
+  alt_en: 'Glass roof above a terrace'
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+- image: ../assets/gallery/pergola-glazing.jpg
+  alt_cs: 'Prosklená pergola u zahrady'
+  alt_en: 'Glazed pergola beside a garden'
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+- image: ../assets/gallery/kitchen-dark-splashback.jpg
+  alt_cs: 'Tmavý skleněný obklad za kuchyňskou linkou'
+  alt_en: 'Dark glass kitchen splashback'
+  category: skleneny-obklad-do-kuchyne
+- image: ../assets/gallery/kitchen-light-splashback.jpg
+  alt_cs: 'Světlý skleněný obklad v kuchyni'
+  alt_en: 'Light glass kitchen splashback'
+  category: skleneny-obklad-do-kuchyne
+- image: ../assets/gallery/kitchen-window-splashback.jpg
+  alt_cs: 'Skleněný obklad v kuchyni pod oknem'
+  alt_en: 'Glass kitchen splashback beneath a window'
+  category: skleneny-obklad-do-kuchyne
+- image: ../assets/gallery/kitchen-corner-splashback.jpg
+  alt_cs: 'Skleněný obklad rohové kuchyňské linky'
+  alt_en: 'Glass splashback in a corner kitchen'
+  category: skleneny-obklad-do-kuchyne
+- image: ../assets/gallery/sliding-frosted-door.jpg
+  alt_cs: 'Bílé skleněné posuvné dveře s pevným panelem'
+  alt_en: 'White sliding glass door with a fixed panel'
+  category: sklenene-dvere

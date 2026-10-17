@@ -1,0 +1,13 @@
+# Media provenance and selection
+
+Owner supplied `Fotky-20261017T172700Z-1-001.zip` on 2026-10-17, containing 72 JPEG photographs. Originals are preserved locally under ignored `.reference/source/photos/`; numbered inventories and three contact sheets are in `.reference/source/`. The owner authorized selection for this website. No independent photographer-rights audit is claimed.
+
+Selected photographs are copied to `src/assets/gallery` after visual inspection. They keep native dimensions and framing; EXIF metadata is removed. Astro produces responsive optimized output at build time. Do not upscale low-resolution originals for full-width hero imagery. Do not invent project names, customer names or locations from images.
+
+Selected contact-sheet IDs: 2, 5, 9, 18, 20, 23, 24, 28, 35, 37, 39, 43, 45, 52, 54, 56, 59, 70. These cover railings, showers, partitions, canopies/pergolas, splashbacks and a sliding door. No suitable supplied image was identified for engraving or memorial plaques; do not relabel another product photograph to fill those categories. Local `.reference/source/selected-media.json` records original paths, dimensions and SHA-256 hashes; `.reference/source/selected-gallery.yaml` contains the prepared bilingual gallery rows.
+
+Brand sources: supplied signature PNG and the public WordPress logo at `https://www.skloservis-brod.cz/wp-content/uploads/2023/04/skobrod.png`, retrieved read-only on 2026-10-17. Originals remain in `.reference/source`. Final logo treatment belongs to the 21:05 design pass. Do not replace the real identity with a generic generated brand.
+
+No stock video is downloaded or licensed into this repository yet. Pexels' [license](https://www.pexels.com/legal-pages/license/) and [official explanation](https://help.pexels.com/hc/en-us/articles/360042295174-What-is-the-license-of-the-photos-and-videos-on-Pexels) were checked on 2026-10-17: free personal/commercial use and modification are allowed, subject to restrictions including no implied endorsement. A specific asset still needs relevance, license and visual review before use. Do not label stock architecture as the company's work.
+
+Candidate for later design review only: [glass facade reflections, Earth Photart](https://www.pexels.com/video/modern-urban-reflections-in-glass-architecture-36302384/). Its subject is urban towers, so it may fit this local glass workshop less well than authentic project photos. Prefer real supplied imagery if a relevant free clip cannot be verified. Any final video needs source URL, creator, license URL, retrieval date, hash, muted encoding, poster, pause control and reduced-motion/data-saving fallbacks.

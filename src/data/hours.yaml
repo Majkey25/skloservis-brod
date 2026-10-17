@@ -1,0 +1,27 @@
+# Source: contact page 1393. No invented Friday walk-in interval or holiday closures.
+weekly:
+  - day: mon
+    slots: [{ opens: '08:00', closes: '15:00' }]
+  - day: tue
+    slots: [{ opens: '08:00', closes: '15:00' }]
+  - day: wed
+    slots: [{ opens: '08:00', closes: '15:00' }]
+  - day: thu
+    slots: [{ opens: '08:00', closes: '15:00' }]
+  - day: fri
+    slots: []
+    note_cs: Realizace montáží
+    note_en: Installation work
+  - day: sat
+    slots: []
+    assumed: true
+    note_cs: Otevírací dobu o víkendu ověřte telefonicky.
+    note_en: Please call to check weekend opening hours.
+  - day: sun
+    slots: []
+    assumed: true
+    note_cs: Otevírací dobu o víkendu ověřte telefonicky.
+    note_en: Please call to check weekend opening hours.
+exceptions: []
+note_cs: V pátek probíhají montáže. Před návštěvou mimo uvedené hodiny nám prosím zavolejte.
+note_en: Fridays are reserved for installation work. Please call before visiting outside the listed hours.

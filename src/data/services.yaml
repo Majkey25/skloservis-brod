@@ -1,0 +1,66 @@
+# Historical Czech paths and explicit English equivalents are documented in docs/routes.md.
+# Broad offerings paraphrased from the corresponding WP pages; technical specifications omitted.
+- slug: sklenene-dvere
+  slug_en: glass-doors
+  title_cs: Skleněné dveře
+  title_en: Glass doors
+  text_cs: Vyrábíme skleněné dveře na míru pro interiéry i exteriéry. Podle prostoru lze zvolit posuvné, otočné nebo kyvné provedení a čiré či matované sklo. Součástí zakázky může být zaměření, povrchové úpravy a montáž.
+  text_en: We make glass doors to measure for indoor and outdoor spaces. Depending on the space, options include sliding, hinged or swing doors and clear or frosted glass. Measuring, surface finishes and installation can be included in the project.
+  seo_description_cs: Skleněné dveře na míru v Uherském Brodě. Posuvné, otočné a kyvné provedení, zaměření a montáž podle konkrétního prostoru.
+  seo_description_en: Made-to-measure glass doors in Uherský Brod. Sliding, hinged and swing options, with measuring and installation to suit your space.
+- slug: sklenene-zabradli
+  slug_en: glass-railings
+  title_cs: Skleněné zábradlí
+  title_en: Glass railings
+  text_cs: Skleněné zábradlí navrhujeme podle místa použití a možností uchycení. Probereme s vámi provedení skla i kotvení pro schodiště, balkon nebo terasu a zajistíme zaměření, výrobu a montáž.
+  text_en: We plan glass railings around their location and fixing requirements. We will discuss glass and mounting options for your staircase, balcony or terrace, then arrange measuring, manufacture and installation.
+  seo_description_cs: Skleněné zábradlí pro schodiště, balkony a terasy. Návrh uchycení, zaměření, výroba na míru a montáž v Uherském Brodě.
+  seo_description_en: Glass railings for stairs, balconies and terraces. Fixing options, measuring, made-to-measure manufacture and installation in Uherský Brod.
+- slug: skleneny-sprchovy-kout
+  slug_en: glass-shower-enclosures
+  title_cs: Skleněný sprchový kout
+  title_en: Glass shower enclosures
+  text_cs: Sprchové kouty a zástěny vyrábíme na míru konkrétní koupelně. Rozměry, uspořádání dveří a provedení skla řešíme podle dispozice prostoru. Zajistíme zaměření a montáž.
+  text_en: We make shower enclosures and screens to fit individual bathrooms. Dimensions, door arrangements and glass finishes are planned around the available space. We provide measuring and installation.
+  seo_description_cs: Skleněné sprchové kouty a zástěny na míru koupelně. Zaměření, výběr provedení a montáž od sklenářství v Uherském Brodě.
+  seo_description_en: Made-to-measure glass shower enclosures and screens. Measuring, glass and door options, and installation from our Uherský Brod workshop.
+- slug: sklenena-stena
+  slug_en: glass-partitions
+  title_cs: Skleněná stěna
+  title_en: Glass partitions
+  text_cs: Skleněné stěny a příčky rozdělují obytné i kancelářské prostory a propouštějí světlo. Nabízíme čiré, matované i dekorované provedení a kombinace se skleněnými dveřmi. Řešení přizpůsobíme danému prostoru.
+  text_en: Glass walls and partitions divide living and office spaces while allowing light through. Options include clear, frosted and decorated glass, combined with glass doors where required. Each solution is planned for its space.
+  seo_description_cs: Skleněné stěny a příčky na míru do bytů i kanceláří. Čiré, matované a dekorované sklo s možností skleněných dveří.
+  seo_description_en: Made-to-measure glass walls and partitions for homes and offices. Clear, frosted and decorated glass with glass door options.
+- slug: skleneny-obklad-do-kuchyne
+  slug_en: glass-kitchen-splashbacks
+  title_cs: Skleněný obklad do kuchyně
+  title_en: Glass kitchen splashbacks
+  text_cs: Skleněný obklad za kuchyňskou linku vyrábíme podle rozměrů vaší kuchyně. Hladký povrch bez spár usnadňuje čištění. Barvu, otvory a návaznost na pracovní desku probereme při návrhu a zaměření.
+  text_en: We make glass splashbacks to fit your kitchen. The smooth surface without grout joints is easy to clean. Colour, cut-outs and the fit with your worktop are discussed during planning and measuring.
+  seo_description_cs: Skleněný obklad do kuchyně na míru. Výběr barvy, zaměření a montáž obkladu za kuchyňskou linku v Uherském Brodě.
+  seo_description_en: Made-to-measure glass kitchen splashbacks. Colour options, measuring and installation from our workshop in Uherský Brod.
+- slug: sklenene-strisky-zaskleni-pergol-zastreseni
+  slug_en: glass-canopies-pergola-glazing
+  title_cs: Skleněné stříšky, zasklení pergol, zastřešení
+  title_en: Glass canopies and pergola glazing
+  text_cs: Nabízíme skleněné stříšky nad vstupy, zastřešení a zasklení pergol. Pro zasklení lze podle konstrukce řešit pevné nebo posuvné panely. Konkrétní podobu a montáž navrhneme podle místa realizace.
+  text_en: We offer glass entrance canopies, roofing and pergola glazing. Depending on the structure, glazing can use fixed or sliding panels. The design and installation are planned for the project location.
+  seo_description_cs: Skleněné stříšky, zastřešení a zasklení pergol na míru. Pevné i posuvné panely podle možností konkrétní konstrukce.
+  seo_description_en: Made-to-measure glass canopies, roofing and pergola glazing. Fixed or sliding panels to suit the structure and project.
+- slug: sklenene-dekorace-gravirovani-fotek
+  slug_en: glass-decorations-photo-engraving
+  title_cs: Skleněné dekorace, gravírování fotek
+  title_en: Glass decorations and photo engraving
+  text_cs: Vyrábíme skleněné dekorace a drobné doplňky, například tácky, hodiny nebo cedulky. Laserové gravírování umožňuje přenést na sklo text i fotografie. Podobu dekorace a vhodný podklad s vámi probereme.
+  text_en: We make glass decorations and small accessories such as coasters, clocks and signs. Laser engraving can reproduce text and photographs on glass. We will discuss the design and a suitable glass item with you.
+  seo_description_cs: Skleněné dekorace, doplňky a laserové gravírování fotografií a textu do skla. Individuální provedení podle vašeho zadání.
+  seo_description_en: Glass decorations, accessories and laser engraving of photographs and text on glass. Individual designs based on your requirements.
+- slug: sklenene-nahrobni-desky
+  slug_en: glass-memorial-plaques
+  title_cs: Skleněné náhrobní desky
+  title_en: Glass memorial plaques
+  text_cs: Skleněné náhrobní desky vyrábíme v rozměrech podle zadání. Na sklo lze laserem gravírovat nápisy i fotografie. Rozměry, podobu textu a přípravu fotografie domluvíme individuálně.
+  text_en: We make glass memorial plaques to the requested dimensions. Inscriptions and photographs can be laser engraved on the glass. Dimensions, wording and photograph preparation are discussed individually.
+  seo_description_cs: Skleněné náhrobní desky na míru s laserově gravírovaným nápisem nebo fotografií. Individuální rozměry a návrh provedení.
+  seo_description_en: Made-to-measure glass memorial plaques with laser-engraved inscriptions or photographs. Individual dimensions and design.
