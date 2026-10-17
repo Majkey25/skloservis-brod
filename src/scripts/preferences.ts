@@ -101,7 +101,6 @@ function preferredLanguage(): Language | undefined {
 function selectInitialBrowserLanguage() {
   const root = document.documentElement;
   if (
-    unexpired(manualLanguage) ||
     root.dataset.page !== 'home' ||
     root.dataset.language !== 'cs' ||
     preferredLanguage() !== 'en' ||
