@@ -60,11 +60,22 @@ const featured = featuredSlugs.map((slug) => {
 });
 const otherServices = services.filter((service) => !featuredSlugs.includes(service.slug));
 const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
+// Each headline word rises from its own mask during the first-load entrance; the text is unchanged.
+const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
 ---
 
 <section class="home-hero" aria-labelledby="home-title">
-  <div class="home-hero__copy" data-reveal="hero">
-    <h1 id="home-title">{settings[`hero_title_${lang}`]}</h1>
+  <div class="home-hero__copy">
+    <h1 id="home-title">
+      {heroWords.map((word, index) => (
+        <>
+          <span class="home-hero__word" style={`--i: ${index}`}>
+            <span>{word}</span>
+          </span>
+          {index < heroWords.length - 1 && ' '}
+        </>
+      ))}
+    </h1>
     <p class="lead">{settings[`hero_text_${lang}`]}</p>
     <div class="home-actions">
       <a class="button" href={url('contact')}>
@@ -95,6 +106,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         fetchpriority="high"
         decoding="async"
       />
+      {/* Glass slats lift off the already painted photo, so the LCP image itself never animates. */}
+      <span class="home-hero__shutters" aria-hidden="true">
+        {[0, 1, 2, 3].map((index) => (
+          <span style={`--i: ${index}`} />
+        ))}
+      </span>
     </figure>
   )}
 </section>
@@ -171,9 +188,10 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
           {about[`title_${lang}`]}
         </h2>
         <p class="lead">{about[`lead_${lang}`]}</p>
-        <details class="home-about-details">
+        <details class="disclosure home-about-details" data-stream>
           <summary>
-            {labels.about} <Icon name="chevron-down" />
+            <span>{labels.about}</span>
+            <Icon name="chevron-down" />
           </summary>
           {paragraphs.map((paragraph) => (
             <p>{paragraph}</p>
@@ -227,30 +245,96 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
       max(1.5rem, calc(100% - 620px));
   }
 
-  /* Copy enters once on first document load; the hero photo stays eager and unanimated. */
+  /* First-load entrance, played by motion.ts once the page has painted (state set in Base.astro).
+     Only transform and opacity animate, so the compositor runs it without main-thread jank. */
+  .home-hero__word {
+    display: inline-block;
+    padding-block: 0.12em 0.16em;
+    margin-block: -0.12em -0.16em;
+    overflow: clip;
+    vertical-align: top;
+  }
+
+  .home-hero__word > span {
+    display: inline-block;
+  }
+
+  .home-hero__shutters {
+    display: none;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    .home-hero__copy > * {
-      animation: home-hero-in 640ms var(--ease) backwards;
+    :global(html[data-entry]) .home-hero__shutters {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      pointer-events: none;
     }
 
-    .home-hero__copy > :nth-child(2) {
-      animation-delay: 70ms;
+    .home-hero__shutters > span {
+      background: var(--bg);
+      box-shadow:
+        inset 1px 0 var(--glass-edge),
+        inset -1px 0 color-mix(in srgb, var(--accent) 22%, transparent);
+      transform: scaleY(0);
+      transform-origin: top center;
     }
 
-    .home-hero__copy > :nth-child(3) {
-      animation-delay: 140ms;
+    :global(html[data-entry='pending']) .home-hero__shutters > span {
+      transform: none;
     }
 
-    .home-hero__copy > :nth-child(4) {
-      animation-delay: 210ms;
+    :global(html[data-entry='play']) .home-hero__shutters > span {
+      animation: home-hero-shutter 1050ms cubic-bezier(0.77, 0, 0.18, 1) both;
+      animation-delay: calc(120ms + var(--i) * 90ms);
+    }
+
+    :global(html[data-entry='pending']) .home-hero__word > span {
+      transform: translateY(112%);
+    }
+
+    :global(html[data-entry='play']) .home-hero__word > span {
+      animation: home-hero-word 950ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(180ms + var(--i) * 70ms);
+    }
+
+    :global(html[data-entry='pending']) :is(.home-hero .lead, .home-actions, .home-call) {
+      opacity: 0;
+    }
+
+    :global(html[data-entry='play']) .home-hero .lead {
+      animation: home-hero-rise 850ms var(--ease) 620ms both;
+    }
+
+    :global(html[data-entry='play']) .home-actions {
+      animation: home-hero-rise 850ms var(--ease) 740ms both;
+    }
+
+    :global(html[data-entry='play']) .home-call {
+      animation: home-hero-rise 850ms var(--ease) 860ms both;
     }
   }
 
-  @keyframes home-hero-in {
+  @keyframes home-hero-word {
     from {
-      opacity: 0.6;
-      transform: translateY(12px);
-      filter: blur(6px);
+      transform: translateY(112%) rotate(4deg);
+    }
+  }
+
+  @keyframes home-hero-shutter {
+    from {
+      transform: none;
+    }
+    to {
+      transform: scaleY(0);
+    }
+  }
+
+  @keyframes home-hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
   }
 
@@ -290,8 +374,10 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   }
 
   .home-hero__media {
+    position: relative;
     min-width: 0;
     margin: 0;
+    overflow: hidden;
   }
 
   .home-hero__media :global(picture) {
@@ -489,13 +575,6 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 
   .home-about-details {
     margin-top: 1rem;
-  }
-
-  .home-about-details summary {
-    width: fit-content;
-    padding-block: 0.5rem;
-    color: var(--accent);
-    cursor: pointer;
   }
 
   .home-about-details p {

@@ -2,6 +2,7 @@
 import { Picture } from 'astro:assets';
 import { getContact, getGallery, getServices, getSettings } from '../content';
 import { pageUrl, type Language, type ServiceSlug } from '../lib/urls';
+import Gallery from './Gallery.astro';
 
 interface Props {
   lang: Language;
@@ -19,7 +20,7 @@ const service = services.find((item) => item.slug === slug);
 if (!service) throw new Error(`Missing validated service: ${slug}`);
 const photos = gallery.filter((item) => item.category === slug);
 const hero = photos[0];
-const additionalPhotos = photos.slice(1, 4);
+const heroId = `service-photo-${slug}`;
 const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
 const labels = {
   cs: {
@@ -28,7 +29,7 @@ const labels = {
     prepare: 'Co uvést do poptávky',
     process: 'Od představy k realizaci',
     examples: 'Ukázky provedení',
-    gallery: 'Celá galerie',
+    gallery: 'Prohlédnout fotografie tohoto výrobku',
     related: 'Další skleněné výrobky',
     contact: 'Probrat zadání',
   },
@@ -38,7 +39,7 @@ const labels = {
     prepare: 'What to include in your enquiry',
     process: 'From your idea to the finished project',
     examples: 'Examples of our work',
-    gallery: 'Full gallery',
+    gallery: 'Browse photos of this product',
     related: 'More glass products',
     contact: 'Discuss your requirements',
   },
@@ -156,9 +157,46 @@ const related = services.filter((item) => item.slug !== slug);
       <span aria-current="page">{service[`title_${lang}`]}</span>
     </nav>
     <div class:list={['service-hero', { 'service-hero--text': !hero }]}>
-      <div class="service-hero__copy">
+      <div class="service-hero__intro">
         <h1 id="service-title">{service[`title_${lang}`]}</h1>
         <p class="lead">{service[`text_${lang}`]}</p>
+      </div>
+      {hero && (
+        <figure class="service-hero__media">
+          <a
+            id={heroId}
+            href={hero.image.src}
+            data-index="0"
+            aria-haspopup="dialog"
+            data-astro-reload
+          >
+            <Picture
+              src={hero.image}
+              alt={hero[`alt_${lang}`]}
+              formats={['avif', 'webp']}
+              widths={[360, 600, 900, Math.min(1200, hero.image.width)].filter(
+                (width, index, all) => width <= hero.image.width && all.indexOf(width) === index,
+              )}
+              sizes="(min-width: 70rem) 37rem, (min-width: 48rem) 46vw, 100vw"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </a>
+          <figcaption>
+            <a class="text-link" href={`#${heroId}-gallery`}>
+              {labels.gallery}
+            </a>
+          </figcaption>
+        </figure>
+      )}
+      <div class="service-hero__copy">
+        {service.details?.map((detail) => (
+          <div class="service-prompts">
+            <h2>{detail[`title_${lang}`]}</h2>
+            <p>{detail[`text_${lang}`]}</p>
+          </div>
+        ))}
         <div class="service-prompts">
           <h2>{labels.prepare}</h2>
           <ul>
@@ -171,63 +209,11 @@ const related = services.filter((item) => item.slug !== slug);
           {labels.enquiry}
         </a>
       </div>
-      {hero && (
-        <figure class="service-hero__media">
-          <Picture
-            src={hero.image}
-            alt={hero[`alt_${lang}`]}
-            formats={['avif', 'webp']}
-            widths={[360, 600, 900, Math.min(1200, hero.image.width)].filter(
-              (width, index, all) => width <= hero.image.width && all.indexOf(width) === index,
-            )}
-            sizes="(min-width: 70rem) 37rem, (min-width: 48rem) 46vw, 100vw"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          />
-          <figcaption>
-            <a class="text-link" href={url('gallery')}>
-              {labels.gallery}
-            </a>
-          </figcaption>
-        </figure>
-      )}
     </div>
   </div>
 </section>
 
-{additionalPhotos.length > 0 && (
-  <section class="section" aria-labelledby="service-examples-title">
-    <div class="wrap">
-      <div class="service-section-heading">
-        <h2 class="section-title" id="service-examples-title">
-          {labels.examples}
-        </h2>
-        <a class="text-link" href={url('gallery')}>
-          {labels.gallery}
-        </a>
-      </div>
-      <div class="service-photos">
-        {additionalPhotos.map((photo) => (
-          <figure>
-            <a href={photo.image.src}>
-              <Picture
-                src={photo.image}
-                alt={photo[`alt_${lang}`]}
-                formats={['avif', 'webp']}
-                widths={[320, 540, 800].filter((width) => width <= photo.image.width)}
-                sizes="(min-width: 70rem) 25rem, (min-width: 40rem) 30vw, 46vw"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-            <figcaption>{photo[`caption_${lang}`] ?? photo[`alt_${lang}`]}</figcaption>
-          </figure>
-        ))}
-      </div>
-    </div>
-  </section>
-)}
+<Gallery lang={lang} category={slug} heading={labels.examples} heroId={hero ? heroId : undefined} />
 
 <section class="section service-related" aria-labelledby="service-related-title">
   <div class="wrap">
@@ -269,15 +255,31 @@ const related = services.filter((item) => item.slug !== slug);
     margin-bottom: 1.5rem;
   }
 
+  /* Photo-led: on phones the photo follows the title, before the longer detail copy. */
   .service-hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(2rem, 5vw, 5rem);
-    align-items: center;
+    grid-template-areas:
+      'intro media'
+      'copy media';
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
   }
 
   .service-hero--text {
     grid-template-columns: minmax(0, 50rem);
+    grid-template-areas:
+      'intro'
+      'copy';
+  }
+
+  .service-hero__intro {
+    grid-area: intro;
+  }
+
+  .service-hero__copy {
+    grid-area: copy;
   }
 
   .service-hero h1 {
@@ -314,8 +316,10 @@ const related = services.filter((item) => item.slug !== slug);
     margin-top: 0.5rem;
   }
 
-  .service-hero__media,
-  .service-photos figure {
+  .service-hero__media {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    grid-area: media;
     min-width: 0;
     margin: 0;
   }
@@ -330,40 +334,14 @@ const related = services.filter((item) => item.slug !== slug);
     background: var(--surface, #edf7fa);
   }
 
-  .service-section-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 1rem 2rem;
-    margin-bottom: 2rem;
+  .service-hero__media > a {
+    display: block;
   }
 
   .service-hero__media figcaption a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-  }
-
-  .service-photos {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  .service-photos :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
-  }
-
-  .service-photos figcaption {
-    margin-top: 0.75rem;
-    color: var(--muted, #52666f);
-    font-size: 0.95rem;
   }
 
   .service-related {
@@ -409,12 +387,18 @@ const related = services.filter((item) => item.slug !== slug);
     .service-contact__grid {
       grid-template-columns: minmax(0, 1fr);
     }
-  }
 
-  @media (max-width: 39.99rem) {
-    .service-photos {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
+    .service-hero:not(.service-hero--text) {
+      grid-template-areas:
+        'intro'
+        'media'
+        'copy';
+      grid-template-rows: auto;
+    }
+
+    .service-hero__media {
+      position: static;
+      margin-block: 1.5rem 0.5rem;
     }
   }
 </style>

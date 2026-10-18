@@ -53,6 +53,9 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
   publishing; never invent a payload or assume an old embed still has the right location.
   Load the external iframe only after explicit visitor consent; keep the map link
   usable without JavaScript and do not add persistent consent storage.
+  Optional `facebook_url` is the public page link `https://www.facebook.com/<page>/`; omission,
+  `null` and `''` hide it. It renders as an ordinary link only: no SDK, embed, tracker or
+  preconnect.
 - `about.yaml`: required bilingual pairs `title`, `lead`, `body`; optional `photo`.
   Additional required fields:
   - `experience_years`: positive integer, seeded as `40`. Render as **over 40 years
@@ -111,11 +114,26 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
   Blank bounds are unbounded. Both absent means permanent until disabled. Notices may
   overlap and do **not** change opening hours.
 - `services.yaml`: exactly eight entries, each `{slug, slug_en, title_cs, title_en,
-text_cs, text_en, seo_description_cs, seo_description_en, image?}`. Every established
+text_cs, text_en, details?, seo_description_cs, seo_description_en, image?}`. Every established
   Czech slug must occur once; English must match its fixed pair below.
+  Keep `text_cs/en` as the short introduction used on product cards and detail pages.
+  Optional `details` holds at most four strict `{title_cs, title_en, text_cs, text_en}`
+  objects. Each field must be nonblank. Omission, `null` and `''` normalize to
+  `undefined`; `[]` is valid. Delete the whole list item to remove a section; blank
+  or partially translated items fail validation. Detail sections preserve list order
+  and render as escaped headings and paragraphs in static HTML, only on product details.
+  Restore only owner-confirmed product options; specifications are not certifications
+  or universal performance guarantees. Pages CMS uses the same optional list and limit.
 - `gallery.yaml`: list of `{image, alt_cs, alt_en, category, caption_cs?, caption_en?}`.
-  `category` is one of the eight Czech service slugs. Required alt text describes the
-  actual image. The initial gallery is empty for the parent's curated media import.
+  `category` is one of the eight Czech service slugs or `vitriny`, `sklo-na-nabytek`,
+  `zrcadla`, `krbova-skla`. These four gallery-only subjects do not create product routes.
+  `src/lib/gallery.ts` exports the allowed categories and bilingual gallery-only labels;
+  the CMS select must match this list. Required alt text describes the actual image.
+  YAML order determines photo order and the first photo of each service remains its hero.
+  The full gallery filters static HTML through category fragment links, also without JS.
+  Its viewer follows only the selected category. Each service detail renders every photo
+  in its category, with its hero included in the viewer but not repeated in the grid.
+  Categories without photos show an empty message, never substitute another subject.
 
 Stable pairs, exported as `SERVICE_ROUTES` from `src/content.config.ts`:
 

@@ -14,7 +14,8 @@ The [source repository](https://github.com/Majkey25/skloservis-brod) publishes a
 ## Included
 
 - Czech and English home, product, service, gallery, contact and legal pages, preserving existing Czech product addresses.
-- Responsive layouts, animated language/theme switches and persistent manual choices, with reduced-motion support.
+- Responsive layouts, instant language switching, an animated theme switch and persistent manual choices, with reduced-motion support.
+- A first-visit entrance that starts after the page has painted, expandable company text that types itself in, and a consent-first map panel.
 - Editable weekly opening hours, Czech public-holiday closures, dated exceptions and scheduled information, attention and warning notices, evaluated using Europe/Prague dates.
 - Local optimized photographs that expand beyond their frames on hover or focus, a keyboard-accessible gallery viewer and CMS gallery fields.
 - Service and product cards that turn over on mouse hover, with a button for keyboard and touch, plus scroll reveals and counting annual figures that stay readable without JavaScript or with reduced motion.

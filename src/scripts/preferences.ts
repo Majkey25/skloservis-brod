@@ -62,11 +62,11 @@ function savePreference<T extends string>(key: string, value: T): Preference<T> 
 const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let manualTheme = readPreference(THEME_KEY, isTheme);
-type Visual = { kind: 'theme' | 'language'; transition?: ViewTransition };
+// Only a theme change animates. Language changes are instant client navigations.
+type Visual = { kind: 'theme'; transition?: ViewTransition };
 type Navigation = {
   signal: AbortSignal;
   language?: Language;
-  visual?: Visual;
   scroll?: { left: number; top: number };
   dispose: () => void;
 };
@@ -85,7 +85,7 @@ function clearVisual(effect: Visual | undefined = visual) {
   visual = undefined;
   const root = document.documentElement;
   delete root.dataset.preferenceTransition;
-  for (const property of ['--theme-x', '--theme-y', '--theme-radius', '--lang-sign']) {
+  for (const property of ['--theme-x', '--theme-y', '--theme-radius']) {
     root.style.removeProperty(property);
   }
 }
@@ -246,38 +246,18 @@ document.addEventListener('astro:before-preparation', (event) => {
         : undefined,
     dispose: () => {
       event.signal.removeEventListener('abort', state.dispose);
-      if (navigation !== state) return;
-      if (visual === state.visual) stopVisual();
-      navigation = undefined;
+      if (navigation === state) navigation = undefined;
     },
   };
   clickedLanguage = undefined;
   navigation = state;
   event.signal.addEventListener('abort', state.dispose, { once: true });
-  if (
-    state.language &&
-    !reducedMotion.matches &&
-    typeof document.startViewTransition === 'function'
-  ) {
-    state.visual = { kind: 'language' };
-    visual = state.visual;
-    // This runs BEFORE Astro calls startViewTransition and captures the old page.
-    document.documentElement.dataset.preferenceTransition = 'language';
-    document.documentElement.style.setProperty('--lang-sign', state.language === 'en' ? '1' : '-1');
-  }
   const load = event.loader;
   event.loader = async () => {
     try {
       await load();
-      // An interrupted transition may still be replacing the root attributes.
+      // An interrupted theme transition may still be replacing the root attributes.
       await previousUpdate;
-      if (navigation === state && visual === state.visual && state.visual) {
-        document.documentElement.dataset.preferenceTransition = 'language';
-        document.documentElement.style.setProperty(
-          '--lang-sign',
-          state.language === 'en' ? '1' : '-1',
-        );
-      }
     } catch (error) {
       reportTransitionError(error);
       event.preventDefault();
@@ -293,15 +273,9 @@ document.addEventListener('astro:before-swap', (event) => {
   const state = navigation?.signal === event.signal ? navigation : undefined;
   observeTransition(event.viewTransition, () => state?.dispose());
   if (state?.language) state.scroll = { left: scrollX, top: scrollY };
-  if (state?.visual && visual === state.visual && !reducedMotion.matches) {
-    state.visual.transition = event.viewTransition;
-    const root = event.newDocument.documentElement;
-    root.dataset.preferenceTransition = 'language';
-    root.style.setProperty('--lang-sign', state.language === 'en' ? '1' : '-1');
-  } else {
-    // Astro creates its own transition even for ordinary routes; never give it a root snapshot.
-    event.viewTransition.skipTransition();
-  }
+  // Astro creates its own transition for every route, language changes included; never give it
+  // a page snapshot, so the swap is immediate and nothing fades, slides or glides.
+  event.viewTransition.skipTransition();
 });
 document.addEventListener('astro:after-swap', () => {
   initializePreferences();

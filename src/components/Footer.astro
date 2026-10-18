@@ -30,6 +30,11 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       <a href={`mailto:${settings.contact_email}`}>
         <Icon name="mail" /> {settings.contact_email}
       </a>
+      {contact.facebook_url && (
+        <a href={contact.facebook_url} target="_blank" rel="noopener noreferrer">
+          <Icon name="external" /> Facebook
+        </a>
+      )}
     </div>
     <address class="footer-address">
       <Icon name="location" />
@@ -59,7 +64,78 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       </a>
     </nav>
   </div>
+  <p class="footer-credit">
+    made by{' '}
+    <a class="footer-credit__name" href="https://majkey25.github.io/init/" data-scramble>
+      <span class="footer-credit__text">Majkey25</span>
+      <span class="footer-credit__code" aria-hidden="true"></span>
+    </a>
+  </p>
 </footer>
+<script>
+  // Hovering or focusing the author name runs a short code-like scramble that resolves letter by
+  // letter. The real name stays in the link for assistive technology; only an overlay changes.
+  const glyphs = '0123456789ABCDEF#$%&*+=?<>/|{}[]~^_:;';
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const running = new Map<HTMLElement, number>();
+
+  function stop(link: HTMLElement) {
+    cancelAnimationFrame(running.get(link) ?? 0);
+    running.delete(link);
+    link.removeAttribute('data-scrambling');
+    const code = link.querySelector('.footer-credit__code');
+    if (code) {
+      code.textContent = '';
+      code.removeAttribute('data-text');
+    }
+  }
+
+  function scramble(link: HTMLElement) {
+    const name = link.querySelector('.footer-credit__text')?.textContent ?? '';
+    const code = link.querySelector('.footer-credit__code');
+    if (calm.matches || running.has(link) || !name || !code) return;
+    link.setAttribute('data-scrambling', '');
+    const started = performance.now();
+    let drawn = 0;
+    const tick = (now: number) => {
+      const progress = (now - started) / 900;
+      // Dense noise at roughly 40 updates a second; letters lock in from left to right.
+      if (now - drawn > 24 || progress >= 1) {
+        drawn = now;
+        const text = [...name]
+          .map((letter, index) =>
+            progress >= (index + 1.5) / (name.length + 1)
+              ? letter
+              : glyphs[Math.floor(Math.random() * glyphs.length)],
+          )
+          .join('');
+        code.textContent = text;
+        // The glitch layers repeat the same frame with sliced offsets.
+        code.setAttribute('data-text', text);
+      }
+      if (progress < 1) running.set(link, requestAnimationFrame(tick));
+      else stop(link);
+    };
+    running.set(link, requestAnimationFrame(tick));
+  }
+
+  const target = (event: Event) =>
+    event.target instanceof Element ? event.target.closest<HTMLElement>('[data-scramble]') : null;
+  document.addEventListener('pointerover', (event) => {
+    const link = target(event);
+    if (link && !link.contains(event.relatedTarget as Node | null)) scramble(link);
+  });
+  document.addEventListener('focusin', (event) => {
+    const link = target(event);
+    if (link) scramble(link);
+  });
+  const stopAll = () => running.forEach((_, link) => stop(link));
+  document.addEventListener('astro:before-swap', stopAll);
+  window.addEventListener('pagehide', stopAll);
+  calm.addEventListener('change', () => {
+    if (calm.matches) stopAll();
+  });
+</script>
 <style>
   .site-footer {
     border-top: 1px solid var(--line);
@@ -140,6 +216,115 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
   }
   .footer-bottom a:hover {
     text-decoration: underline;
+  }
+  .footer-credit {
+    margin: 0;
+    padding-bottom: 1.25rem;
+    color: var(--muted);
+    font-size: var(--step--1);
+    text-align: center;
+  }
+  .footer-credit__name {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.75rem;
+    color: var(--accent);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .footer-credit__name:hover,
+  .footer-credit__name:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+  /* The overlay sits over the real name, so scrambling never changes the line's layout. */
+  .footer-credit__code {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    pointer-events: none;
+    translate: -50% 0;
+  }
+  .footer-credit__name[data-scrambling] .footer-credit__text {
+    color: transparent;
+  }
+  .footer-credit__name[data-scrambling] .footer-credit__code {
+    text-shadow:
+      2px 0 color-mix(in srgb, var(--accent) 60%, transparent),
+      -2px 0 color-mix(in srgb, var(--text) 40%, transparent);
+    animation: footer-credit-glitch 900ms steps(10) both;
+  }
+  /* Two copies of the current frame, cut into shifting bands, give the distortion. */
+  .footer-credit__name[data-scrambling] .footer-credit__code::before,
+  .footer-credit__name[data-scrambling] .footer-credit__code::after {
+    position: absolute;
+    inset: 0;
+    content: attr(data-text);
+    pointer-events: none;
+  }
+  .footer-credit__name[data-scrambling] .footer-credit__code::before {
+    color: var(--accent);
+    animation: footer-credit-slice-a 900ms steps(9) both;
+  }
+  .footer-credit__name[data-scrambling] .footer-credit__code::after {
+    color: color-mix(in srgb, var(--text) 70%, var(--accent));
+    animation: footer-credit-slice-b 900ms steps(7) both;
+  }
+  @keyframes footer-credit-slice-a {
+    0% {
+      clip-path: inset(10% 0 62% 0);
+      translate: -4px 0;
+    }
+    30% {
+      clip-path: inset(55% 0 20% 0);
+      translate: 3px 0;
+    }
+    60% {
+      clip-path: inset(30% 0 45% 0);
+      translate: -2px 0;
+    }
+    100% {
+      clip-path: inset(50% 0 50% 0);
+      translate: 0 0;
+    }
+  }
+  @keyframes footer-credit-slice-b {
+    0% {
+      clip-path: inset(68% 0 6% 0);
+      translate: 4px 0;
+    }
+    35% {
+      clip-path: inset(18% 0 60% 0);
+      translate: -3px 0;
+    }
+    70% {
+      clip-path: inset(40% 0 38% 0);
+      translate: 2px 0;
+    }
+    100% {
+      clip-path: inset(50% 0 50% 0);
+      translate: 0 0;
+    }
+  }
+  @keyframes footer-credit-glitch {
+    0% {
+      transform: skewX(-12deg);
+    }
+    25% {
+      transform: skewX(8deg);
+    }
+    50% {
+      transform: skewX(-5deg);
+    }
+    75% {
+      transform: skewX(2deg);
+    }
+    100% {
+      transform: none;
+    }
   }
   @media (min-width: 48rem) {
     .footer-main {

@@ -260,14 +260,14 @@ const { id, openLabel, toggleLabel, closeLabel, class: className, hoverDelay = 1
   }
 
   /* Back content brightens once the turn has passed its midpoint; nothing slides. */
+  /* Only the turn itself fades the back content in; enhancing a card on load runs no transition. */
   .flip-card[data-flip-ready] .flip-card__back > :global(*) {
     opacity: 0;
-    transition: opacity 260ms var(--ease);
   }
 
   .flip-card[data-flipped] .flip-card__back > :global(*) {
     opacity: 1;
-    transition-delay: 280ms;
+    transition: opacity 260ms var(--ease) 280ms;
   }
 
   @media (hover: hover) and (pointer: fine) {

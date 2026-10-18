@@ -12,6 +12,7 @@ const contact = await getContact();
 const copy = {
   cs: {
     title: 'Zastavte se u nás',
+    consent: 'Mapa provozovny',
     place: 'Provozovna v areálu Horní Dvůr',
     load: 'Souhlasit a načíst mapu',
     decline: 'Bez mapy',
@@ -26,6 +27,7 @@ const copy = {
   },
   en: {
     title: 'Visit our workshop',
+    consent: 'Workshop map',
     place: 'Workshop in the Horní Dvůr complex',
     load: 'Agree and load the map',
     decline: 'Without the map',
@@ -59,34 +61,47 @@ const copy = {
   </div>
   <div class="location-map__pane" data-map-pane>
     <div class="location-map__preview" data-map-placeholder>
-      <div class="location-map__pin" aria-hidden="true">
-        <Icon name="location" />
+      {/* Decorative only: a beacon over etched glass, not a drawing of real streets. */}
+      <div class="location-map__beacon" aria-hidden="true">
+        <svg viewBox="0 0 200 200" focusable="false" data-reveal="draw">
+          <path d="M100 30a70 70 0 1 1 0 140a70 70 0 1 1 0-140" pathLength="1" />
+          <path d="M100 55a45 45 0 1 1 0 90a45 45 0 1 1 0-90" pathLength="1" />
+          <path d="M100 78a22 22 0 1 1 0 44a22 22 0 1 1 0-44" pathLength="1" />
+        </svg>
+        <span class="location-map__pin">
+          <Icon name="location" />
+        </span>
       </div>
-      <address>
-        <strong>{contact.address.street}</strong>
-        {contact.address.postal_code} {contact.address.city}
-      </address>
-      <p class="location-map__privacy muted">{copy.privacy}</p>
-      {contact.map_embed_url && (
-        <div class="location-map__choices" data-map-choices hidden>
-          <button class="button" type="button" data-map-load>
-            <Icon name="location" />
-            {copy.load}
-          </button>
-          <button class="button button--secondary" type="button" data-map-decline>
-            {copy.decline}
-          </button>
-        </div>
-      )}
-      <p class="location-map__status muted" data-map-status role="status"></p>
-      <a
-        class="location-map__terms text-link"
-        href={`https://policies.google.com/privacy?hl=${lang}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {copy.terms}
-      </a>
+      <div class="location-map__card" data-reveal="rise">
+        <h3>{copy.consent}</h3>
+        <address>
+          <strong>{contact.address.street}</strong>
+          <span>
+            {contact.address.postal_code} {contact.address.city}
+          </span>
+        </address>
+        <p class="location-map__privacy muted">{copy.privacy}</p>
+        {contact.map_embed_url && (
+          <div class="location-map__choices" data-map-choices hidden>
+            <button class="button" type="button" data-map-load>
+              <Icon name="location" />
+              {copy.load}
+            </button>
+            <button class="button button--secondary" type="button" data-map-decline>
+              {copy.decline}
+            </button>
+          </div>
+        )}
+        <p class="location-map__status muted" data-map-status role="status"></p>
+        <a
+          class="location-map__terms text-link"
+          href={`https://policies.google.com/privacy?hl=${lang}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {copy.terms}
+        </a>
+      </div>
     </div>
     <div class="location-map__loaded" data-map-loaded hidden>
       <div class="location-map__frame" data-map-target></div>
@@ -197,48 +212,128 @@ const copy = {
     border: 1px solid var(--line);
     background: var(--surface);
   }
+  /* Before consent: a deliberate glass panel with the real address, never an empty broken frame. */
   .location-map__preview {
+    --beacon-x: 72%;
+    --beacon-y: 50%;
+    position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 1rem;
     min-height: var(--map-height);
-    padding: 2rem 1.25rem;
-    background-image: linear-gradient(
-      120deg,
-      transparent 43%,
-      var(--bg) 43.2%,
-      var(--bg) 56.8%,
-      transparent 57%
-    );
-    text-align: center;
+    padding: clamp(1.25rem, 4vw, 3.5rem);
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at var(--beacon-x) var(--beacon-y),
+        color-mix(in srgb, var(--accent) 16%, transparent),
+        transparent 34%
+      ),
+      linear-gradient(
+        112deg,
+        transparent 54%,
+        color-mix(in srgb, var(--accent) 7%, transparent) 54% 64%,
+        transparent 64% 67%,
+        color-mix(in srgb, var(--accent) 5%, transparent) 67% 71%,
+        transparent 71%
+      ),
+      radial-gradient(
+          circle,
+          color-mix(in srgb, var(--accent) 24%, transparent) 1.2px,
+          transparent 1.7px
+        )
+        0 0 / 26px 26px,
+      var(--surface);
   }
   .location-map__preview[hidden],
   .location-map__loaded[hidden],
   .location-map__choices[hidden] {
     display: none;
   }
-  .location-map__pin {
+  .location-map__beacon {
+    position: absolute;
+    top: var(--beacon-y);
+    left: var(--beacon-x);
     display: grid;
     place-items: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    border: 1px solid var(--line);
+    width: min(22rem, 70vw);
+    aspect-ratio: 1;
+    color: var(--accent);
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+  .location-map__beacon svg {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 0.8;
+  }
+  .location-map__beacon path {
+    stroke-dasharray: 1;
+  }
+  .location-map__beacon path:nth-child(1) {
+    opacity: 0.25;
+  }
+  .location-map__beacon path:nth-child(2) {
+    opacity: 0.4;
+  }
+  .location-map__beacon path:nth-child(3) {
+    opacity: 0.6;
+  }
+  .location-map__pin {
+    display: grid;
+    grid-area: 1 / 1;
+    place-items: center;
+    width: 3.75rem;
+    height: 3.75rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
     border-radius: 50%;
     background: var(--bg);
-    color: var(--accent);
-    font-size: 2rem;
-    transition: transform 320ms var(--ease);
+    box-shadow:
+      inset 1px 1px 0 var(--glass-edge),
+      var(--lift);
+    font-size: 1.75rem;
+    transition: translate 360ms var(--ease);
   }
-  .location-map__preview:has(.button:hover) .location-map__pin {
-    transform: translateY(-4px) rotate(-6deg);
+  .location-map__preview:has(.button:hover) .location-map__pin,
+  .location-map__preview:has(.button:focus-visible) .location-map__pin {
+    translate: 0 -6px;
+  }
+  .location-map__card {
+    position: relative;
+    display: grid;
+    gap: 0.9rem;
+    width: min(100%, 31rem);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    box-shadow:
+      inset 1px 1px 0 var(--glass-edge),
+      var(--lift);
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    .location-map__card {
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      backdrop-filter: blur(var(--frost));
+    }
+  }
+  .location-map__card h3 {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.3;
   }
   .location-map address {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.15rem;
+    font-size: var(--step-1);
     font-style: normal;
+  }
+  .location-map__card .location-map__privacy,
+  .location-map__card .location-map__status {
+    margin: 0;
   }
   .location-map__privacy {
     max-width: 66ch;
@@ -247,7 +342,6 @@ const copy = {
   .location-map__choices {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 0.75rem;
   }
   .location-map__status:empty {
@@ -277,10 +371,18 @@ const copy = {
     background: var(--bg);
     box-shadow: var(--lift, 0 6px 20px rgb(7 30 40 / 0.15));
   }
+  @media (max-width: 47.99rem) {
+    .location-map__preview {
+      --beacon-x: 50%;
+      --beacon-y: 6.5rem;
+      flex-direction: column;
+      align-items: stretch;
+      padding-top: 12rem;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .location-map__pin {
-      transition: none;
-      transform: none !important;
+      translate: none !important;
     }
   }
 </style>

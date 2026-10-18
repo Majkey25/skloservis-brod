@@ -70,3 +70,729 @@
   alt_cs: 'Bílé skleněné posuvné dveře s pevným panelem'
   alt_en: 'White sliding glass door with a fixed panel'
   category: sklenene-dvere
+- image: ../assets/gallery/fireplace-glass-insert.jpg
+  alt_cs: Krbová vložka s prosklenými dvířky v lesklém tmavém obkladu
+  alt_en: Glazed fireplace insert in a glossy dark surround
+  category: krbova-skla
+  caption_cs: Prosklení krbové vložky
+  caption_en: Fireplace insert glazing
+- image: ../assets/gallery/library-stair-glass-railing.jpg
+  alt_cs: Skleněné zábradlí s madlem u schodiště mezi knihovnami
+  alt_en: Glass railing with a handrail beside stairs between bookshelves
+  category: sklenene-zabradli
+  caption_cs: Zábradlí podél schodiště
+  caption_en: Railing alongside stairs
+- image: ../assets/gallery/stair-railing-top-rail.jpg
+  alt_cs: Skleněné zábradlí s horní lištou podél přímého schodiště
+  alt_en: Glass railing with a top rail along a straight staircase
+  category: sklenene-zabradli
+  caption_cs: Skleněná výplň u schodiště
+  caption_en: Glass infill beside stairs
+- image: ../assets/gallery/balcony-glass-handrail.jpg
+  alt_cs: Skleněné zábradlí s madlem na rohovém balkoně
+  alt_en: Glass railing with a handrail on a corner balcony
+  category: sklenene-zabradli
+  caption_cs: Rohové balkonové zábradlí
+  caption_en: Corner balcony railing
+- image: ../assets/gallery/entrance-stair-glass-railing.jpg
+  alt_cs: Skleněné výplně zábradlí u venkovního schodiště a vstupu
+  alt_en: Glass railing panels beside outdoor stairs and an entrance
+  category: sklenene-zabradli
+  caption_cs: Zábradlí u vstupního schodiště
+  caption_en: Entrance stair railing
+- image: ../assets/gallery/window-glass-guard-front.jpg
+  alt_cs: Skleněná zábrana před oknem s bodovým uchycením
+  alt_en: Point-fixed glass guard in front of a window
+  category: sklenene-zabradli
+  caption_cs: Čelní pohled na okenní zábranu
+  caption_en: Front view of a window guard
+- image: ../assets/gallery/window-glass-guard-side.jpg
+  alt_cs: Boční pohled na skleněnou zábranu před vysokým oknem
+  alt_en: Side view of a glass guard in front of a tall window
+  category: sklenene-zabradli
+  caption_cs: Detail okenní skleněné zábrany
+  caption_en: Window glass guard detail
+- image: ../assets/gallery/balcony-frosted-glass-panels.jpg
+  alt_cs: Balkonové zábradlí s neprůhlednými skleněnými výplněmi
+  alt_en: Balcony railing with opaque glass infill panels
+  category: sklenene-zabradli
+  caption_cs: Skleněné výplně balkonového zábradlí
+  caption_en: Glass balcony infill panels
+- image: ../assets/gallery/recessed-glass-shelves.jpg
+  alt_cs: Čtyři skleněné police v úzkém výklenku stěny
+  alt_en: Four glass shelves in a narrow wall recess
+  category: vitriny
+  caption_cs: Skleněné police ve výklenku
+  caption_en: Recessed glass shelving
+- image: ../assets/gallery/shower-screen-wave-pattern.jpg
+  alt_cs: Sprchová zástěna s vlnitým vzorem vedle okna
+  alt_en: Shower screen with a wave pattern beside a window
+  category: skleneny-sprchovy-kout
+  caption_cs: Vzorovaná sprchová zástěna
+  caption_en: Patterned shower screen
+- image: ../assets/gallery/shower-door-fixed-panel.jpg
+  alt_cs: Čiré sprchové dveře s pevným panelem v šedě obložené koupelně
+  alt_en: Clear shower door with a fixed panel in a grey tiled bathroom
+  category: skleneny-sprchovy-kout
+  caption_cs: Sprchové dveře a pevná zástěna
+  caption_en: Shower door and fixed screen
+- image: ../assets/gallery/shower-textured-glass-door.jpg
+  alt_cs: Sprchové dveře ze strukturovaného skla mezi obloženými stěnami
+  alt_en: Textured glass shower door between tiled walls
+  category: skleneny-sprchovy-kout
+  caption_cs: Strukturované sklo sprchových dveří
+  caption_en: Textured shower door glass
+- image: ../assets/gallery/shower-square-tray-glass.jpg
+  alt_cs: Prosklený sprchový kout se čtvercovou vaničkou a světlým obkladem
+  alt_en: Glass shower enclosure with a square tray and light tiles
+  category: skleneny-sprchovy-kout
+  caption_cs: Sprchový kout se světlým obkladem
+  caption_en: Shower enclosure with light tiles
+- image: ../assets/gallery/shower-grey-tile-enclosure.jpg
+  alt_cs: Čirý skleněný sprchový kout s šedými dlaždicemi a oknem
+  alt_en: Clear glass shower enclosure with grey tiles and a window
+  category: skleneny-sprchovy-kout
+  caption_cs: Prosklený sprchový kout u okna
+  caption_en: Glass shower enclosure beside a window
+- image: ../assets/gallery/shower-black-hinges-corner.jpg
+  alt_cs: Rohový sprchový kout s černými panty a černou sprchou
+  alt_en: Corner shower enclosure with black hinges and a black shower
+  category: skleneny-sprchovy-kout
+  caption_cs: Rohové prosklení s černým kováním
+  caption_en: Corner glazing with black fittings
+- image: ../assets/gallery/living-room-stair-partition.jpg
+  alt_cs: Skleněná stěna s madlem za pohovkou podél schodiště
+  alt_en: Glass partition with a handrail behind a sofa beside stairs
+  category: sklenena-stena
+  caption_cs: Skleněné oddělení schodiště
+  caption_en: Glass stair partition
+- image: ../assets/gallery/patterned-glass-corner-partition.jpg
+  alt_cs: Rohová skleněná příčka se svislým vzorem kolem posezení
+  alt_en: Corner glass partition with a vertical pattern around a seating area
+  category: sklenena-stena
+  caption_cs: Rohová příčka se vzorem
+  caption_en: Patterned corner partition
+- image: ../assets/gallery/office-corridor-black-frame.jpg
+  alt_cs: Kancelářská skleněná příčka s tmavým rámem podél chodby
+  alt_en: Office glass partition with a dark frame along a corridor
+  category: sklenena-stena
+  caption_cs: Příčka podél kancelářské chodby
+  caption_en: Office corridor partition
+- image: ../assets/gallery/frosted-showroom-divider.jpg
+  alt_cs: Vysoký neprůhledný skleněný dělicí panel v interiéru prodejny
+  alt_en: Tall opaque glass divider panel inside a showroom
+  category: sklenena-stena
+  caption_cs: Samostatný skleněný dělicí panel
+  caption_en: Freestanding glass divider panel
+- image: ../assets/gallery/circle-pattern-showroom-partition.jpg
+  alt_cs: Skleněná příčka s kruhovým vzorem u vystaveného nábytku
+  alt_en: Glass partition with a circle pattern beside displayed furniture
+  category: sklenena-stena
+  caption_cs: Příčka s kruhovým vzorem
+  caption_en: Circle-patterned partition
+- image: ../assets/gallery/grass-pattern-glass-partition.jpg
+  alt_cs: Světlá skleněná stěna s rostlinným vzorem mezi dveřmi
+  alt_en: Light glass partition with a plant pattern between doorways
+  category: sklenena-stena
+  caption_cs: Skleněná stěna s rostlinným vzorem
+  caption_en: Plant-patterned glass partition
+- image: ../assets/gallery/timber-porch-glass-wall.jpg
+  alt_cs: Průhledná skleněná stěna na dřevěné zastřešené terase
+  alt_en: Clear glass wall on a covered timber terrace
+  category: sklenena-stena
+  caption_cs: Svislé zasklení dřevěné terasy
+  caption_en: Vertical glazing on a timber terrace
+- image: ../assets/gallery/office-opaque-panel-wall.jpg
+  alt_cs: Kancelářská příčka se světlými panely a prosklenými dveřmi
+  alt_en: Office partition with light panels and a glazed door
+  category: sklenena-stena
+  caption_cs: Kancelářská dělicí stěna
+  caption_en: Office dividing wall
+- image: ../assets/gallery/entrance-canopy-side-view.jpg
+  alt_cs: Boční pohled na skleněnou stříšku nad vstupem do dřevěného domu
+  alt_en: Side view of a glass canopy above the entrance to a timber house
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Boční pohled na vstupní stříšku
+  caption_en: Side view of an entrance canopy
+- image: ../assets/gallery/courtyard-glass-roof.jpg
+  alt_cs: Skleněné zastřešení nad průchodem kolem dvora
+  alt_en: Glass roof above a passage beside a courtyard
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Zastřešený průchod u dvora
+  caption_en: Covered courtyard passage
+- image: ../assets/gallery/terrace-roof-front-view.jpg
+  alt_cs: Čelní pohled na skleněné zastřešení terasy u trávníku
+  alt_en: Front view of a glass terrace roof beside a lawn
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Čelní pohled na terasové zastřešení
+  caption_en: Front view of a terrace roof
+- image: ../assets/gallery/terrace-roof-grey-frame.jpg
+  alt_cs: Skleněné zastřešení terasy v šedém rámu u domu
+  alt_en: Glass terrace roof in a grey frame beside a house
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Terasové zastřešení v šedém rámu
+  caption_en: Grey-framed terrace roof
+- image: ../assets/gallery/glass-top-wooden-cabinet.jpg
+  alt_cs: Světlá skleněná deska s oblými rohy na dřevěné komodě
+  alt_en: Light glass top with rounded corners on a wooden chest of drawers
+  category: sklo-na-nabytek
+  caption_cs: Skleněná ochranná deska na komodě
+  caption_en: Protective glass cabinet top
+- image: ../assets/gallery/bathroom-rounded-mirror.jpg
+  alt_cs: Vysoké zrcadlo se zaoblenými rohy mezi dvěma nástěnnými svítidly
+  alt_en: Tall mirror with rounded corners between two wall lights
+  category: zrcadla
+  caption_cs: Zaoblené nástěnné zrcadlo
+  caption_en: Rounded wall mirror
+- image: ../assets/gallery/kitchen-white-glass-dark-cabinets.jpg
+  alt_cs: Bílý skleněný obklad mezi tmavými kuchyňskými skříňkami
+  alt_en: White glass splashback between dark kitchen cabinets
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Bílý obklad u tmavé kuchyně
+  caption_en: White splashback in a dark kitchen
+- image: ../assets/gallery/kitchen-white-glass-open-shelf.jpg
+  alt_cs: Bílý skleněný obklad pod tmavou otevřenou kuchyňskou policí
+  alt_en: White glass splashback beneath a dark open kitchen shelf
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Skleněný obklad pod otevřenou policí
+  caption_en: Glass splashback beneath an open shelf
+- image: ../assets/gallery/kitchen-blue-grey-splashback.jpg
+  alt_cs: Modrošedý skleněný obklad za kuchyňským dřezem
+  alt_en: Blue-grey glass splashback behind a kitchen sink
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Modrošedé kuchyňské sklo
+  caption_en: Blue-grey kitchen glass
+- image: ../assets/gallery/kitchen-grey-splashback-long-counter.jpg
+  alt_cs: Šedý skleněný obklad podél dlouhé pracovní desky s dřezem a sporákem
+  alt_en: Grey glass splashback along a long worktop with a sink and cooker
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Skleněný obklad podél pracovní desky
+  caption_en: Glass splashback along a worktop
+- image: ../assets/gallery/kitchen-floral-glass-splashback.jpg
+  alt_cs: Kuchyňský skleněný obklad s černým květinovým vzorem
+  alt_en: Kitchen glass splashback with a black floral pattern
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Květinový vzor na kuchyňském skle
+  caption_en: Floral pattern on kitchen glass
+- image: ../assets/gallery/double-glass-door-floral-pattern.jpg
+  alt_cs: Dvoukřídlé skleněné dveře s dekorativním rostlinným vzorem
+  alt_en: Double glass doors with a decorative plant pattern
+  category: sklenene-dvere
+  caption_cs: Dvoukřídlé dveře s rostlinným vzorem
+  caption_en: Double doors with a plant pattern
+- image: ../assets/gallery/double-glass-door-arched-opening.jpg
+  alt_cs: Dvoukřídlé skleněné dveře v obloukovém průchodu
+  alt_en: Double glass doors in an arched opening
+  category: sklenene-dvere
+  caption_cs: Skleněné dveře v oblouku
+  caption_en: Glass doors in an archway
+- image: ../assets/gallery/single-glass-door-black-handle.jpg
+  alt_cs: Jednokřídlé skleněné dveře s černým madlem otevřené do místnosti
+  alt_en: Single glass door with a black handle opening into a room
+  category: sklenene-dvere
+  caption_cs: Otevřené skleněné dveře s černým madlem
+  caption_en: Open glass door with a black handle
+- image: ../assets/gallery/framed-frosted-glass-door.jpg
+  alt_cs: Matné skleněné dveře s kovovou klikou v obložkovém rámu
+  alt_en: Frosted glass door with a metal handle in a fitted frame
+  category: sklenene-dvere
+  caption_cs: Matné skleněné dveře v rámu
+  caption_en: Framed frosted glass door
+- image: ../assets/gallery/double-sliding-door-landing.jpg
+  alt_cs: Skleněné posuvné dveře s pevnými panely u schodišťové podesty
+  alt_en: Sliding glass doors with fixed panels beside a stair landing
+  category: sklenene-dvere
+  caption_cs: Posuvné prosklení u schodiště
+  caption_en: Sliding glazing beside stairs
+- image: ../assets/gallery/double-sliding-door-kitchen.jpg
+  alt_cs: Dvoukřídlé skleněné posuvné dveře mezi jídelnou a kuchyní
+  alt_en: Double sliding glass doors between a dining area and kitchen
+  category: sklenene-dvere
+  caption_cs: Posuvné dveře do kuchyně
+  caption_en: Sliding doors into a kitchen
+- image: ../assets/gallery/double-sliding-door-line-pattern.jpg
+  alt_cs: Dvoukřídlé matné skleněné dveře s čirými vodorovnými linkami a dlouhými madly
+  alt_en: Double frosted glass doors with clear horizontal lines and long handles
+  category: sklenene-dvere
+  caption_cs: Dvoukřídlé dveře s linkovým vzorem
+  caption_en: Double doors with a line pattern
+- image: ../assets/gallery/sliding-door-wave-pattern.jpg
+  alt_cs: Matné skleněné posuvné dveře s čirým vlnitým pruhem
+  alt_en: Frosted sliding glass door with a clear wave-shaped stripe
+  category: sklenene-dvere
+  caption_cs: Posuvné dveře s vlnitým vzorem
+  caption_en: Sliding door with a wave pattern
+- image: ../assets/gallery/single-sliding-door-line-pattern.jpg
+  alt_cs: Jednokřídlé matné skleněné posuvné dveře s čirými vodorovnými linkami
+  alt_en: Single frosted sliding glass door with clear horizontal lines
+  category: sklenene-dvere
+  caption_cs: Jednokřídlé dveře s linkovým vzorem
+  caption_en: Single door with a line pattern
+- image: ../assets/gallery/sliding-door-clear-strips.jpg
+  alt_cs: Matné skleněné posuvné dveře se svislými čirými proužky
+  alt_en: Frosted sliding glass door with clear vertical strips
+  category: sklenene-dvere
+  caption_cs: Matné dveře s čirými proužky
+  caption_en: Frosted door with clear strips
+- image: ../assets/gallery/sliding-door-square-pattern.jpg
+  alt_cs: Matné skleněné posuvné dveře s pevným panelem a čirými čtverci
+  alt_en: Frosted sliding glass door with a fixed panel and clear squares
+  category: sklenene-dvere
+  caption_cs: Posuvné prosklení se čtvercovým vzorem
+  caption_en: Sliding glazing with a square pattern
+- image: ../assets/gallery/sliding-door-leaf-pattern.jpg
+  alt_cs: Skleněné posuvné dveře s pevným panelem a vzorem listů
+  alt_en: Sliding glass door with a fixed panel and a leaf pattern
+  category: sklenene-dvere
+  caption_cs: Posuvné prosklení s listovým vzorem
+  caption_en: Sliding glazing with a leaf pattern
+- image: ../assets/gallery/wp-1589-white-double-door.jpg
+  alt_cs: Bílé dvoukřídlé skleněné dveře se dvěma dlouhými madly
+  alt_en: White double glass doors with two long handles
+  category: sklenene-dvere
+  caption_cs: Bílé dvoukřídlé dveře
+  caption_en: White double doors
+- image: ../assets/gallery/wp-1722-white-kitchen-grey-splashback.jpg
+  alt_cs: Šedý skleněný obklad v bílé rohové kuchyni s vestavěnou troubou
+  alt_en: Grey glass splashback in a white corner kitchen with a built-in oven
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Šedý obklad v bílé kuchyni
+  caption_en: Grey splashback in a white kitchen
+- image: ../assets/gallery/wp-1724-cream-kitchen-splashback.jpg
+  alt_cs: Světlý skleněný obklad za pracovní deskou bílé rohové kuchyně
+  alt_en: Light glass splashback behind the worktop of a white corner kitchen
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Světlý kuchyňský obklad
+  caption_en: Light kitchen splashback
+- image: ../assets/gallery/wp-1726-grey-kitchen-sink-splashback.jpg
+  alt_cs: Šedý skleněný obklad kolem dřezu pod skříňkami s dekorem dřeva
+  alt_en: Grey glass splashback around a sink beneath wood-effect cabinets
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Šedé sklo kolem dřezu
+  caption_en: Grey glass around a sink
+- image: ../assets/gallery/wp-1728-white-splashback-dark-kitchen-front.jpg
+  alt_cs: Bílý skleněný obklad pod tmavými skříňkami při pohledu podél pracovní desky
+  alt_en: White glass splashback beneath dark cabinets viewed along the worktop
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Obklad pod tmavými skříňkami
+  caption_en: Splashback beneath dark cabinets
+- image: ../assets/gallery/wp-1732-stair-glass-point-fixings-side.jpg
+  alt_cs: Boční pohled na skleněné zábradlí s bodovým uchycením u dřevěného schodiště
+  alt_en: Side view of a point-fixed glass railing beside wooden stairs
+  category: sklenene-zabradli
+  caption_cs: Bodově uchycené sklo u schodiště
+  caption_en: Point-fixed glass beside stairs
+- image: ../assets/gallery/wp-1733-landing-glass-guard.jpg
+  alt_cs: Skleněná zábrana kolem schodišťového otvoru v dřevěné podlaze
+  alt_en: Glass guard around a stair opening in a wooden floor
+  category: sklenene-zabradli
+  caption_cs: Zábrana kolem schodišťového otvoru
+  caption_en: Guard around a stair opening
+- image: ../assets/gallery/wp-1734-clear-door-beside-shelves.jpg
+  alt_cs: Čiré skleněné dveře s dlouhým madlem vedle bílých polic
+  alt_en: Clear glass door with a long handle beside white shelves
+  category: sklenene-dvere
+  caption_cs: Čiré dveře u polic
+  caption_en: Clear door beside shelves
+- image: ../assets/gallery/wp-1745-frosted-double-door-black-fittings.jpg
+  alt_cs: Matné dvoukřídlé skleněné dveře s černými panty a madlem
+  alt_en: Frosted double glass doors with black hinges and a handle
+  category: sklenene-dvere
+  caption_cs: Matné dveře s černým kováním
+  caption_en: Frosted doors with black fittings
+- image: ../assets/gallery/wp-1746-frosted-sliding-door-closed.jpg
+  alt_cs: Matné skleněné posuvné dveře s pevným panelem uzavírající průchod
+  alt_en: Frosted sliding glass door with a fixed panel closing an opening
+  category: sklenene-dvere
+  caption_cs: Uzavřené posuvné prosklení
+  caption_en: Closed sliding glazing
+- image: ../assets/gallery/wp-1748-wood-stairs-point-fixed-railing.jpg
+  alt_cs: Skleněné zábradlí s bodovými úchyty podél dřevěných schodů
+  alt_en: Point-fixed glass railing along wooden stairs
+  category: sklenene-zabradli
+  caption_cs: Skleněné zábradlí u dřevěných schodů
+  caption_en: Glass railing beside wooden stairs
+- image: ../assets/gallery/wp-1750-terrace-clear-sliding-door.jpg
+  alt_cs: Čiré skleněné posuvné dveře v širokém průchodu u terasy
+  alt_en: Clear sliding glass doors in a wide opening beside a terrace
+  category: sklenene-dvere
+  caption_cs: Čiré posuvné dveře u terasy
+  caption_en: Clear sliding doors beside a terrace
+- image: ../assets/gallery/wp-1751-dining-room-stair-glass.jpg
+  alt_cs: Skleněná výplň podél dřevěného schodiště vedle jídelního stolu
+  alt_en: Glass infill along wooden stairs beside a dining table
+  category: sklenene-zabradli
+  caption_cs: Zábradlí vedle jídelny
+  caption_en: Railing beside a dining area
+- image: ../assets/gallery/wp-1755-balcony-opaque-glass-exterior.jpg
+  alt_cs: Balkonové zábradlí s neprůhlednými skleněnými výplněmi vedle venkovního schodiště
+  alt_en: Balcony railing with opaque glass panels beside an outdoor staircase
+  category: sklenene-zabradli
+  caption_cs: Balkonové skleněné výplně
+  caption_en: Glass balcony panels
+- image: ../assets/gallery/wp-1757-floral-glass-double-door-open.jpg
+  alt_cs: Prosklené dvoukřídlé dveře s rostlinným vzorem otevřené do chodby
+  alt_en: Glazed double doors with a plant pattern opening into a hallway
+  category: sklenene-dvere
+  caption_cs: Otevřené dveře s rostlinným vzorem
+  caption_en: Open doors with a plant pattern
+- image: ../assets/gallery/wp-1761-grey-splashback-microwave-kitchen.jpg
+  alt_cs: Šedý skleněný obklad v rohové kuchyni pod vestavěnou mikrovlnnou troubou
+  alt_en: Grey glass splashback in a corner kitchen beneath a built-in microwave
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Obklad v rohové kuchyni
+  caption_en: Corner kitchen splashback
+- image: ../assets/gallery/wp-1769-decorated-glass-mugs.jpg
+  alt_cs: Dva skleněné hrnky s jemnými rostlinnými motivy
+  alt_en: Two glass mugs with delicate plant motifs
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Skleněné hrnky s motivem
+  caption_en: Decorated glass mugs
+- image: ../assets/gallery/wp-1770-decorated-stemmed-glasses.jpg
+  alt_cs: Sklenice na stopce s dekorativními vzory vystavené na polici
+  alt_en: Stemmed glasses with decorative patterns displayed on a shelf
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Dekorované sklenice na stopce
+  caption_en: Decorated stemmed glasses
+- image: ../assets/gallery/wp-1771-illuminated-glass-table.jpg
+  alt_cs: Skleněný stolek s osvětlenými hranami a dekorativním vzorem
+  alt_en: Glass table with illuminated edges and a decorative pattern
+  category: sklo-na-nabytek
+  caption_cs: Dekorativní skleněný stolek
+  caption_en: Decorative glass table
+- image: ../assets/gallery/wp-1774-clear-double-sliding-door.jpg
+  alt_cs: Čiré dvoukřídlé posuvné skleněné dveře v průchodu pod schodištěm
+  alt_en: Clear double sliding glass doors in an opening beneath stairs
+  category: sklenene-dvere
+  caption_cs: Čiré dvoukřídlé posuvné dveře
+  caption_en: Clear double sliding doors
+- image: ../assets/gallery/wp-1775-patterned-double-sliding-door.jpg
+  alt_cs: Matné dvoukřídlé skleněné posuvné dveře se vzorem a dvěma madly
+  alt_en: Patterned frosted double sliding glass doors with two handles
+  category: sklenene-dvere
+  caption_cs: Vzorované dvoukřídlé dveře
+  caption_en: Patterned double doors
+- image: ../assets/gallery/wp-1779-striped-office-partition-door.jpg
+  alt_cs: Skleněná příčka s vodorovnými pruhy a dveřmi do kanceláře
+  alt_en: Glass partition with horizontal stripes and an office door
+  category: sklenena-stena
+  caption_cs: Pruhovaná kancelářská příčka
+  caption_en: Striped office partition
+- image: ../assets/gallery/wp-1780-vertical-stripe-counter-partition.jpg
+  alt_cs: Skleněná příčka se svislými pruhy nad bílou pracovní deskou
+  alt_en: Glass partition with vertical stripes above a white counter
+  category: sklenena-stena
+  caption_cs: Příčka nad pracovní deskou
+  caption_en: Partition above a counter
+- image: ../assets/gallery/wp-1785-grey-shower-recess-glass.jpg
+  alt_cs: Čirý skleněný sprchový kout s šedým obkladem a výklenkem ve stěně
+  alt_en: Clear glass shower enclosure with grey tiles and a wall recess
+  category: skleneny-sprchovy-kout
+  caption_cs: Sprchové prosklení s šedým obkladem
+  caption_en: Shower glazing with grey tiles
+- image: ../assets/gallery/wp-1789-wood-tile-shower-screen.jpg
+  alt_cs: Čiré sprchové sklo vedle okna v koupelně s obkladem v dekoru dřeva
+  alt_en: Clear shower glass beside a window in a wood-effect tiled bathroom
+  category: skleneny-sprchovy-kout
+  caption_cs: Sprchové sklo u okna
+  caption_en: Shower glass beside a window
+- image: ../assets/gallery/wp-1790-landing-glass-edge-detail.jpg
+  alt_cs: Detail skleněného zábradlí u horní hrany schodiště
+  alt_en: Glass railing detail at the upper edge of a staircase
+  category: sklenene-zabradli
+  caption_cs: Detail zábradlí u podesty
+  caption_en: Landing railing detail
+- image: ../assets/gallery/wp-1795-horse-motif-glass-decoration.jpg
+  alt_cs: Skleněná dekorace s barevným motivem hlavy koně ve stojánku
+  alt_en: Glass decoration with a coloured horse head motif on a stand
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Skleněná dekorace s koněm
+  caption_en: Horse motif glass decoration
+- image: ../assets/gallery/wp-1796-dog-motif-glass-decoration.jpg
+  alt_cs: Skleněná dekorace s barevným motivem hlavy psa ve stojánku
+  alt_en: Glass decoration with a coloured dog head motif on a stand
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Skleněná dekorace se psem
+  caption_en: Dog motif glass decoration
+- image: ../assets/gallery/wp-1798-illuminated-house-number-night.jpg
+  alt_cs: Osvětlené domovní číslo na skleněné destičce za tmy
+  alt_en: Illuminated house number on a glass plaque at night
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Podsvícené skleněné domovní číslo
+  caption_en: Illuminated glass house number
+- image: ../assets/gallery/wp-1799-glass-house-number-day.jpg
+  alt_cs: Skleněná destička s domovním číslem upevněná na světlé fasádě
+  alt_en: Glass house number plaque mounted on a light facade
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Skleněné domovní číslo za dne
+  caption_en: Glass house number in daylight
+- image: ../assets/gallery/wp-1801-engraved-horse-glass-stand.jpg
+  alt_cs: Skleněná destička s rytým motivem hlavy koně ve stojánku
+  alt_en: Glass plaque with an engraved horse head motif on a stand
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Rytý motiv koně ve skle
+  caption_en: Engraved horse motif in glass
+- image: ../assets/gallery/wp-1812-glass-railing-open-staircase.jpg
+  alt_cs: Skleněné zábradlí kolem otevřeného dřevěného schodiště se širokou podestou
+  alt_en: Glass railing around an open wooden staircase with a wide landing
+  category: sklenene-zabradli
+  caption_cs: Zábradlí otevřeného schodiště
+  caption_en: Open staircase railing
+- image: ../assets/gallery/wp-1813-glass-rail-wooden-post-detail.jpg
+  alt_cs: Boční detail skleněného zábradlí u dřevěného sloupku a schodů
+  alt_en: Side detail of a glass railing beside a wooden post and stairs
+  category: sklenene-zabradli
+  caption_cs: Skleněné zábradlí u sloupku
+  caption_en: Glass railing beside a post
+- image: ../assets/gallery/wp-1820-wood-handrail-stair-glass.jpg
+  alt_cs: Skleněné zábradlí s dřevěným madlem a kovovými sloupky u dřevěných schodů
+  alt_en: Glass railing with a wooden handrail and metal posts beside wooden stairs
+  category: sklenene-zabradli
+  caption_cs: Skleněné zábradlí s dřevěným madlem
+  caption_en: Glass railing with a wooden handrail
+- image: ../assets/gallery/wp-1821-loft-glass-guard.jpg
+  alt_cs: Skleněná zábrana podél schodišťového otvoru v podkroví
+  alt_en: Glass guard along a stair opening in a loft
+  category: sklenene-zabradli
+  caption_cs: Podkrovní skleněné zábradlí
+  caption_en: Loft glass railing
+- image: ../assets/gallery/wp-1884-office-double-glass-door-black-handles.jpg
+  alt_cs: Dvoukřídlé skleněné dveře s černými madly do kancelářského prostoru
+  alt_en: Double glass doors with black handles opening into an office space
+  category: sklenene-dvere
+  caption_cs: Kancelářské dvoukřídlé dveře
+  caption_en: Office double doors
+- image: ../assets/gallery/wp-1885-grass-pattern-interior-door.jpg
+  alt_cs: Skleněné dveře s jemným rostlinným vzorem v interiérovém průchodu
+  alt_en: Glass door with a delicate plant pattern in an interior opening
+  category: sklenene-dvere
+  caption_cs: Dveře s rostlinným vzorem
+  caption_en: Door with a plant pattern
+- image: ../assets/gallery/wp-1888-single-frosted-door-black-handle.jpg
+  alt_cs: Jednokřídlé matné skleněné dveře s černými panty a dlouhým madlem
+  alt_en: Single frosted glass door with black hinges and a long handle
+  category: sklenene-dvere
+  caption_cs: Matné jednokřídlé dveře
+  caption_en: Single frosted door
+- image: ../assets/gallery/wp-1889-clear-landing-door-fixed-panels.jpg
+  alt_cs: Čiré skleněné dveře s pevnými panely u schodišťové podesty pod dřevěným stropem
+  alt_en: Clear glass door with fixed panels beside a stair landing beneath a timber ceiling
+  category: sklenene-dvere
+  caption_cs: Čiré prosklení u podesty
+  caption_en: Clear glazing beside a landing
+- image: ../assets/gallery/wp-1890-loft-glass-door-wide-opening.jpg
+  alt_cs: Prosklené dveře v širokém dřevěném rámu u podkrovního schodiště
+  alt_en: Glazed doors in a wide wooden frame beside a loft staircase
+  category: sklenene-dvere
+  caption_cs: Prosklený podkrovní průchod
+  caption_en: Glazed loft opening
+- image: ../assets/gallery/wp-1891-frosted-double-sliding-door-front.jpg
+  alt_cs: Matné dvoukřídlé skleněné posuvné dveře v bílé stěně
+  alt_en: Frosted double sliding glass doors in a white wall
+  category: sklenene-dvere
+  caption_cs: Matné dvoukřídlé posuvné dveře
+  caption_en: Frosted double sliding doors
+- image: ../assets/gallery/wp-1892-hallway-patterned-sliding-door.jpg
+  alt_cs: Skleněné posuvné dveře se vzorem v průchodu mezi chodbou a schodištěm
+  alt_en: Patterned sliding glass door in an opening between a hallway and stairs
+  category: sklenene-dvere
+  caption_cs: Vzorované posuvné dveře v chodbě
+  caption_en: Patterned sliding door in a hallway
+- image: ../assets/gallery/wp-1895-circular-pattern-glass-door.jpg
+  alt_cs: Skleněné dveře s tmavými a čirými kruhovými motivy
+  alt_en: Glass door with dark and clear circular motifs
+  category: sklenene-dvere
+  caption_cs: Dveře s kruhovými motivy
+  caption_en: Door with circular motifs
+- image: ../assets/gallery/wp-1923-frosted-sliding-door-open.jpg
+  alt_cs: Matné skleněné posuvné dveře otevřené do obývacího pokoje
+  alt_en: Frosted sliding glass door opening into a living room
+  category: sklenene-dvere
+  caption_cs: Otevřené matné posuvné dveře
+  caption_en: Open frosted sliding door
+- image: ../assets/gallery/wp-1943-glass-rail-between-wood-posts.jpg
+  alt_cs: Skleněné zábradlí mezi dřevěnými sloupky u schodiště
+  alt_en: Glass railing between wooden posts beside stairs
+  category: sklenene-zabradli
+  caption_cs: Sklo mezi dřevěnými sloupky
+  caption_en: Glass between wooden posts
+- image: ../assets/gallery/wp-1946-illuminated-stair-glass-side.jpg
+  alt_cs: Boční pohled na skleněné zábradlí podél osvětleného schodiště
+  alt_en: Side view of a glass railing along an illuminated staircase
+  category: sklenene-zabradli
+  caption_cs: Skleněné zábradlí u osvětlených schodů
+  caption_en: Glass railing beside illuminated stairs
+- image: ../assets/gallery/wp-1948-wood-framed-balcony-glass.jpg
+  alt_cs: Balkonové zábradlí s matnými skleněnými výplněmi v dřevěném rámu
+  alt_en: Balcony railing with frosted glass panels in a wooden frame
+  category: sklenene-zabradli
+  caption_cs: Skleněné výplně v dřevěném rámu
+  caption_en: Glass panels in a wooden frame
+- image: ../assets/gallery/wp-1949-mezzanine-glass-railing-below.jpg
+  alt_cs: Skleněné zábradlí dřevěné podesty při pohledu zespodu
+  alt_en: Glass railing on a wooden mezzanine viewed from below
+  category: sklenene-zabradli
+  caption_cs: Pohled zespodu na skleněné zábradlí
+  caption_en: Glass railing viewed from below
+- image: ../assets/gallery/wp-1957-shower-door-top-rail.jpg
+  alt_cs: Skleněné sprchové dveře s horní kolejnicí a obkladem v dekoru dřeva
+  alt_en: Glass shower door with a top rail and wood-effect tiles
+  category: skleneny-sprchovy-kout
+  caption_cs: Sprchové dveře s horní kolejnicí
+  caption_en: Shower door with a top rail
+- image: ../assets/gallery/wp-1958-bath-side-glass-screen.jpg
+  alt_cs: Čirá skleněná zástěna mezi vanou a sprchovým prostorem
+  alt_en: Clear glass screen between a bath and a shower area
+  category: skleneny-sprchovy-kout
+  caption_cs: Skleněná zástěna vedle vany
+  caption_en: Glass screen beside a bath
+- image: ../assets/gallery/wp-1959-glass-doors-beside-sauna.jpg
+  alt_cs: Čiré skleněné dveře vedle dřevěné sauny v koupelně
+  alt_en: Clear glass doors beside a wooden sauna in a bathroom
+  category: sklenene-dvere
+  caption_cs: Skleněné dveře vedle sauny
+  caption_en: Glass doors beside a sauna
+- image: ../assets/gallery/wp-1960-frosted-shower-dark-tiles.jpg
+  alt_cs: Matné skleněné sprchové dveře v koupelně s tmavým obkladem
+  alt_en: Frosted glass shower door in a dark tiled bathroom
+  category: skleneny-sprchovy-kout
+  caption_cs: Matné sprchové dveře
+  caption_en: Frosted shower door
+- image: ../assets/gallery/wp-1962-shower-door-black-hinges-open.jpg
+  alt_cs: Otevřené čiré sprchové dveře s černými panty a madlem
+  alt_en: Open clear shower door with black hinges and a handle
+  category: skleneny-sprchovy-kout
+  caption_cs: Otevřené sprchové dveře s černým kováním
+  caption_en: Open shower door with black fittings
+- image: ../assets/gallery/wp-1963-attic-shower-glass.jpg
+  alt_cs: Skleněný sprchový kout pod šikmým podkrovním oknem
+  alt_en: Glass shower enclosure beneath a sloping loft window
+  category: skleneny-sprchovy-kout
+  caption_cs: Podkrovní sprchový kout
+  caption_en: Loft shower enclosure
+- image: ../assets/gallery/wp-1965-double-shower-door-recess.jpg
+  alt_cs: Dvoukřídlé čiré sprchové dveře v úzkém obloženém výklenku
+  alt_en: Double clear shower doors in a narrow tiled recess
+  category: skleneny-sprchovy-kout
+  caption_cs: Dvoukřídlé sprchové dveře
+  caption_en: Double shower doors
+- image: ../assets/gallery/wp-1966-frosted-sliding-shower-door.jpg
+  alt_cs: Matné posuvné sprchové dveře s horní kolejnicí v koupelně
+  alt_en: Frosted sliding shower door with a top rail in a bathroom
+  category: skleneny-sprchovy-kout
+  caption_cs: Matné posuvné sprchové dveře
+  caption_en: Frosted sliding shower door
+- image: ../assets/gallery/wp-1967-clear-shower-white-bathroom.jpg
+  alt_cs: Čirý skleněný sprchový kout s horní kolejnicí v bílé koupelně
+  alt_en: Clear glass shower enclosure with a top rail in a white bathroom
+  category: skleneny-sprchovy-kout
+  caption_cs: Čirý sprchový kout v bílé koupelně
+  caption_en: Clear shower enclosure in a white bathroom
+- image: ../assets/gallery/wp-1973-office-clear-corner-partition.jpg
+  alt_cs: Čirá rohová skleněná příčka s dveřmi kolem kancelářského stolu
+  alt_en: Clear corner glass partition with a door around an office desk
+  category: sklenena-stena
+  caption_cs: Čirá rohová kancelářská příčka
+  caption_en: Clear corner office partition
+- image: ../assets/gallery/wp-1974-office-striped-door-open.jpg
+  alt_cs: Otevřené skleněné dveře s vodorovnými pruhy u kancelářské chodby
+  alt_en: Open glass door with horizontal stripes beside an office corridor
+  category: sklenena-stena
+  caption_cs: Otevřená pruhovaná kancelářská příčka
+  caption_en: Open striped office partition
+- image: ../assets/gallery/wp-1975-meeting-room-glass-wall.jpg
+  alt_cs: Široká skleněná stěna s dveřmi před místností s jednacím stolem
+  alt_en: Wide glass wall with a door in front of a meeting room
+  category: sklenena-stena
+  caption_cs: Prosklená jednací místnost
+  caption_en: Glazed meeting room
+- image: ../assets/gallery/wp-1982-window-kitchen-light-glass.jpg
+  alt_cs: Světlý skleněný obklad pod dřevěným stropem v kuchyni s dlouhým oknem
+  alt_en: Light glass splashback beneath a timber ceiling in a kitchen with a long window
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Světlé sklo u dlouhého okna
+  caption_en: Light glass beside a long window
+- image: ../assets/gallery/wp-1983-yellow-kitchen-glass-splashback.jpg
+  alt_cs: Žlutý skleněný obklad mezi bílými skříňkami a dřevěnou pracovní deskou
+  alt_en: Yellow glass splashback between white cabinets and a wooden worktop
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Žlutý kuchyňský obklad
+  caption_en: Yellow kitchen splashback
+- image: ../assets/gallery/wp-1986-light-pattern-kitchen-splashback.jpg
+  alt_cs: Světlý skleněný obklad s jemným vzorem pod bílými kuchyňskými skříňkami
+  alt_en: Light patterned glass splashback beneath white kitchen cabinets
+  category: skleneny-obklad-do-kuchyne
+  caption_cs: Kuchyňský obklad s jemným vzorem
+  caption_en: Subtly patterned kitchen splashback
+- image: ../assets/gallery/wp-1992-glass-canopy-support-rods-entrance.jpg
+  alt_cs: Skleněná stříška zavěšená na táhlech nad vstupem do domu
+  alt_en: Glass canopy suspended on support rods above a house entrance
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Vstupní stříška s táhly
+  caption_en: Entrance canopy with support rods
+- image: ../assets/gallery/wp-1993-glazed-porch-grey-frame.jpg
+  alt_cs: Zasklená terasa s šedými rámy a skleněným zastřešením
+  alt_en: Glazed terrace with grey frames and a glass roof
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Terasa se skleněným zastřešením
+  caption_en: Terrace with a glass roof
+- image: ../assets/gallery/wp-1995-glass-canopy-side-blue-sky.jpg
+  alt_cs: Boční pohled na skleněnou stříšku s kovovými podpěrami u fasády
+  alt_en: Side view of a glass canopy with metal supports beside a facade
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Boční pohled na skleněnou stříšku
+  caption_en: Side view of a glass canopy
+- image: ../assets/gallery/wp-1997-timber-pergola-glazing-wide.jpg
+  alt_cs: Celkový pohled na zasklenou dřevěnou pergolu u dvora
+  alt_en: Wide view of a glazed timber pergola beside a courtyard
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Zasklená dřevěná pergola
+  caption_en: Glazed timber pergola
+- image: ../assets/gallery/wp-1998-timber-pergola-glass-panels.jpg
+  alt_cs: Skleněné stěny pod dřevěnou pergolou s venkovním posezením
+  alt_en: Glass walls beneath a timber pergola with outdoor seating
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Skleněné stěny pod pergolou
+  caption_en: Glass walls beneath a pergola
+- image: ../assets/gallery/wp-1999-timber-pergola-glazing-under-roof.jpg
+  alt_cs: Pohled pod střechu dřevěné pergoly na skleněné zasklení kolem vířivky
+  alt_en: View beneath a timber pergola roof of glazing around a hot tub
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Zasklení pod dřevěnou střechou
+  caption_en: Glazing beneath a timber roof
+- image: ../assets/gallery/wp-2000-glass-canopy-from-below.jpg
+  alt_cs: Pohled zespodu na skleněnou stříšku a její podpěrné táhlo
+  alt_en: View from below of a glass canopy and its support rod
+  category: sklenene-strisky-zaskleni-pergol-zastreseni
+  caption_cs: Detail stříšky při pohledu zespodu
+  caption_en: Canopy detail viewed from below
+- image: ../assets/gallery/wp-2005-music-motif-glass-coasters.jpg
+  alt_cs: Čtyři skleněné podtácky s motivy not, houslového klíče a klaviatury
+  alt_en: Four glass coasters with notes, treble clef and piano key motifs
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Podtácky s hudebními motivy
+  caption_en: Coasters with musical motifs
+- image: ../assets/gallery/wp-2008-cup-hearts-glass-coaster.jpg
+  alt_cs: Světlý skleněný podtácek s motivem šálku a srdcí na černém pozadí
+  alt_en: Light glass coaster with a cup and hearts motif against a black background
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Podtácek s motivem šálku
+  caption_en: Cup motif coaster
+- image: ../assets/gallery/wp-2009-coffee-motif-glass-coaster.jpg
+  alt_cs: Skleněný podtácek s hnědým kávovým motivem na černém pozadí
+  alt_en: Glass coaster with a brown coffee motif against a black background
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Podtácek s kávovým motivem
+  caption_en: Coffee motif coaster
+- image: ../assets/gallery/wp-2011-glass-coasters-with-cups.jpg
+  alt_cs: Skleněné podtácky s kávovými motivy a šálky na dřevěném stole
+  alt_en: Glass coasters with coffee motifs and cups on a wooden table
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Podtácky a šálky na stole
+  caption_en: Coasters and cups on a table
+- image: ../assets/gallery/wp-2012-panda-decorative-clock.jpg
+  alt_cs: Kulaté dekorativní hodiny s černobílým motivem pandy
+  alt_en: Round decorative clock with a black and white panda motif
+  category: sklenene-dekorace-gravirovani-fotek
+  caption_cs: Dekorativní hodiny s pandou
+  caption_en: Decorative panda clock

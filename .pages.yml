@@ -194,6 +194,13 @@ content:
         pattern:
           regex: ^https://www\.google\.com/maps/embed\?pb=[A-Za-z0-9!%._-]+$
           message: Použijte vygenerovanou URL https://www.google.com/maps/embed?pb=…
+      - name: facebook_url
+        label: Facebook stránka (volitelné)
+        description: Veřejný odkaz na stránku firmy. Web načítá jen obyčejný odkaz, žádný plugin ani sledování. Vymazáním odkaz skryjete.
+        type: string
+        pattern:
+          regex: ^https://www\.facebook\.com/[A-Za-z0-9.]+/?$
+          message: Použijte odkaz ve tvaru https://www.facebook.com/nazev-stranky/
       - name: phone
         label: Telefon (+420 a devět číslic)
         type: string
@@ -726,13 +733,23 @@ content:
         type: string
         required: true
       - name: text_cs
-        label: Popis — česky
+        label: Stručný úvod — česky
         type: text
         required: true
       - name: text_en
-        label: Popis — anglicky
+        label: Stručný úvod — anglicky
         type: text
         required: true
+      - name: details
+        label: Podrobnosti výrobku (volitelné)
+        description: Nejvýše čtyři krátké oddíly s nadpisem a textem v obou jazycích. Uvádějte pouze potvrzené možnosti. Oddíl odstraníte smazáním celé položky.
+        type: object
+        list: { max: 4 }
+        fields:
+          - { name: title_cs, label: 'Nadpis — česky', type: string, required: true }
+          - { name: title_en, label: 'Nadpis — anglicky', type: string, required: true }
+          - { name: text_cs, label: 'Text — česky', type: text, required: true }
+          - { name: text_en, label: 'Text — anglicky', type: text, required: true }
       - name: seo_description_cs
         label: SEO popis — česky
         type: text
@@ -768,7 +785,7 @@ content:
         type: text
         required: true
       - name: category
-        label: Výrobek (český slug)
+        label: Kategorie fotografie (stálý klíč)
         type: select
         required: true
         options:
@@ -781,6 +798,10 @@ content:
             - sklenene-strisky-zaskleni-pergol-zastreseni
             - sklenene-dekorace-gravirovani-fotek
             - sklenene-nahrobni-desky
+            - vitriny
+            - sklo-na-nabytek
+            - zrcadla
+            - krbova-skla
       - name: caption_cs
         label: Popisek — česky
         type: text

@@ -4,6 +4,7 @@ import test from 'node:test';
 import { CORE_SCHEMA, load } from 'js-yaml';
 import { z } from 'astro/zod';
 import { createSchemas, yamlItems } from '../src/content.config.ts';
+import { GALLERY_CATEGORIES, isServiceCategory } from '../src/lib/gallery.ts';
 
 const schemas = createSchemas(z.string().min(1));
 const read = async (name: string): Promise<unknown> =>
@@ -140,6 +141,109 @@ test('stable route pairs, gallery categories, strict keys and YAML file shapes a
   assert.throws(() => yamlItems({}, 'list'));
   assert.throws(() => yamlItems(['invalid'], 'list'));
   assert.deepEqual(yamlItems([], 'list'), []);
+});
+
+test('gallery-only subjects validate without product routes and CMS categories match the schema', async () => {
+  const photo = { image: '../assets/gallery/real.jpg', alt_cs: 'Sklo', alt_en: 'Glass' };
+  for (const category of GALLERY_CATEGORIES) {
+    assert.equal(schemas.galleryItem.safeParse({ ...photo, category }).success, true);
+  }
+  for (const category of ['vitriny', 'sklo-na-nabytek', 'zrcadla', 'krbova-skla'] as const) {
+    assert.equal(isServiceCategory(category), false);
+  }
+  assert.equal(isServiceCategory('sklenene-dvere'), true);
+  assert.deepEqual(schemas.gallery.parse([]), []);
+
+  const cms = z
+    .object({
+      content: z.array(
+        z.object({
+          name: z.string(),
+          fields: z
+            .array(z.object({ name: z.string(), options: z.unknown().optional() }))
+            .optional(),
+        }),
+      ),
+    })
+    .parse(
+      load(await readFile(new URL('../.pages.yml', import.meta.url), 'utf8'), {
+        schema: CORE_SCHEMA,
+      }),
+    );
+  const field = cms.content
+    .find(({ name }) => name === 'gallery')
+    ?.fields?.find(({ name }) => name === 'category');
+  const { values } = z.object({ values: z.array(z.string()) }).parse(field?.options);
+  assert.deepEqual([...values].sort(), [...GALLERY_CATEGORIES].sort());
+});
+
+test('service details allow CMS clearing but reject incomplete translations and excessive sections', async () => {
+  const [service] = schemas.services.parse(await read('services'));
+  const detail = {
+    title_cs: 'Provedení',
+    title_en: 'Options',
+    text_cs: 'Popis provedení.',
+    text_en: 'Description of the options.',
+  };
+  for (const details of [undefined, null, '']) {
+    assert.equal(schemas.service.parse({ ...service, details }).details, undefined);
+  }
+  for (const details of [[], [detail], Array.from({ length: 4 }, () => detail)]) {
+    assert.deepEqual(schemas.service.parse({ ...service, details }).details, details);
+  }
+  for (const field of Object.keys(detail)) {
+    for (const value of [undefined, null, '', ' ', 8]) {
+      assert.equal(
+        schemas.service.safeParse({ ...service, details: [{ ...detail, [field]: value }] }).success,
+        false,
+      );
+    }
+  }
+  for (const details of [
+    {},
+    [null],
+    [{}],
+    [{ ...detail, html: '<p>Unsupported markup field</p>' }],
+    Array.from({ length: 5 }, () => detail),
+  ]) {
+    assert.equal(schemas.service.safeParse({ ...service, details }).success, false);
+  }
+});
+
+test('CMS service details match the optional bounded bilingual content contract', async () => {
+  const cms = z
+    .object({
+      content: z.array(
+        z.object({
+          name: z.string(),
+          fields: z.array(z.looseObject({ name: z.string() })).optional(),
+        }),
+      ),
+    })
+    .parse(
+      load(await readFile(new URL('../.pages.yml', import.meta.url), 'utf8'), {
+        schema: CORE_SCHEMA,
+      }),
+    );
+  const details = cms.content
+    .find(({ name }) => name === 'services')
+    ?.fields?.find(({ name }) => name === 'details');
+  assert.ok(details);
+  assert.equal(details.type, 'object');
+  assert.notEqual(details.required, true);
+  assert.deepEqual(details.list, { max: 4 });
+  const fields = z
+    .array(z.object({ name: z.string(), type: z.string(), required: z.boolean() }))
+    .parse(details.fields);
+  assert.deepEqual(
+    fields.map(({ name, type, required }) => [name, type, required]),
+    [
+      ['title_cs', 'string', true],
+      ['title_en', 'string', true],
+      ['text_cs', 'text', true],
+      ['text_en', 'text', true],
+    ],
+  );
 });
 
 test('company figures and service groups preserve owner-confirmed values and reject incomplete content', async () => {
@@ -282,6 +386,27 @@ test('Google reputation validates the profile link, bounds, quoted reviews and C
     schemas.about.safeParse({ ...about, google_reputation: { url: google.url } }).success,
     false,
   );
+});
+
+test('the optional Facebook link accepts only a public facebook.com page URL', async () => {
+  const contact = schemas.contact.parse(await read('contact'));
+  for (const facebook_url of [undefined, null, '']) {
+    assert.equal(schemas.contact.parse({ ...contact, facebook_url }).facebook_url, undefined);
+  }
+  for (const facebook_url of [
+    'https://www.facebook.com/skloservisbrod/',
+    'https://www.facebook.com/skloservisbrod',
+  ]) {
+    assert.equal(schemas.contact.safeParse({ ...contact, facebook_url }).success, true);
+  }
+  for (const facebook_url of [
+    'http://www.facebook.com/skloservisbrod/',
+    'https://www.facebook.com.evil.example/skloservisbrod/',
+    'https://www.facebook.com/plugins/page.php?href=x',
+    'https://example.com/skloservisbrod/',
+  ]) {
+    assert.equal(schemas.contact.safeParse({ ...contact, facebook_url }).success, false);
+  }
 });
 
 test('map links require HTTPS and embeds accept only the official generated host and path', async () => {

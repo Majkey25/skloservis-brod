@@ -202,6 +202,20 @@ const products = {
     border-bottom: 1px solid var(--line);
     box-shadow: inset 0 -1px var(--glass-edge);
   }
+  /* Part of the first-load entrance (see Base.astro and motion.ts): the bar drops into place. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-entry='pending']) .site-header {
+      translate: 0 -100%;
+    }
+    :global(html[data-entry='play']) .site-header {
+      animation: header-entry 820ms cubic-bezier(0.16, 1, 0.3, 1) 40ms both;
+    }
+  }
+  @keyframes header-entry {
+    from {
+      translate: 0 -100%;
+    }
+  }
   @supports (backdrop-filter: blur(1px)) {
     .site-header {
       background: var(--glass);
@@ -231,6 +245,9 @@ const products = {
     width: 32px;
     height: 32px;
     flex: none;
+    transition:
+      rotate 420ms var(--ease),
+      scale 420ms var(--ease);
   }
   .desktop-nav,
   .tools {
@@ -262,9 +279,9 @@ const products = {
     letter-spacing: 0.12em;
     text-decoration: none;
   }
+  /* The language switch never animates: colour changes are immediate. */
   a.language-nav__item {
     color: var(--muted);
-    transition: color var(--dur-fast) var(--ease);
   }
   a.language-nav__item:hover,
   a.language-nav__item:focus-visible {
@@ -283,12 +300,6 @@ const products = {
     border-radius: 1px;
     background: currentColor;
   }
-  :global(html[data-preference-transition='language']) .site-header {
-    view-transition-name: preference-header;
-  }
-  :global(html[data-preference-transition='language']) .language-indicator {
-    view-transition-name: preference-language;
-  }
   .desktop-nav a,
   .nav-products summary {
     text-decoration: none;
@@ -299,6 +310,80 @@ const products = {
   .nav-products summary:hover,
   .nav-products[open] > summary {
     color: var(--accent);
+  }
+  /* Top links draw an underline in from the left on hover and sweep it out to the right on leave.
+     Only the line and the icons move, never the hover target itself. */
+  .desktop-nav > a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .desktop-nav > a[aria-current='page'] {
+    text-decoration: none;
+  }
+  .desktop-nav > a::after,
+  .nav-products > summary::after,
+  .header-phone::after {
+    position: absolute;
+    right: 0;
+    bottom: 0.55rem;
+    left: 0;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    content: '';
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 380ms var(--ease);
+  }
+  .desktop-nav > a:focus-visible::after,
+  .desktop-nav > a[aria-current='page']::after,
+  .nav-products > summary:focus-visible::after,
+  .nav-products[open] > summary::after,
+  .nav-products > summary[data-current]::after,
+  .header-phone:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .desktop-nav > a:hover::after,
+    .nav-products > summary:hover::after,
+    .header-phone:hover::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+    .brand:hover .brand-logo {
+      rotate: -8deg;
+      scale: 1.06;
+    }
+    .header-phone:hover :global([data-icon='phone']) {
+      animation: header-phone-ring 720ms var(--ease);
+    }
+    .products-panel ul a:hover .products-panel__title {
+      translate: 3px 0;
+    }
+    .mobile-menu:not([open]) > summary:hover {
+      background: var(--surface);
+    }
+    .mobile-menu:not([open]) > summary:hover :global([data-icon='menu'] path:nth-child(2)) {
+      transform: scaleX(0.6);
+    }
+  }
+  @keyframes header-phone-ring {
+    20% {
+      rotate: -14deg;
+    }
+    40% {
+      rotate: 11deg;
+    }
+    60% {
+      rotate: -7deg;
+    }
+    80% {
+      rotate: 3deg;
+    }
   }
   .nav-products {
     position: relative;
@@ -318,10 +403,15 @@ const products = {
     gap: 0.3rem;
     min-height: 44px;
   }
-  .nav-products summary[data-current] span {
+  .nav-products > summary {
+    position: relative;
+  }
+  .nav-products > summary[data-current] {
     color: var(--accent);
-    text-decoration: underline;
-    text-underline-offset: 0.55rem;
+  }
+  /* The summary underline spans the label only, not the chevron after it. */
+  .nav-products > summary::after {
+    right: calc(1.1em + 0.3rem);
   }
   /* Opaque pane: the header's backdrop filter would leave a nested blur with nothing to blur. */
   .products-panel {
@@ -373,6 +463,7 @@ const products = {
   }
   .products-panel__title {
     flex: 1;
+    transition: translate var(--dur-fast) var(--ease);
   }
   .products-panel__glyph {
     display: grid;
@@ -467,6 +558,12 @@ const products = {
     text-decoration: none;
     color: var(--accent);
   }
+  .header-phone {
+    position: relative;
+  }
+  .header-phone::after {
+    left: calc(1.1em + 0.5rem);
+  }
   [aria-current='page'] {
     color: var(--accent);
     text-decoration: underline;
@@ -477,20 +574,48 @@ const products = {
     place-items: center;
     width: 44px;
     height: 44px;
+    position: relative;
+    isolation: isolate;
     border: 0;
     border-radius: 50%;
     background: transparent;
     color: var(--text);
-    transition: background-color var(--dur-fast) var(--ease);
   }
-  .theme-toggle:hover {
+  /* A soft disc grows behind the theme icon while the visible icon turns a little. */
+  .theme-toggle::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 50%;
     background: var(--surface);
+    content: '';
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      transform 320ms var(--ease),
+      opacity 200ms var(--ease);
+  }
+  .theme-toggle:focus-visible::before {
+    opacity: 1;
+    transform: none;
   }
   .theme-toggle svg {
     grid-area: 1 / 1;
     transition:
-      transform var(--dur-fast) var(--ease),
+      transform 320ms var(--ease),
       opacity var(--dur-fast) var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .theme-toggle:hover::before {
+      opacity: 1;
+      transform: none;
+    }
+    .theme-toggle[aria-pressed='false']:hover .icon-moon {
+      transform: rotate(-24deg) scale(1.1);
+    }
+    .theme-toggle[aria-pressed='true']:hover .icon-sun {
+      transform: rotate(60deg) scale(1.1);
+    }
   }
   .theme-toggle .icon-sun,
   .theme-toggle[aria-pressed='true'] .icon-moon {

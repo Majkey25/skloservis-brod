@@ -1,6 +1,6 @@
 # Náhled a budoucí přechod domény
 
-Stav ověřený 17. října 2026. Tento postup **není pokynem k okamžitému přepnutí**. Aktuálně se publikuje pouze [náhled na GitHub Pages](https://majkey25.github.io/skloservis-brod/). WordPress, produkční doména a DNS zůstávají beze změny.
+Stav aktualizovaný 18. října 2026. Majitel chce budoucí produkci na GitHub Pages s vlastní doménou, podobně jako Exhalace. Tento postup **není pokynem k okamžitému přepnutí**. Aktuálně se publikuje pouze [náhled na GitHub Pages](https://majkey25.github.io/skloservis-brod/). WordPress, produkční doména a DNS zůstávají beze změny.
 
 ## Máme vše potřebné?
 
@@ -8,16 +8,16 @@ Pro náhled máme repozitář, statický Astro web, české a anglické adresy, 
 
 Před skutečným přechodem ještě potřebujeme:
 
-- Ověřený přístup správce k doméně/DNS a produkčnímu hostingu. Tyto přístupy nebyly testovány.
-- Potvrdit, že cílový hosting obslouží statické soubory, HTTPS, skutečné 404 a potřebná přesměrování. Možnosti současného tarifu nejsou ověřené.
+- Ověřený přístup správce k doméně a aktivní DNS zóně. Ten nebyl testován. Administrátorský přístup k repozitáři na GitHubu byl pouze čtením potvrzen; není to přístup k DNS.
+- Pro požadovaný GitHub Pages ověřit vhodnost podle podmínek služby, připravit produkční workflow, vlastní doménu, HTTPS, skutečné 404 a řešení starých aliasů. Přístup SFTP k nynějšímu hostingu není potřeba k publikování na Pages, může však být potřeba pro zálohu a návrat WordPressu.
 - Zálohu souborů a databáze WordPressu, kompletní export DNS a ověřený způsob návratu. Při tomto běhu se záloha ani obnova produkce neprovádí.
 - Ověřit přístupy a nasazování pro vybraný produkční cíl. Na současném náhledu byl 18. října 2026 úspěšně ověřen celý průchod Pages CMS: uložení → commit → zelené CI → zveřejněný český i anglický text galerie. [Ověřený běh](https://github.com/Majkey25/skloservis-brod/actions/runs/39081477798) se týká GitHub Pages, nikoli dosud nenastaveného produkčního hostingu.
 - Před přechodem na jiný host znovu ověřit funkčnost formuláře. FormSubmit používá potvrzenou schránku `skloservis.brod@gmail.com`; majitel potvrdil aktivaci a 18. října 2026 také přijetí jediného povoleného testu. Klient při tomto pokusu nedostal do 15 sekund odpověď relaye, přesto zpráva dorazila. Další test vyžaduje nové povolení. Potvrzení relé ani `mailto:` samy neprokazují doručení. Prověřit také podmínky poskytovatele popsané v právních poznámkách.
 - Dokončit inventuru starých adres a médií včetně případných `?page_id=…` aliasů. Kód zachovává 14 známých českých adres, to ale samo neprokazuje úplnost historických odkazů.
-- Vyřešit automatický výběr jazyka před zapnutím indexace. Náhled při čerstvé návštěvě české úvodní adresy může podle uložené volby nebo jazyka zařízení přejít na `/en/`; přímé vnitřní adresy a ruční přepínání zůstávají dostupné. [Google doporučuje samostatné jazykové adresy a varuje před automatickým přesměrováním mezi nimi](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites). Pro produkční SEO doporučujeme zachovat českou úvodní adresu a angličtinu nabídnout odkazem. Tato změna požadovaného automatického chování zatím není provedena; skutečný dopad na indexaci není změřený.
+- Ověřit výsledný produkční výběr jazyka. Produkční sestavení již nechává českou úvodní adresu českou bez automatického přechodu na `/en/`; náhled zachovává výchozí výběr podle zařízení. Přímé jazykové adresy a ruční přepínač zůstávají dostupné. [Google doporučuje samostatné jazykové adresy a varuje před automatickým přesměrováním mezi nimi](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites). Skutečný dopad na indexaci zatím není změřený.
 - Před přechodem potvrdit aktuální firemní informace a provozní pravidla. Jednoměsíční uchování vyřízených poptávek zajišťuje majitel v e-mailu a papírových záznamech, nikoli tento web.
 
-## Doporučená varianta: Pages ponechat jako náhled
+## Alternativa: Pages ponechat jako samostatný náhled
 
 Produkci publikovat na samostatném ověřeném cíli, případně na současném hostingu, pokud podporuje uvedené požadavky. Astro vytvoří HTML, CSS, JavaScript a obrázky; na serveru nepotřebuje běžící Node.js ani „Astro backend“. Náhled na adrese Majkey25 tak může dál zůstat nezávislý a s `noindex`.
 
@@ -69,6 +69,7 @@ Na neveřejném testovacím cíli nebo lokálně ověřit:
 - Všechny adresy z [mapy cest](routes.md), obě jazykové verze, obrázky, odkazy a skutečnou neznámou 404.
 - Produkční samoodkazující canonical, vzájemné `cs`/`en`/`x-default`, sitemap a robots. Produkce nesmí obsahovat `noindex` na známých stránkách ani prefix `/skloservis-brod/`; náhled musí `noindex` zachovat.
 - Kontakty, platnost hlášek, výjimky otevírací doby, klávesnici galerie, oba motivy a mobil. Údaje ve strukturovaných datech musí odpovídat viditelnému obsahu.
+- [Technická SEO metadata](seo.md): vlastní popisy právních stránek, obrázek sdílení odpovídající produktu, jeho dostupnou adresu a skutečné rozměry; po přepnutí jazyka také nový popis, alternativní text a canonical. Produkční drobečková data musí odpovídat viditelnému „Produkty → výrobek“. Při datovaných výjimkách nebo zavírání o českých svátcích se týdenní strukturované hodiny záměrně nevydávají.
 - Zavřenou sobotu, neděli a české svátky včetně pohyblivých Velikonoc; konkrétní datovaná výjimka má přednost. U přepínání jazyka ověřit zachování rozpracované poptávky a pozice stránky.
 - Google Maps až po souhlasu návštěvníka: před souhlasem ani po odmítnutí se mapa nesmí načítat. Ověřit správnou polohu Prakšická 281, zavření mapy, funkční externí odkaz a shodu s českou i anglickou informací o soukromí. Případná pravidla cílového hostingu nesmí blokovat schválené vložení nebo formulář.
 - Staré aliasy řešit skutečným HTTP 301 na odpovídající stránku. Statický HTML/JavaScript přechod není 301. Staré mediální adresy zachovat nebo jednotlivě přesměrovat na odpovídající soubory; neházet všechny ztracené adresy na úvodní stranu.
@@ -88,9 +89,22 @@ Použít stávající ověřené účty Search Console, Seznam Webmaster, firemn
 
 První týden sledovat denně chyby a důležité stránky, další měsíc pravidelně porovnávat návštěvnost a skutečné poptávky s dřívějším obdobím. Zpětné odkazy mají vycházet ze skutečných dodavatelů, projektů a relevantních zmínek. Jejich získávání ani oslovování třetích stran zde není provedeno. První pozici [Google nezaručuje](https://developers.google.com/search/docs/fundamentals/do-i-need-seo); [Seznam doporučuje přínosný obsah a přirozené odkazy](https://o-seznam.cz/napoveda/vyhledavani/optimalizace/optimalizacni-minimum/).
 
-## Volitelná varianta: vlastní doména na GitHub Pages
+## Požadovaná budoucí varianta: vlastní doména na GitHub Pages
 
-Není zvolená ani provedená. [Pravidla Pages omezují provoz komerčních webů](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits); vhodnost zamýšlené produkce musí být vyřešena před volbou tohoto hostingu. Technické nasazení nepředstavuje potvrzení souladu s podmínkami.
+Majitel tuto variantu požaduje, dosud není nastavená ani provedená. Dne 18. října 2026 byl pouze čtením ověřen jeho příklad `Majkey25/exhalace`: GitHub Pages používá Actions, vlastní `www.exhalace.cz` a schválený certifikát pro `www` i hlavní doménu s vynuceným HTTPS. Technicky lze podobně připravit tento web; není to potvrzení vhodnosti komerčního použití.
+
+[Pravidla Pages omezují provoz komerčních webů](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits), zejména provoz online podnikání a webů zaměřených především na obchodní transakce. Tento web je firemní prezentace s externí poptávkou, nikoli platební systém. Před produkční volbou je potřeba vyjasnit použitelnost pravidel s GitHubem. Samotný fungující kapelní web není schválením firemního webu.
+
+### Co zjistit a připravit předem
+
+- **Správa domény a DNS:** kdo má přístup k aktivní DNS zóně a u jakého poskytovatele. Veřejné NS `ns.grdns.cz` a `ns.grdns.it` samy neprokazují registrátora ani oprávnění. Správce musí umět přidat ověřovací TXT a později upravit webové A/CNAME, případně konfliktní AAAA a CAA. Nezveřejňovat přístupová hesla.
+- **Úplný export DNS:** všechny webové i poštovní záznamy včetně SPF, DKIM a DMARC. Současné MX směřují na `mx1.savana.cz` a `mx2.savana.cz`; přesun webu nevyžaduje jejich změnu ani rušení poštovní služby.
+- **Záloha a návrat:** soubory a databáze WordPressu, původní DNS a ověřená obnova. Není potřeba WordPress nejprve smazat. Starý server musí zůstat dostupný pro případ návratu.
+- **GitHub:** administrátorský přístup k `Majkey25/skloservis-brod` byl přes API potvrzen. To neověřuje přístup k doméně. Budoucí produkční workflow je nutné připravit a samostatně schválit; současný job záměrně publikuje jen náhled a produkční cíl odmítá.
+- **Vyhledávače:** přístup ke stávajícím Search Console a Seznam Webmaster, export nejnavštěvovanějších stránek a odkazů, zachování existujícího ověření. Nevytvářet duplicitní firemní profily.
+- **Staré adresy:** porovnat 14 současných cest ze sitemap s historickými adresami, `?page_id=…`, starými sitemap a `/wp-content/uploads/…`. Některé existující odkazy vedou přímo na `/galerie/`. Zachovat významné adresy médií nebo předem rozhodnout o jejich náhradě. Nepublikovat vyřazené osobní či portrétní fotografie jen kvůli zachování staré adresy.
+
+GitHub Pages nelze považovat za server s vlastními pravidly Apache/Nginx pro libovolné HTTP 301. U zachovaných 14 cest přesměrování potřeba není. Jiným aliasům a přejmenovaným médiím je nutné navrhnout konkrétní řešení. Statické HTML přesměrování není odpověď HTTP 301; [Google může okamžitý meta refresh chápat jako trvalý přechod](https://developers.google.com/search/docs/crawling-indexing/301-redirects), ale nelze tím tvrdit shodné chování všech vyhledávačů ani nahrazovat inventuru adres. Plošné přesměrování všeho na homepage není vhodné.
 
 Připojení vlastní domény ke **stejnému** Pages webu by změnilo také chování dnešní adresy `github.io`, která přesměruje na vlastní doménu. Pro zachování nezávislého náhledu je potřeba oddělený produkční cíl. Popis viz [GitHub a vlastní domény](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages).
 
@@ -99,7 +113,10 @@ Po samostatném schválení této varianty:
 1. Připravit oddělené produkční publikování a ověřený artefakt. Dnešní workflow je pouze pro náhled.
 2. V nastavení účtu Majkey25 → Pages ověřit doménu pomocí GitHubem vygenerovaného TXT. Hodnotu nevymýšlet; TXT ponechat. Viz [ověření domény](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages).
 3. Před směrováním DNS nastavit u cílového repozitáře Settings → Pages → Custom domain na `www.skloservis-brod.cz`.
-4. `www` CNAME nasměrovat přímo na `Majkey25.github.io`, bez jména repozitáře. Apex podle aktuálního oficiálního návodu směrovat A/ALIAS/ANAME na Pages; odstranit pouze konfliktní webové záznamy a zkontrolovat případné AAAA. Nepoužívat wildcard. Poštovní záznamy zachovat.
+4. `www` CNAME nasměrovat přímo na `Majkey25.github.io`, bez jména repozitáře. Pro hlavní doménu současný oficiální návod uvádí čtyři A záznamy `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`, případně podporované ALIAS/ANAME. Před akcí hodnoty znovu ověřit. Odstranit pouze konfliktní webové záznamy a zkontrolovat případné AAAA. Nepoužívat wildcard. Poštovní záznamy zachovat.
 5. Po úspěšné DNS a certifikátové kontrole zapnout Enforce HTTPS, otestovat apex → `www` a všechny cesty. U Actions publikování se soubor CNAME nepoužívá jako nastavení domény.
+
+6. V předem schváleném okamžiku publikovat ověřený produkční artefakt s kořenem `/`, indexovatelnými známými stránkami a canonical na `https://www.skloservis-brod.cz`. Dnešní náhledový artefakt má prefix repozitáře a `noindex`, proto jej nelze pouze připojit k nové doméně. Připravit automatické produkční nasazování obsahových CMS commitů se stejnými kontrolami; neobcházet validaci.
+7. Po přechodu ověřit HTTPS, hlavní doménu i `www`, všechna historická URL, skutečné 404, média, metadata, sitemap, kontakty a CMS nasazování. Odeslat skutečnou produkční sitemap přes stávající účty vyhledávačů, sledovat chyby a návštěvnost a ponechat připravený návrat. Nový skutečný testovací e-mail vyžaduje další výslovné povolení.
 
 Přesné DNS hodnoty a pořadí znovu ověřit v [aktuálním návodu GitHubu](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site). Tento dokument nic nenastavuje a neopravňuje provést přepnutí nyní.

@@ -110,6 +110,9 @@ No CNAME, WordPress, production hosting or DNS changes are part of this implemen
 
 Production uses `https://www.skloservis-brod.cz` at `/`. Each known localized page has a self
 canonical, reciprocal `cs`/`en` alternates and an `x-default` pointing to the pair's Czech page.
+The initial language bootstrap automatically redirects only an explicit preview build.
+Production Czech `/` remains Czech regardless of device locale or saved English choice;
+explicit English URLs and manual preference persistence remain available.
 Metadata resolves the actual pathname and document language, not the shell's page identity;
 404 and unknown paths stay `noindex` without canonical, alternates or business schema.
 The production sitemap includes all `ROUTES` pairs and excludes 404, with no invented `lastmod`.
@@ -119,7 +122,7 @@ Only production contact pages emit one stable `LocalBusiness` identity from `get
 `getContact` and `getHours`. Address is the operating address; billing is not another branch.
 No reviews, ratings, coordinates, certifications or unverified images are invented. Numeric hours
 exclude assumed rows and rows without visiting intervals, including the current installation-only
-Friday. Explicit future Friday visiting intervals remain editable. When any dated exception exists, structured hours are omitted
+Friday. Explicit future Friday visiting intervals remain editable. When any dated exception exists or Czech holiday closure is enabled, structured hours are omitted
 conservatively; the complete visible Prague-aware schedule remains authoritative. Empty slots do
 not assert closure. JSON-LD escapes `<` so editable text cannot close the data script.
 

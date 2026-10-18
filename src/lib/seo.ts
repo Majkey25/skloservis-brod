@@ -1,5 +1,5 @@
-import { PRODUCTION_ORIGIN, ROUTES, pageUrl, type Language } from './urls.ts';
-import type { Contact, Settings } from '../content.ts';
+import { PRODUCTION_ORIGIN, ROUTES, SERVICE_ROUTES, pageUrl, type Language } from './urls.ts';
+import type { Contact, GalleryItem, Service, Settings } from '../content.ts';
 import type { Hours } from './schedule.ts';
 
 export type BuildTarget = 'preview' | 'production';
@@ -31,8 +31,42 @@ export function seoContext(target: string, site: URL | undefined, base: string) 
 
 type SeoContext = ReturnType<typeof seoContext>;
 
+function pageRoute(context: SeoContext, pathname: string, lang: Language) {
+  return ROUTES.find(({ id }) => pageUrl(id, lang, context.base) === pathname);
+}
+
+/** Legal Markdown and the 404 have no CMS description; do not advertise homepage services there. */
+export function defaultDescription(
+  context: SeoContext,
+  pathname: string,
+  lang: Language,
+  homepage: string,
+): string {
+  const route = pageRoute(context, pathname, lang);
+  if (!route)
+    return lang === 'cs'
+      ? 'Stránka nenalezena. Pokračujte na českou nebo anglickou úvodní stránku Skloservis Brod.'
+      : 'Page not found. Continue to the Czech or English Skloservis Brod homepage.';
+  switch (route.id) {
+    case 'privacy':
+      return lang === 'cs'
+        ? 'Jak Skloservis Brod zpracovává údaje z poptávek, jak je uchovává a jak uplatnit práva k osobním údajům.'
+        : 'How Skloservis Brod processes and retains enquiry information, and how to exercise your personal data rights.';
+    case 'cookies':
+      return lang === 'cs'
+        ? 'Informace o cookies, uložení volby jazyka a motivu v prohlížeči a souhlasu s volitelnou mapou Google.'
+        : 'Information about cookies, saved language and theme preferences, and consent for the optional Google map.';
+    case 'legal':
+      return lang === 'cs'
+        ? 'Údaje provozovatele Skloservis Brod, informace o poptávkách, reklamacích a mimosoudním řešení spotřebitelských sporů.'
+        : 'Skloservis Brod company details, enquiries, complaints and consumer alternative dispute resolution information.';
+    default:
+      return homepage;
+  }
+}
+
 export function pageSeo(context: SeoContext, pathname: string, lang: Language) {
-  const route = ROUTES.find(({ id }) => pageUrl(id, lang, context.base) === pathname);
+  const route = pageRoute(context, pathname, lang);
   const indexable = context.target === 'production' && !!route;
   return {
     robots: indexable ? 'index, follow' : 'noindex, follow',
@@ -46,6 +80,51 @@ export function pageSeo(context: SeoContext, pathname: string, lang: Language) {
       : [],
     business: indexable && route.id === 'contact',
   };
+}
+
+/** Match the two visible breadcrumb items on service detail pages, never the shell's page ID. */
+export function serviceBreadcrumbs(
+  context: SeoContext,
+  pathname: string,
+  lang: Language,
+  service: Pick<Service, 'slug' | 'title_cs' | 'title_en'> | undefined,
+) {
+  const route = pageRoute(context, pathname, lang);
+  if (context.target !== 'production' || !route || !service || route.id !== service.slug)
+    return undefined;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: lang === 'cs' ? 'Produkty' : 'Products',
+        item: new URL(pageUrl('products', lang), context.site).href,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: service[`title_${lang}`],
+        item: new URL(route[lang], context.site).href,
+      },
+    ],
+  };
+}
+
+/** Use a photograph actually shown on the page; a missing product photo keeps the brand fallback. */
+export function socialPhoto(
+  context: SeoContext,
+  pathname: string,
+  lang: Language,
+  gallery: readonly Pick<GalleryItem, 'category' | 'image' | 'alt_cs' | 'alt_en'>[],
+) {
+  const route = pageRoute(context, pathname, lang);
+  if (!route) return undefined;
+  if (route.id === 'gallery') return gallery[0];
+  if (Object.hasOwn(SERVICE_ROUTES, route.id))
+    return gallery.find((photo) => photo.category === route.id);
+  return undefined;
 }
 
 export function robotsText(context: SeoContext): string {
@@ -75,20 +154,21 @@ export function localBusiness(
   hours: Hours,
 ) {
   if (context.target !== 'production') return undefined;
-  // Dated/uncertain exceptions cannot be faithfully represented as recurring weekly hours.
+  // Dated exceptions and movable holidays cannot be represented as year-round weekly hours.
   // Leave the complete dated schedule to the visible, Prague-aware hours component.
-  const openingHoursSpecification = hours.exceptions.length
-    ? []
-    : hours.weekly
-        .filter((row) => !row.assumed)
-        .flatMap((row) =>
-          row.slots.map((slot) => ({
-            '@type': 'OpeningHoursSpecification',
-            dayOfWeek: `https://schema.org/${SCHEMA_DAYS[row.day]}`,
-            opens: slot.opens,
-            closes: slot.closes,
-          })),
-        );
+  const openingHoursSpecification =
+    hours.exceptions.length || hours.holidays_closed
+      ? []
+      : hours.weekly
+          .filter((row) => !row.assumed)
+          .flatMap((row) =>
+            row.slots.map((slot) => ({
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: `https://schema.org/${SCHEMA_DAYS[row.day]}`,
+              opens: slot.opens,
+              closes: slot.closes,
+            })),
+          );
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
@@ -110,6 +190,8 @@ export function localBusiness(
 }
 
 /** JSON-LD is data, not executable code; prevent CMS text from closing its script element. */
-export function jsonLd(value: NonNullable<ReturnType<typeof localBusiness>>): string {
+export function jsonLd(
+  value: NonNullable<ReturnType<typeof localBusiness> | ReturnType<typeof serviceBreadcrumbs>>,
+): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }

@@ -16,6 +16,8 @@ const REVEAL_SELECTOR = [
 ].join(', ');
 let observer: IntersectionObserver | undefined;
 let page: HTMLElement | undefined;
+// A language change shows the same page in another language: nothing should animate again.
+let languageSwap = false;
 
 function stopMotion() {
   observer?.disconnect();
@@ -155,7 +157,10 @@ function initializeMotion() {
   if (page === document.body) return;
   stopMotion();
   page = document.body;
+  const skipReveals = languageSwap;
+  languageSwap = false;
   if (
+    skipReveals ||
     !motionQuery ||
     motionQuery.matches ||
     !motionQuery.addEventListener ||
@@ -225,24 +230,129 @@ motionQuery?.addEventListener?.('change', () => {
   stopMotion();
   if (!motionQuery.matches) initializeMotion();
 });
+document.addEventListener('astro:before-preparation', (event) => {
+  languageSwap = !!event.sourceElement?.closest('a[data-language]');
+});
 document.addEventListener('astro:before-swap', stopMotion);
 document.addEventListener('astro:page-load', initializeMotion);
-// The hero entrance is CSS-only. Finish it on client navigation so it never replays.
-document.addEventListener('astro:after-swap', () => {
-  if (!('getAnimations' in Element.prototype)) return;
-  document
-    .querySelectorAll<HTMLElement>('[data-reveal="hero"], [data-reveal="hero"] *')
-    .forEach((element) =>
-      element.getAnimations().forEach((animation) => {
-        // finish() throws for infinite animations; those are never part of the entrance.
-        if (animation.effect?.getComputedTiming().endTime !== Infinity) animation.finish();
-      }),
-    );
-});
+// First-load entrance: Base.astro marks a fresh document as pending; the CSS plays once the page
+// has parsed and painted, when the main thread is free. Client navigation replaces the root
+// attributes, so the entrance never replays on internal, language or history changes.
+function playEntrance() {
+  const root = document.documentElement;
+  if (root.dataset.entry !== 'pending') return;
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      if (root.dataset.entry !== 'pending') return;
+      root.dataset.entry = 'play';
+      // Drop the state once the longest step has ended, so a later motion-preference change
+      // cannot replay the entrance.
+      window.setTimeout(() => delete root.dataset.entry, 2400);
+    }),
+  );
+}
+motionQuery?.addEventListener?.('change', () => delete document.documentElement.dataset.entry);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', playEntrance, { once: true });
+} else {
+  playEntrance();
+}
 window.addEventListener('pagehide', stopMotion);
 window.addEventListener('pageshow', (event) => {
   if (event.persisted) initializeMotion();
 });
 initializeMotion();
+
+// An opened disclosure writes its text in quickly, like a streamed answer. The text stays in the
+// document the whole time: a highlight only paints the not-yet-written part transparent, so
+// layout, reading, search and copy are untouched and screen readers hear nothing extra.
+type Stream = { details: HTMLDetailsElement; frame: number; caret: HTMLElement };
+let stream: Stream | undefined;
+
+function endStream() {
+  if (!stream) return;
+  cancelAnimationFrame(stream.frame);
+  stream.caret.remove();
+  CSS.highlights.delete('stream-pending');
+  CSS.highlights.delete('stream-head');
+  stream = undefined;
+}
+
+function startStream(details: HTMLDetailsElement) {
+  endStream();
+  if (!('highlights' in CSS) || !motionQuery || motionQuery.matches) return;
+  const words: { node: Text; start: number; end: number }[] = [];
+  const walker = document.createTreeWalker(details, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) =>
+      node.parentElement?.closest('summary') || !node.textContent?.trim()
+        ? NodeFilter.FILTER_REJECT
+        : NodeFilter.FILTER_ACCEPT,
+  });
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = node as Text;
+    for (const match of text.data.matchAll(/\S+/g)) {
+      words.push({ node: text, start: match.index, end: match.index + match[0].length });
+    }
+  }
+  const last = words.at(-1);
+  if (!last) return;
+
+  const pending = new Highlight();
+  const head = new Highlight();
+  CSS.highlights.set('stream-pending', pending);
+  CSS.highlights.set('stream-head', head);
+  const caret = document.createElement('span');
+  caret.className = 'stream-caret';
+  caret.setAttribute('aria-hidden', 'true');
+  details.append(caret);
+  // Fast on purpose: about 16ms per word, never shorter than 0.5s or longer than 1.4s.
+  const duration = Math.min(Math.max(words.length * 16, 500), 1400);
+  const started = performance.now();
+  const range = (from: (typeof words)[number], to: (typeof words)[number], end = to.end) => {
+    const value = new Range();
+    value.setStart(from.node, from.start);
+    value.setEnd(to.node, end);
+    return value;
+  };
+
+  const step = (now: number) => {
+    if (!stream || stream.details !== details) return;
+    const shown = Math.min(words.length, Math.ceil(((now - started) / duration) * words.length));
+    pending.clear();
+    head.clear();
+    const written = words[shown - 1];
+    if (shown >= words.length || !written) {
+      endStream();
+      return;
+    }
+    pending.add(range(words[shown]!, last));
+    head.add(range(words[Math.max(0, shown - 3)]!, written));
+    const tip = range(written, written, written.end);
+    tip.collapse(false);
+    const rect = tip.getClientRects()[0] ?? tip.getBoundingClientRect();
+    const box = details.getBoundingClientRect();
+    caret.style.height = `${rect.height}px`;
+    caret.style.translate = `${rect.right - box.left + 2}px ${rect.top - box.top}px`;
+    stream.frame = requestAnimationFrame(step);
+  };
+  stream = { details, frame: requestAnimationFrame(step), caret };
+}
+
+document.addEventListener(
+  'toggle',
+  (event) => {
+    const details = event.target;
+    if (!(details instanceof HTMLDetailsElement) || !details.hasAttribute('data-stream')) return;
+    if (details.open) startStream(details);
+    else if (stream?.details === details) endStream();
+  },
+  true,
+);
+document.addEventListener('astro:before-swap', endStream);
+window.addEventListener('pagehide', endStream);
+window.addEventListener('beforeprint', endStream);
+motionQuery?.addEventListener?.('change', () => {
+  if (motionQuery.matches) endStream();
+});
 // Module scope keeps these names out of the shared global script scope.
 export {};

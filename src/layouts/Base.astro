@@ -1,11 +1,20 @@
 ---
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
 import favicon from '../assets/brand/favicon.png';
 import logo from '../assets/brand/wordpress-logo.png';
-import { getSettings, getContact, getHours } from '../content.ts';
+import { getSettings, getContact, getHours, getServices, getGallery } from '../content.ts';
 import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
-import { seoContext, pageSeo, localBusiness, jsonLd } from '../lib/seo.ts';
+import {
+  seoContext,
+  pageSeo,
+  defaultDescription,
+  localBusiness,
+  serviceBreadcrumbs,
+  socialPhoto,
+  jsonLd,
+} from '../lib/seo.ts';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Notices from '../components/Notices.astro';
@@ -18,18 +27,37 @@ interface Props {
 const { lang, page, title, description } = Astro.props;
 const settings = await getSettings();
 const pageTitle = title ?? (lang === 'cs' ? settings.seo_title_cs : settings.seo_title_en);
-const pageDescription =
-  description ?? (lang === 'cs' ? settings.seo_description_cs : settings.seo_description_en);
 const base = import.meta.env.BASE_URL;
 const seo = seoContext(import.meta.env.SITE_BUILD_TARGET, Astro.site, base);
 const metadata = pageSeo(seo, Astro.url.pathname, lang);
+const pageDescription =
+  description ??
+  defaultDescription(seo, Astro.url.pathname, lang, settings[`seo_description_${lang}`]);
 const business = metadata.business
   ? localBusiness(seo, settings, await getContact(), await getHours())
+  : undefined;
+const [services, gallery] = await Promise.all([getServices(), getGallery()]);
+const breadcrumbs = serviceBreadcrumbs(
+  seo,
+  Astro.url.pathname,
+  lang,
+  services.find((service) => service.slug === page),
+);
+const photo = socialPhoto(seo, Astro.url.pathname, lang, gallery);
+// Generate one portable JPEG without cropping or upscaling the owner's photograph.
+const socialImage = photo
+  ? await getImage({ src: photo.image, width: Math.min(1200, photo.image.width), format: 'jpg' })
   : undefined;
 ---
 
 <!doctype html>
-<html lang={lang} data-language={lang} data-page={page} data-home-en={pageUrl('home', 'en', base)}>
+<html
+  lang={lang}
+  data-language={lang}
+  data-page={page}
+  data-home-en={pageUrl('home', 'en', base)}
+  data-build-target={seo.target}
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -37,6 +65,17 @@ const business = metadata.business
     <script is:inline>
       (() => {
         const root = document.documentElement;
+        // First full load only: hold the entrance until the page has painted; motion.ts plays it.
+        // The timer guarantees the content appears even if the module script never runs.
+        if (
+          document.readyState === 'loading' &&
+          !matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          root.dataset.entry = 'pending';
+          setTimeout(() => {
+            if (root.dataset.entry === 'pending') root.dataset.entry = 'play';
+          }, 2500);
+        }
         const readPreference = (key, values) => {
           try {
             const raw = localStorage.getItem(key);
@@ -69,7 +108,9 @@ const business = metadata.business
           ?.setAttribute('content', theme === 'dark' ? '#071e28' : '#ffffff');
 
         // Select an initial homepage before loading the app, never during a client-side swap.
+        // Production language URLs stay explicit, regardless of device or saved preferences.
         if (
+          root.dataset.buildTarget !== 'preview' ||
           document.readyState !== 'loading' ||
           root.dataset.page !== 'home' ||
           root.dataset.language !== 'cs' ||
@@ -110,15 +151,17 @@ const business = metadata.business
       <link rel="alternate" hreflang={alternate.lang} href={alternate.href} />
     ))}
     {business && <script type="application/ld+json" is:inline set:html={jsonLd(business)} />}
+    {breadcrumbs && <script type="application/ld+json" is:inline set:html={jsonLd(breadcrumbs)} />}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'cs' ? 'cs_CZ' : 'en_GB'} />
-    <meta property="og:site_name" content="Skloservis Brod" />
-    <meta property="og:image" content={new URL(logo.src, Astro.site).href} />
-    <meta property="og:image:width" content={String(logo.width)} />
-    <meta property="og:image:height" content={String(logo.height)} />
-    <meta property="og:image:alt" content="Skloservis Brod" />
+    <meta property="og:site_name" content={settings.name} />
+    <meta property="og:image" content={new URL(socialImage?.src ?? logo.src, seo.site).href} />
+    <meta property="og:image:type" content={socialImage ? 'image/jpeg' : 'image/png'} />
+    <meta property="og:image:width" content={String(socialImage?.options.width ?? logo.width)} />
+    <meta property="og:image:height" content={String(socialImage?.options.height ?? logo.height)} />
+    <meta property="og:image:alt" content={photo?.[`alt_${lang}`] ?? settings.name} />
   </head>
   <body>
     <a class="skip-link" href="#main">

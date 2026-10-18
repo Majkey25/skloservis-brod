@@ -26,7 +26,13 @@ Prázdné datum „od“ nebo „do“ znamená neomezený začátek nebo konec.
 
 Fotografii nahrajte do médií galerie a přidejte ji do seznamu galerie. Vyplňte věcný český i anglický popis a správnou kategorii. Nevkládejte jména zákazníků, adresy zakázek ani jiné soukromé údaje bez souhlasu. Pořadí položek určuje pořadí fotografií.
 
+Kategorie osmi výrobků propojují fotografie s jejich detailními stránkami. Detail ukazuje všechny fotografie svého výrobku; první je úvodní a v mřížce se neopakuje. Kliknutím na fotografii otevřete prohlížeč pouze této kategorie. Bez fotografií se zobrazí zpráva o prázdné kategorii.
+
+Pro další doložené náměty slouží `vitriny` (vitríny a skleněné police), `sklo-na-nabytek`, `zrcadla` a `krbova-skla`. Jsou to pouze kategorie galerie, nevytvářejí nové produktové stránky. Celá galerie nabízí filtry s počty fotografií; odkazy na kategorie fungují i bez JavaScriptu. Po přidání nebo změně kategorie zkontrolujte její obsah v obou jazycích.
+
 Stejně lze upravit firemní údaje, texty, produkty a popisy pro vyhledávače. Stabilní adresy produktových stránek zachovejte. Jejich změna může poškodit existující odkazy a vyžaduje plán přesměrování.
+
+U výrobků ponechte „Stručný úvod“ krátký, používá se také na přehledových kartách. Volitelné „Podrobnosti výrobku“ obsahují nejvýše čtyři oddíly. Každý potřebuje nadpis i text česky a anglicky. Zobrazují se v zadaném pořadí pouze na detailu výrobku, také bez JavaScriptu. Uvádějte jen potvrzené možnosti a parametry. Pro odstranění oddílu smažte celou položku; nevyplněný nebo neúplně přeložený oddíl zastaví kontroly. Prázdný seznam je v pořádku.
 
 V kontaktu lze upravit odkaz na Google Maps a volitelnou URL vložené mapy. Z Google Maps → Sdílet → Vložení mapy zkopírujte pouze adresu `src`, ne celý HTML kód, a ověřte polohu provozovny. Prázdná URL vložení mapu vypne. Mapa se načítá až po souhlasu návštěvníka; externí odkaz funguje i bez JavaScriptu.
 

@@ -6,6 +6,7 @@ import { z } from 'astro/zod';
 import { CORE_SCHEMA, load } from 'js-yaml';
 import { isCalendarDate, WEEKDAYS } from './lib/schedule.ts';
 import { SERVICE_ROUTES } from './lib/urls.ts';
+import { GALLERY_CATEGORIES } from './lib/gallery.ts';
 
 const slugs = Object.keys(SERVICE_ROUTES) as [
   keyof typeof SERVICE_ROUTES,
@@ -140,6 +141,12 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
     company_id: z.string().regex(/^\d{8}$/),
     map_url: httpsUrl,
     map_embed_url: optional(mapEmbedUrl),
+    facebook_url: optional(
+      httpsUrl.regex(
+        /^https:\/\/www\.facebook\.com\/[A-Za-z0-9.]+\/?$/,
+        'Use the public page link https://www.facebook.com/<page>/',
+      ),
+    ),
     title_cs: text,
     title_en: text,
     text_cs: text,
@@ -237,6 +244,11 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
       title_en: text,
       text_cs: text,
       text_en: text,
+      details: optional(
+        z
+          .array(z.strictObject({ title_cs: text, title_en: text, text_cs: text, text_en: text }))
+          .max(4),
+      ),
       seo_description_cs: text,
       seo_description_en: text,
       image: optional(image),
@@ -256,7 +268,7 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
     image,
     alt_cs: text,
     alt_en: text,
-    category: z.enum(slugs),
+    category: z.enum(GALLERY_CATEGORIES),
     caption_cs: optional(text),
     caption_en: optional(text),
   });

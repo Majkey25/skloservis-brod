@@ -1,4 +1,4 @@
-/* Only an explicit language/theme choice may capture a full-page bitmap. */
+/* Only an explicit theme choice may capture a full-page bitmap. */
 html:root {
   view-transition-name: none;
 }
@@ -34,7 +34,6 @@ html:root[data-preference-transition] {
   --header-h: 72px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 160ms;
-  --dur-lang: 380ms;
   --dur-theme: 560ms;
   --dur-flip: 620ms;
   --dur-bleed: 360ms;
@@ -189,7 +188,12 @@ summary:focus-visible {
 .muted {
   color: var(--muted);
 }
+/* Actions fill with a deeper tone that rises from the bottom edge, inside a soft accent halo.
+   Only colour, fill and shadow change, so the hit area never moves under the pointer. */
 .button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -203,35 +207,64 @@ summary:focus-visible {
   font-weight: 600;
   text-decoration: none;
   transition:
-    background-color var(--dur-fast) var(--ease),
     border-color var(--dur-fast) var(--ease),
-    box-shadow 240ms var(--ease),
-    color var(--dur-fast) var(--ease),
-    transform 240ms var(--ease);
+    box-shadow 320ms var(--ease),
+    color 240ms var(--ease);
 }
-.button:focus-visible {
-  background-color: var(--accent-hover);
+.button::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--accent-hover);
+  content: '';
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  transition: transform 380ms var(--ease);
 }
-.button:active:not(:disabled) {
-  transform: translateY(1px);
+.button svg {
+  transition:
+    translate 320ms var(--ease),
+    scale 320ms var(--ease);
 }
 .button--secondary {
   background-color: transparent;
   color: var(--accent);
 }
-.button--secondary:focus-visible {
-  background-color: var(--surface);
+.button--secondary::before {
+  background: var(--accent);
+}
+.button:focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.button:focus-visible::before,
+.button:active:not(:disabled)::before {
+  transform: scaleY(1);
+}
+.button--secondary:focus-visible,
+.button--secondary:active:not(:disabled) {
+  color: var(--on-accent);
+}
+.button:active:not(:disabled) {
+  box-shadow: inset 0 2px 0 rgb(0 0 0 / 0.14);
 }
 @media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled)::before {
+    transform: scaleY(1);
+  }
   .button:hover:not(:disabled) {
-    background-color: var(--accent-hover);
-    box-shadow: 0 10px 22px -14px var(--accent);
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent),
+      0 14px 26px -16px var(--accent);
   }
   .button--secondary:hover:not(:disabled) {
-    background-color: var(--surface);
+    color: var(--on-accent);
+  }
+  .button:hover:not(:disabled) svg {
+    translate: 0 -1px;
+    scale: 1.12;
   }
   .button:active:not(:disabled) {
-    transform: translateY(1px);
+    box-shadow: inset 0 2px 0 rgb(0 0 0 / 0.14);
   }
 }
 .text-link {
@@ -301,7 +334,7 @@ summary:focus-visible {
   margin-top: 0.4rem;
 }
 
-/* Disable UA crossfades; the two deliberate gestures have their own motion. */
+/* Disable UA crossfades; only a theme change has its own motion. Language swaps are instant. */
 ::view-transition-group(root) {
   animation: none;
 }
@@ -312,25 +345,6 @@ summary:focus-visible {
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
-}
-/* The header changes language at once while only its underline glides to the chosen language. */
-::view-transition-group(preference-header) {
-  z-index: 1;
-  animation: none;
-}
-::view-transition-old(preference-header) {
-  display: none;
-}
-::view-transition-new(preference-header),
-::view-transition-old(preference-language),
-::view-transition-new(preference-language) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-::view-transition-group(preference-language) {
-  z-index: 2;
-  animation-duration: 360ms;
-  animation-timing-function: var(--ease);
 }
 html[data-preference-transition='theme']::view-transition-old(root) {
   z-index: 1;
@@ -347,15 +361,65 @@ html[data-preference-transition='theme']::view-transition-new(root) {
     clip-path: circle(var(--theme-radius) at var(--theme-x) var(--theme-y));
   }
 }
-/* The new language settles over the opaque old page: no movement and no see-through frame. */
-html[data-preference-transition='language']::view-transition-new(root) {
-  animation: language-in var(--dur-lang) var(--ease) both;
+/* Disclosure: one right-hand chevron, the native marker removed in every engine. */
+.disclosure {
+  position: relative;
 }
-@keyframes language-in {
-  from {
-    opacity: 0;
-    filter: blur(3px);
+.disclosure > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  color: var(--accent);
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.disclosure > summary::marker {
+  content: '';
+}
+.disclosure > summary > span {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat;
+  transition: background-size 320ms var(--ease);
+}
+.disclosure > summary:hover > span,
+.disclosure[open] > summary > span {
+  background-size: 100% 1.5px;
+}
+/* Engines that can animate to auto height open and close the content smoothly. */
+@supports (interpolate-size: allow-keywords) {
+  .disclosure {
+    interpolate-size: allow-keywords;
   }
+  .disclosure::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 420ms var(--ease),
+      content-visibility 420ms allow-discrete;
+  }
+  .disclosure[open]::details-content {
+    block-size: auto;
+  }
+}
+/* Opened text is written in like a streamed answer; it stays in the document throughout. */
+::highlight(stream-pending) {
+  color: transparent;
+}
+::highlight(stream-head) {
+  color: var(--accent);
+}
+.stream-caret {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  pointer-events: none;
 }
 @media (max-width: 950px) {
   :root {
@@ -379,10 +443,6 @@ html[data-preference-transition='language']::view-transition-new(root) {
   ::view-transition-new(*) {
     animation: none !important;
   }
-  .button:hover:not(:disabled),
-  .button:active:not(:disabled) {
-    transform: none;
-  }
   *,
   *::before,
   *::after {
@@ -390,5 +450,9 @@ html[data-preference-transition='language']::view-transition-new(root) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* The universal selector does not reach this pseudo-element, so opening stays instant here. */
+  .disclosure::details-content {
+    transition: none !important;
   }
 }
