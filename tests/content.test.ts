@@ -30,8 +30,10 @@ test('seed content validates and preserves confirmed contacts and historical rou
   assert.equal(hours.weekly.find((row) => row.day === 'fri')?.note_cs, 'Realizace montáží');
   assert.deepEqual(hours.weekly.find((row) => row.day === 'fri')?.slots, []);
   for (const day of ['sat', 'sun']) {
-    assert.equal(hours.weekly.find((row) => row.day === day)?.assumed, true);
+    assert.equal(hours.weekly.find((row) => row.day === day)?.assumed, false);
+    assert.deepEqual(hours.weekly.find((row) => row.day === day)?.slots, []);
   }
+  assert.equal(hours.holidays_closed, true);
   const services = schemas.services.parse(await read('services'));
   // Independent route inventory from the SEO report; changing both seed and schema must not rename URLs.
   assert.deepEqual(
@@ -138,4 +140,115 @@ test('stable route pairs, gallery categories, strict keys and YAML file shapes a
   assert.throws(() => yamlItems({}, 'list'));
   assert.throws(() => yamlItems(['invalid'], 'list'));
   assert.deepEqual(yamlItems([], 'list'), []);
+});
+
+test('company figures and service groups preserve owner-confirmed values and reject incomplete content', async () => {
+  const about = schemas.about.parse(await read('about'));
+  assert.equal(about.experience_years, 40);
+  assert.deepEqual(
+    about.metrics.map(({ value }) => value),
+    [3000, 300, 100, 28000],
+  );
+  assert.deepEqual(
+    about.service_groups.map(({ id }) => id),
+    ['processing', 'doors', 'showers', 'structures'],
+  );
+  const rejected = (patch: Record<string, unknown>) =>
+    assert.equal(schemas.about.safeParse({ ...about, ...patch }).success, false);
+  for (const value of [-1, 0, 1.5, '3000']) {
+    rejected({ metrics: about.metrics.map((row, i) => (i === 0 ? { ...row, value } : row)) });
+  }
+  rejected({ experience_years: -40 });
+  rejected({ metrics: about.metrics.slice(1) });
+  rejected({ metrics: about.metrics.map((row) => ({ ...row, label_en: ' ' })) });
+  rejected({ service_groups: about.service_groups.slice(1) });
+  rejected({ service_groups: about.service_groups.map(() => about.service_groups[0]) });
+  for (const patch of [
+    { link: 'invented-route' },
+    { link: 'https://example.com' },
+    { summary_en: '' },
+    { id: 'other' },
+  ]) {
+    rejected({
+      service_groups: about.service_groups.map((row, i) => (i === 0 ? { ...row, ...patch } : row)),
+    });
+  }
+  rejected({ special_glass_text_en: '' });
+  rejected({ consultation_text_cs: '' });
+});
+
+test('reputation validates source, rating bounds and real dates while allowing CMS clearing', async () => {
+  const about = schemas.about.parse(await read('about'));
+  assert.equal(about.reputation?.rating, 5);
+  assert.equal(about.reputation?.count, 4);
+  assert.equal(about.reputation?.verified_on, '2026-10-18');
+  for (const patch of [
+    { rating: -0.1 },
+    { rating: 5.1 },
+    { rating: '5' },
+    { count: 0 },
+    { count: 1.5 },
+    { verified_on: '2026-02-29' },
+    { verified_on: '2026-04-31' },
+    { source: '' },
+    { url: 'https://www.firmy.cz/detail/123-other.html' },
+    { url: 'https://www.firmy.cz.evil.example/detail/13749142-skloservis-brod.html' },
+    { award: 'unverified' },
+  ]) {
+    assert.equal(
+      schemas.about.safeParse({ ...about, reputation: { ...about.reputation, ...patch } }).success,
+      false,
+    );
+  }
+  for (const rating of [0, 4.9, 5]) {
+    assert.equal(
+      schemas.about.safeParse({
+        ...about,
+        reputation: { ...about.reputation, rating, verified_on: '2024-02-29' },
+      }).success,
+      true,
+    );
+  }
+  for (const reputation of [
+    undefined,
+    null,
+    '',
+    {},
+    { source: '', url: null, rating: null, count: null, verified_on: '' },
+  ]) {
+    assert.equal(schemas.about.parse({ ...about, reputation }).reputation, undefined);
+  }
+  for (const reputation of [{ source: 'Firmy.cz' }, { unknown: '' }]) {
+    assert.equal(schemas.about.safeParse({ ...about, reputation }).success, false);
+  }
+});
+
+test('map links require HTTPS and embeds accept only the official generated host and path', async () => {
+  const contact = schemas.contact.parse(await read('contact'));
+  assert.match(contact.map_url, /^https:\/\/www\.google\.com\/maps/);
+  for (const map_embed_url of [undefined, null, '']) {
+    assert.equal(schemas.contact.parse({ ...contact, map_embed_url }).map_embed_url, undefined);
+  }
+  // This token only tests the accepted URL shape, not a live map or a verified location.
+  assert.equal(
+    schemas.contact.safeParse({
+      ...contact,
+      map_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1stest%20map',
+    }).success,
+    true,
+  );
+  for (const map_embed_url of [
+    'https://example.com/s/abc123',
+    'http://www.google.com/maps/embed?pb=!1m18',
+    'https://www.google.com.evil.example/maps/embed?pb=!1m18',
+    'https://www.google.com@evil.example/maps/embed?pb=!1m18',
+    'https://www.google.com/maps/embed?pb=',
+    'https://www.google.com/maps/other?pb=!1m18',
+    'https://www.google.com/maps/embed?pb=!1m18&redirect=https://example.com',
+  ]) {
+    assert.equal(schemas.contact.safeParse({ ...contact, map_embed_url }).success, false);
+  }
+  for (const map_url of ['http://mapy.com', 'javascript:alert(1)', 'https://']) {
+    assert.equal(schemas.contact.safeParse({ ...contact, map_url }).success, false);
+  }
 });

@@ -1,13 +1,77 @@
-# Paraphrase of pages 1388 and 1390. No unverified age, metrics, credentials or guarantees.
+# Original business copy; experience and annual figures confirmed by the owner on 2026-10-18.
+# Experience describes glassworking tradition, not the incorporation of the current company.
 title_cs: O společnosti
 title_en: About us
 lead_cs: Sklo pro váš prostor, od návrhu po montáž.
 lead_en: Glass for your space, from planning to installation.
 body_cs: |
-  SKLOSERVIS-BROD s.r.o. v Uherském Brodě se věnuje sklenářským pracím a výrobě skleněných výrobků na míru. Nabízíme dveře, zábradlí, obklady, příčky i sprchové kouty pro domácnosti a firemní prostory.
+  SKLOSERVIS-BROD s.r.o. v Uherském Brodě nabízí české skleněné dveře, skleněná zábradlí, obklady a zástěny, sprchové kouty i sklenářské práce podle individuálních potřeb zákazníků. Poskytujeme komplexní služby od návrhu řešení přes zaměření a výrobu skleněných výrobků až po montáž a servis. Naše služby zajišťujeme pro Uherský Brod, celý Zlínský kraj i další kraje.
 
-  Součástí spolupráce je návrh řešení, zaměření, výroba, doprava, montáž a servis. Zajišťujeme také opracování skla a zasklívání. Možnosti realizace ve vašem místě s vámi rádi probereme.
+  I přes bohaté zkušenosti stojíme o nové výzvy a chceme společně se zákazníky objevovat nová řešení pro jejich interiéry a exteriéry. Sklo je moderním prvkem domácností i firemních prostor. Představíme vám ho nejen jako luxusní, ale také funkční a praktickou součást každodenního života.
 body_en: |
-  Based in Uherský Brod, SKLOSERVIS-BROD s.r.o. specialises in glassworking and made-to-measure glass products. We offer doors, railings, splashbacks, partitions and shower enclosures for homes and business premises.
+  Based in Uherský Brod, SKLOSERVIS-BROD s.r.o. offers Czech-made glass doors, railings, splashbacks and screens, shower enclosures and glassworking tailored to each customer's needs. Our service covers planning, measuring and manufacture through to installation and servicing. We serve Uherský Brod, the whole Zlín Region and other regions.
 
-  Our work covers planning, measuring, manufacture, delivery, installation and servicing. We also offer glass processing and glazing. Contact us to discuss the possibilities for your project location.
+  With extensive experience behind us, we still welcome new challenges and enjoy exploring new solutions for interiors and exteriors with our customers. Glass brings a modern touch to homes and business premises. We will help you make it a practical and functional part of everyday life, as well as an elegant one.
+experience_years: 40
+metrics_title_cs: Náš rok v číslech
+metrics_title_en: Our year in numbers
+metrics:
+  - value: 3000
+    label_cs: hotových zakázek
+    label_en: completed orders
+  - value: 300
+    label_cs: kompletních realizací
+    label_en: complete projects
+  - value: 100
+    label_cs: tun zpracovaného skla
+    label_en: tonnes of processed glass
+  - value: 28000
+    label_cs: km broušených hran
+    label_en: km of ground glass edges
+service_groups:
+  - id: processing
+    title_cs: Kompletní úpravy skla a zasklívání
+    title_en: Glass processing and glazing
+    summary_cs: Provádíme veškeré úpravy a opracování skla a skleněných výrobků včetně zasklívání a montáže na míru.
+    summary_en: We process and finish glass and glass products, including made-to-measure glazing and installation.
+    text_cs: Řezání, vrtání, pískování, broušení a další úpravy skla a skleněných výrobků. Zasklívání nových i stávajících otvorů dle potřeb zákazníka.
+    text_en: Cutting, drilling, sandblasting, grinding and other glass finishing. Glazing for new and existing openings, tailored to your needs.
+    link: services
+  - id: doors
+    title_cs: Výroba a montáž skleněných dveří
+    title_en: Glass door manufacture and installation
+    summary_cs: Vyrábíme skleněné dveře do interiéru i exteriéru, včetně povrchových úprav a montáže.
+    summary_en: We manufacture glass doors for interiors and exteriors, including surface finishes and installation.
+    text_cs: Každé skleněné dveře jsou vyrobeny na míru pro konkrétní prostor, tvoří opravdový originál a moderní součást interiéru i exteriéru.
+    text_en: Each glass door is made to measure for its space, creating an individual, modern feature for interiors and exteriors.
+    link: sklenene-dvere
+  - id: showers
+    title_cs: Skleněné sprchové kouty a obklady
+    title_en: Glass shower enclosures and splashbacks
+    summary_cs: Vyrábíme skleněné obklady a zástěny nejen do koupelny a kuchyně. Včetně montáže a servisu.
+    summary_en: We manufacture glass splashbacks and screens for bathrooms, kitchens and other spaces, with installation and servicing.
+    text_cs: Kompletní dodávka a instalace sprchových koutů, koupelnových zástěn a skleněných obkladů nejen do koupelny.
+    text_en: Complete supply and installation of shower enclosures, bathroom screens and glass wall coverings for bathrooms and beyond.
+    link: skleneny-sprchovy-kout
+  - id: structures
+    title_cs: Skleněné zábradlí, stěny a markýzy
+    title_en: Glass railings, partitions and canopies
+    summary_cs: Skleněné zábradlí a stěny jsou součástí moderního designu. Zajišťujeme také montáž a servis.
+    summary_en: Glass railings and partitions bring a modern design to your space. We also provide installation and servicing.
+    text_cs: Zaměření, výroba a montáž skleněných stěn, příček, zábradlí, markýz a dalších stavebních prvků pro interiéry i exteriéry.
+    text_en: Measuring, manufacture and installation of glass walls, partitions, railings, canopies and other architectural features for interiors and exteriors.
+    link: sklenene-zabradli
+special_glass_title_cs: Speciální skla pro vaše řešení
+special_glass_title_en: Specialist glass for your project
+special_glass_text_cs: K našim sklenářským pracím patří také bezpečnostní skla, izolační dvojskla a trojskla různých optických a tepelných vlastností, neprůstřelná a protipožární skla. Vhodné provedení s vámi probereme podle konkrétního zadání.
+special_glass_text_en: Our range also includes safety and security glass, insulating double and triple glazing with different optical and thermal properties, bullet-resistant glass and fire-resistant glass. We will discuss a suitable specification for your particular project.
+consultation_title_cs: Návrh, kalkulace a zaměření zdarma
+consultation_title_en: Free planning, quotation and measuring
+consultation_text_cs: Máte-li zájem o sklenářské práce, kontaktujte nás s nezávaznou poptávkou. Na základě vaší představy vám předložíme návrh řešení, vypracujeme podrobnou cenovou kalkulaci a poskytneme odborné poradenství. Tyto služby jsou zdarma, včetně zaměření prostoru před realizací zakázky. Po doladění zadání vyrobíme skleněné výrobky na míru, v dohodnutém termínu je dopravíme a namontujeme.
+consultation_text_en: Contact us with a no-obligation enquiry about your glass project. Based on your ideas, we will propose a solution, prepare a detailed quotation and provide expert advice. These services are free, including measuring the space before the project begins. Once the details are agreed, we manufacture your glass to measure, deliver it at the agreed time and install it.
+reputation:
+  source: Firmy.cz / Mapy.com
+  url: https://www.firmy.cz/detail/13749142-skloservis-brod-uhersky-brod.html
+  rating: 5
+  count: 4
+  verified_on: '2026-10-18'

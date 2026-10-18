@@ -1,0 +1,168 @@
+---
+import { getAbout } from '../content';
+import type { Language } from '../lib/urls';
+
+interface Props {
+  lang: Language;
+}
+
+const { lang } = Astro.props;
+const { reputation } = await getAbout();
+const copy = {
+  cs: {
+    title: 'Jak nás hodnotí zákazníci',
+    reviews: 'hodnocení',
+    link: 'Přečíst hodnocení na Firmy.cz',
+    checked: 'Ověřeno',
+    note: 'Hodnocení zákazníků na profilu Firmy.cz a Mapy.com.',
+  },
+  en: {
+    title: 'What our customers think',
+    reviews: 'reviews',
+    link: 'Read reviews on Firmy.cz',
+    checked: 'Checked',
+    note: 'Customer ratings on our Firmy.cz and Mapy.com profile.',
+  },
+}[lang];
+const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
+const rating = reputation?.rating.toLocaleString(locale, { minimumFractionDigits: 1 });
+const date = reputation
+  ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(
+      new Date(`${reputation.verified_on}T12:00:00Z`),
+    )
+  : '';
+const star = 'M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.85L12 16.9l-5.25 2.75 1-5.85L3.5 9.7l5.9-.9Z';
+---
+
+{reputation && (
+  <section class="section reputation" aria-labelledby="reputation-title">
+    <div class="wrap reputation__layout" data-reveal="rise">
+      <div>
+        <h2 id="reputation-title">{copy.title}</h2>
+        <p class="muted">{copy.note}</p>
+        <a class="text-link" href={reputation.url} target="_blank" rel="noopener noreferrer">
+          {copy.link}
+        </a>
+      </div>
+      <div class="reputation__rating">
+        <p class="reputation__source">{reputation.source}</p>
+        <p class="reputation__value">
+          <strong>{rating}</strong>
+          <span>/ 5</span>
+        </p>
+        <span
+          class="reputation__stars"
+          aria-hidden="true"
+          style={`--rating: ${reputation.rating / 5}`}
+        >
+          {['outline', 'fill'].map((layer) => (
+            <span class:list={['reputation__stars-row', `reputation__stars-row--${layer}`]}>
+              {[0, 1, 2, 3, 4].map(() => (
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d={star} />
+                </svg>
+              ))}
+            </span>
+          ))}
+        </span>
+        <p>
+          {reputation.count} {copy.reviews}
+        </p>
+        <p class="reputation__date muted">
+          {copy.checked} <time datetime={reputation.verified_on}>{date}</time>
+        </p>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .reputation__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5rem);
+  }
+  .reputation h2 {
+    max-width: 18ch;
+    margin-bottom: 1.25rem;
+  }
+  .reputation .text-link {
+    display: inline-block;
+    margin-top: 1.25rem;
+    padding-block: 0.5rem;
+  }
+  .reputation__rating {
+    border-left: 1px solid var(--line);
+    padding-left: clamp(1.5rem, 4vw, 3rem);
+  }
+  .reputation__source {
+    font-weight: 600;
+  }
+  .reputation__value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    color: var(--accent);
+  }
+  /* Decorative stars mirror the verified rating; the number above stays the accessible value. */
+  .reputation__stars {
+    display: inline-grid;
+    margin-top: 0.75rem;
+    color: var(--accent);
+    font-size: 1.75rem;
+  }
+  .reputation__stars-row {
+    display: flex;
+    grid-area: 1 / 1;
+    gap: 0.2rem;
+  }
+  .reputation__stars svg {
+    width: 1em;
+    height: 1em;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    stroke-width: 1.4;
+  }
+  .reputation__stars-row--outline svg {
+    fill: none;
+    opacity: 0.4;
+  }
+  .reputation__stars-row--fill {
+    clip-path: inset(0 calc((1 - var(--rating)) * 100%) 0 0);
+  }
+  .reputation__stars-row--fill svg {
+    fill: currentColor;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .reputation__rating:hover .reputation__stars-row--fill {
+      animation: reputation-stars-fill 900ms var(--ease) both;
+    }
+  }
+  @keyframes reputation-stars-fill {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+  }
+  .reputation__value strong {
+    font-size: clamp(4rem, 9vw, 6.5rem);
+    font-weight: 550;
+    line-height: 1;
+    letter-spacing: -0.06em;
+  }
+  .reputation__rating .reputation__date {
+    margin-top: 0.5rem;
+    font-size: var(--step--1);
+  }
+  @media (max-width: 39.99rem) {
+    .reputation__layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .reputation__rating {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+      padding: 1.5rem 0 0;
+    }
+  }
+</style>

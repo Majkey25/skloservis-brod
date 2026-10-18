@@ -15,6 +15,36 @@ const text = z.string().trim().min(1);
 const optional = <T extends z.ZodType>(schema: T) =>
   z.preprocess((value) => (value === null || value === '' ? undefined : value), schema.optional());
 const date = z.string().refine(isCalendarDate, 'Use a real calendar date: YYYY-MM-DD');
+const httpsUrl = z.url().regex(/^https:\/\//, 'Use an HTTPS URL');
+const mapEmbedUrl = httpsUrl.regex(
+  /^https:\/\/www\.google\.com\/maps\/embed\?pb=[A-Za-z0-9!%._-]+$/,
+  'Use the Google Maps Share > Embed a map URL (https://www.google.com/maps/embed?pb=...)',
+);
+const reputationFields = {
+  source: text,
+  url: httpsUrl.regex(/^https:\/\/(www\.)?firmy\.cz\/detail\/13749142-[a-z0-9-]+\.html$/),
+  rating: z.number().min(0).max(5),
+  count: z.number().int().positive(),
+  verified_on: date,
+};
+const reputation = z.preprocess(
+  (value) => {
+    // Pages CMS can serialize a cleared optional object as empty child fields.
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      Object.entries(value).every(
+        ([key, field]) =>
+          Object.hasOwn(reputationFields, key) &&
+          (field == null || (typeof field === 'string' && field.trim() === '')),
+      )
+    )
+      return undefined;
+    return value;
+  },
+  optional(z.strictObject(reputationFields)),
+);
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use HH:MM');
 const slot = z
   .strictObject({ opens: time, closes: time })
@@ -90,6 +120,8 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
     address,
     billing_address: address,
     company_id: z.string().regex(/^\d{8}$/),
+    map_url: httpsUrl,
+    map_embed_url: optional(mapEmbedUrl),
     title_cs: text,
     title_en: text,
     text_cs: text,
@@ -109,9 +141,43 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
     body_cs: text,
     body_en: text,
     photo: optional(image),
+    experience_years: z.number().int().positive(),
+    metrics_title_cs: text,
+    metrics_title_en: text,
+    metrics: z
+      .array(z.strictObject({ value: z.number().int().positive(), label_cs: text, label_en: text }))
+      .length(4),
+    service_groups: z
+      .array(
+        z.strictObject({
+          id: z.enum(['processing', 'doors', 'showers', 'structures']),
+          title_cs: text,
+          title_en: text,
+          summary_cs: text,
+          summary_en: text,
+          text_cs: text,
+          text_en: text,
+          link: z.enum(['services', ...slugs]),
+        }),
+      )
+      .length(4)
+      .refine(
+        (rows) => new Set(rows.map((row) => row.id)).size === 4,
+        'Include each service group exactly once',
+      ),
+    special_glass_title_cs: text,
+    special_glass_title_en: text,
+    special_glass_text_cs: text,
+    special_glass_text_en: text,
+    consultation_title_cs: text,
+    consultation_title_en: text,
+    consultation_text_cs: text,
+    consultation_text_en: text,
+    reputation,
   });
   const hours = z
     .strictObject({
+      holidays_closed: z.boolean().default(false),
       weekly: z
         .array(weeklyDay)
         .length(7)

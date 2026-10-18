@@ -2,6 +2,9 @@
 import { Picture } from 'astro:assets';
 import { getGallery, getServices, getSettings } from '../content';
 import { pageUrl, type Language } from '../lib/urls';
+import FlipCard from './FlipCard.astro';
+import Icon from './Icon.astro';
+import ProductIcon from './ProductIcon.astro';
 
 interface Props {
   lang: Language;
@@ -15,51 +18,81 @@ const [settings, services, gallery] = await Promise.all([
 ]);
 const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
 const labels = {
-  cs: { detail: 'Detail', enquiry: 'Nezávazná poptávka', process: 'Jak probíhá zakázka' },
+  cs: {
+    detail: 'Detail',
+    enquiry: 'Nezávazná poptávka',
+    process: 'Jak probíhá zakázka',
+    more: 'Více o',
+    back: 'Zpět',
+  },
   en: {
     detail: 'Details',
     enquiry: 'Project enquiry',
     process: 'How your project takes shape',
+    more: 'More about',
+    back: 'Back',
   },
 }[lang];
 ---
 
 <section class="section" aria-labelledby="products-title">
   <div class="wrap">
-    <header class="products-heading">
+    <header class="products-heading" data-reveal="rise">
       <h1 id="products-title">{settings[`products_title_${lang}`]}</h1>
       <p class="lead">{settings[`products_text_${lang}`]}</p>
     </header>
     <div class="products-grid">
       {services.map((service) => {
         const photo = gallery.find((item) => item.category === service.slug);
+        const title = service[`title_${lang}`];
         return (
-          <article class="product">
-            {photo && (
-              <Picture
-                src={photo.image}
-                alt={photo[`alt_${lang}`]}
-                formats={['avif', 'webp']}
-                widths={[320, 480, 720].filter((width) => width <= photo.image.width)}
-                sizes="(min-width: 70rem) 24rem, (min-width: 60rem) 30vw, (min-width: 40rem) 46vw, 100vw"
-                loading="lazy"
-                decoding="async"
-              />
-            )}
-            <h2 class:list={['product__title', { 'product__title--panel': !photo }]}>
-              <a class="text-link" href={url(service.slug)}>
-                {service[`title_${lang}`]}
-              </a>
-            </h2>
-            <p>{service[`seo_description_${lang}`]}</p>
-            <a
-              class="text-link product__detail"
-              href={url(service.slug)}
-              aria-label={`${labels.detail}: ${service[`title_${lang}`]}`}
+          <article class="product" data-reveal="rise">
+            <FlipCard
+              id={`product-${service.slug}`}
+              openLabel={`${labels.more}: ${title}`}
+              closeLabel={labels.back}
+              hoverDelay={460}
             >
-              {labels.detail}
-              <span aria-hidden="true">→</span>
-            </a>
+              <Fragment slot="front">
+                {!photo && (
+                  <span class="product__glyph" aria-hidden="true">
+                    <ProductIcon slug={service.slug} reveal />
+                  </span>
+                )}
+                {photo && (
+                  <span class="product__media">
+                    <Picture
+                      src={photo.image}
+                      alt={photo[`alt_${lang}`]}
+                      formats={['avif', 'webp']}
+                      widths={[320, 480, 720].filter((width) => width <= photo.image.width)}
+                      sizes="(min-width: 70rem) 24rem, (min-width: 60rem) 30vw, (min-width: 40rem) 46vw, 100vw"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                )}
+                <h2 class:list={['product__title', { 'product__title--plain': !photo }]}>
+                  <a class="text-link" href={url(service.slug)}>
+                    {title}
+                  </a>
+                </h2>
+                <p>{service[`seo_description_${lang}`]}</p>
+              </Fragment>
+              <Fragment slot="back">
+                <p>{service[`text_${lang}`]}</p>
+                <a
+                  class="text-link product__detail"
+                  href={url(service.slug)}
+                  aria-label={`${labels.detail}: ${title}`}
+                >
+                  {labels.detail} <Icon name="arrow-right" />
+                </a>
+                <a class="text-link product__enquiry" href={url('contact')}>
+                  {labels.enquiry}
+                </a>
+              </Fragment>
+            </FlipCard>
           </article>
         );
       })}
@@ -105,12 +138,29 @@ const labels = {
     min-width: 0;
   }
 
-  .product :global(img) {
+  /* The frame keeps its layout size. The photo grows into the card padding by the bleed. */
+  .product__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 2;
+  }
+
+  .product__media :global(picture) {
+    position: absolute;
+    inset: calc(var(--bleed-y) * -1) calc(var(--bleed-x) * -1);
+    clip-path: inset(var(--bleed-y) var(--bleed-x));
+    transition: clip-path var(--dur-bleed) var(--ease);
+  }
+
+  .product__media :global(img) {
     display: block;
     width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 2;
+    height: 100%;
     object-fit: cover;
+  }
+
+  .product:has(:focus-visible) .product__media :global(picture) {
+    clip-path: inset(0);
   }
 
   .product__title {
@@ -120,16 +170,28 @@ const labels = {
     text-wrap: balance;
   }
 
-  /* Keep products without verified photos visible as compact text panels. */
-  .product__title--panel {
+  .product__media + .product__title {
+    margin-top: calc(var(--bleed-y) + 0.5rem);
+  }
+
+  /* Without a photo the title starts at the pane top, clear of the flip toggle. */
+  .product__title--plain {
+    margin: 0 0 0.5rem;
+    padding-right: 3.5rem;
+  }
+
+  .product__glyph {
     display: grid;
-    align-content: end;
-    margin: 0;
-    padding: 1.25rem;
-    margin-bottom: 0.75rem;
-    background: var(--surface, #edf7fa);
-    font-size: clamp(1.2rem, 1.7vw, 1.5rem);
-    line-height: 1.15;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+    border-radius: 50%;
+    background: var(--glass-solid);
+    box-shadow: inset 1px 1px 0 var(--glass-edge);
+    color: var(--accent);
+    font-size: 1.35rem;
   }
 
   .product p {
@@ -138,21 +200,17 @@ const labels = {
     color: var(--muted, #52666f);
   }
 
-  .product__detail {
+  .product__detail,
+  .product__enquiry {
     display: inline-flex;
+    align-self: flex-start;
     align-items: center;
-    gap: 0.35rem;
     min-height: 44px;
+  }
+
+  .product__detail {
+    gap: 0.35rem;
     margin-top: 0.5rem;
-  }
-
-  .product__detail span {
-    display: inline-block;
-    transition: transform 160ms ease;
-  }
-
-  .product__detail:hover span {
-    transform: translateX(3px);
   }
 
   .products-process {
@@ -177,9 +235,9 @@ const labels = {
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .product__detail:hover span {
-      transform: none;
+  @media (hover: hover) and (pointer: fine) {
+    .product:hover .product__media :global(picture) {
+      clip-path: inset(0);
     }
   }
 

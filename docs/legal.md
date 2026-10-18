@@ -1,5 +1,7 @@
 # Legal content and implementation
 
+Updated 18 October 2026.
+
 The site is a Czech business presentation and enquiry service, with an English translation. The legal work follows that actual scope. No universal compliance certification is claimed.
 
 ## Verified business identity
@@ -20,9 +22,21 @@ The owner confirmed that only the company owner accesses the contact mailbox. A 
 
 The website does not configure the Gmail inbox or destroy physical records. The owner must apply the published policy operationally. Do not represent a policy file as tested mailbox deletion. Account-specific provider terms, transfer safeguards, backup handling and any processor agreement remain unverified; no Google Workspace subscription is established.
 
-Current host information and actual privacy practices can be documented independently. A website request exposes technical connection data to GitHub Pages. A mailto link opens the visitor's mail application; the separate web form uses FormSubmit to relay name, email and message to the confirmed Gmail address. The owner explicitly authorized activation and one test on 17 October 2026. Do not infer inbox delivery from endpoint acceptance.
+Current host information and actual privacy practices can be documented independently. A website request exposes technical connection data to GitHub Pages. The homepage's “Napsat e-mail” / “Write an email” button navigates to Contact. On Contact, that button and the email address link use `mailto:` to open the visitor's mail application with the recipient filled in; they do not send mail. The separate web form uses FormSubmit to relay name, email and message to the confirmed Gmail address. The owner authorized activation and one test on 17 October 2026; that allowance has been consumed and the owner confirmed delivery. This confirms that test only, not future delivery. Do not send further tests, reactivate the relay or infer inbox delivery from endpoint acceptance.
 
 The form validates input, POSTs only on submission, omits provider cookies in AJAX requests, and preserves input when acceptance is not confirmed. It loads no external CAPTCHA or analytics script. Without JavaScript it uses native FormSubmit POST and that service's own result page. Query parameters never establish success. [FormSubmit documentation](https://formsubmit.co/documentation) states a 30-day submission archive, distinct from the owner's one-month retention after resolution. Its [published privacy terms](https://formsubmit.co/privacy.pdf) do not establish every processing location or account-specific transfer safeguard; these remain supplier checks, not proven legal compliance.
+
+## Optional Google Maps embed
+
+The owner selected Google Maps, replacing the unshipped Mapy candidate. `src/components/MapPreview.astro` uses the official Share → Embed a map URL. This integration uses no API key or new account and requires no purchase; do not introduce a paid Maps API or billing configuration.
+
+The component creates no iframe, active map `src`, preconnect or map-provider request before an explicit “Souhlasit a načíst mapu” / “Agree and load the map” click. Keep “Bez mapy” / “Without the map” equally accessible. Address and external map link remain available without consent or JavaScript. Opening the external Google Maps link is a separate visitor action governed by Google's policies.
+
+Consent lasts only for the currently open map. No consent key is saved in cookies, localStorage or sessionStorage. Close removes the iframe; page navigation destroys the embed. Reopening requires another explicit click. Closing stops the embed but does not erase provider cookies, undo prior processing or impose a retention period on Google.
+
+After loading, Google receives IP and technical browser/request information and may use cookies or similar storage. Google processes data under its own [privacy policy](https://policies.google.com/privacy) and [cookie policy](https://policies.google.com/technologies/cookies), checked on 18 October 2026. The policies describe provider purposes and possible processing outside the EEA, including the USA; they are not proof of this site's legal compliance. Actual storage depends on browser restrictions, account state, provider behavior and the visitor's Google choices. Do not publish a fixed cookie inventory or lifetime from general provider examples as if observed in this embed.
+
+The lead must verify actual network and storage behavior before and after consent, decline, close and navigation in a real browser. Runtime cookie inventory remains pending that verification; this copy and source inspection do not establish an observed inventory. Keep both privacy and cookie pages aligned with the resulting evidence.
 
 ## Runtime checks owed after frontend integration
 

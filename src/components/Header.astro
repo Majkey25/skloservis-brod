@@ -1,23 +1,34 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/brand/wordpress-logo.png';
-import { getContact } from '../content.ts';
+import { getContact, getServices } from '../content.ts';
 import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
 import Icon from './Icon.astro';
+import ProductIcon from './ProductIcon.astro';
 interface Props {
   lang: Language;
   page: PageId;
 }
 const { lang, page } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const contact = await getContact();
+const [contact, services] = await Promise.all([getContact(), getServices()]);
 const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
 const nav = [
-  ['products', lang === 'cs' ? 'Produkty' : 'Products'],
   ['services', lang === 'cs' ? 'Služby' : 'Services'],
   ['gallery', lang === 'cs' ? 'Galerie' : 'Gallery'],
   ['contact', lang === 'cs' ? 'Kontakt' : 'Contact'],
 ] as const;
+const products = {
+  label: lang === 'cs' ? 'Produkty' : 'Products',
+  all: lang === 'cs' ? 'Všechny produkty' : 'All products',
+  current: page === 'products' || services.some(({ slug }) => slug === page),
+  links: services.map(({ slug, title_cs, title_en }) => ({
+    slug,
+    href: pageUrl(slug, lang, base),
+    title: lang === 'cs' ? title_cs : title_en,
+    current: page === slug,
+  })),
+};
 ---
 
 <header class="site-header">
@@ -27,6 +38,35 @@ const nav = [
       <span class="brand-name">Skloservis Brod</span>
     </a>
     <nav class="desktop-nav" aria-label={lang === 'cs' ? 'Hlavní navigace' : 'Main navigation'}>
+      <details class="nav-products" data-disclosure data-hover-open>
+        <summary data-current={products.current ? '' : undefined}>
+          <span>{products.label}</span>
+          <Icon name="chevron-down" />
+        </summary>
+        <div class="products-panel">
+          <ul>
+            {products.links.map(({ slug, href, title, current }, index) => (
+              <li style={`--i: ${index}`}>
+                <a href={href} aria-current={current ? 'page' : undefined}>
+                  <span class="products-panel__glyph">
+                    <ProductIcon slug={slug} />
+                  </span>
+                  <span class="products-panel__title">{title}</span>
+                  <Icon name="arrow-right" />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a
+            class="products-panel__all"
+            href={pageUrl('products', lang, base)}
+            aria-current={page === 'products' ? 'page' : undefined}
+          >
+            {products.all}
+            <Icon name="arrow-right" />
+          </a>
+        </div>
+      </details>
       {nav.map(([id, label]) => (
         <a href={pageUrl(id, lang, base)} aria-current={page === id ? 'page' : undefined}>
           {label}
@@ -38,7 +78,12 @@ const nav = [
         <Icon name="phone" />
         {phone}
       </a>
-      <nav class="language-nav" aria-label={lang === 'cs' ? 'Jazyk' : 'Language'}>
+      <nav
+        class="language-nav"
+        data-active-language={lang}
+        aria-label={lang === 'cs' ? 'Jazyk' : 'Language'}
+      >
+        <span class="language-indicator" aria-hidden="true"></span>
         {(['cs', 'en'] as const).map((language) =>
           language === lang ? (
             <span lang={language} aria-current="page" tabindex="-1">
@@ -86,38 +131,58 @@ const nav = [
           <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
         </svg>
       </button>
-      <details class="mobile-menu">
-        <summary aria-label={lang === 'cs' ? 'Otevřít navigaci' : 'Open navigation'}>
-          <svg
-            width="23"
-            height="23"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            aria-hidden="true"
-          >
-            <path d="M3 6h18M3 12h18M3 18h18" />
-          </svg>
+      <details class="mobile-menu" data-disclosure>
+        <summary aria-label={lang === 'cs' ? 'Hlavní nabídka' : 'Main menu'}>
+          <Icon name="menu" />
         </summary>
         <nav
           class="mobile-nav"
           aria-label={lang === 'cs' ? 'Mobilní navigace' : 'Mobile navigation'}
         >
-          {nav.map(([id, label]) => (
+          <details class="mobile-products" data-disclosure style="--i: 0">
+            <summary class="mobile-link" data-current={products.current ? '' : undefined}>
+              {products.label}
+              <Icon name="chevron-down" />
+            </summary>
+            <ul>
+              {products.links.map(({ href, title, current }) => (
+                <li>
+                  <a href={href} aria-current={current ? 'page' : undefined}>
+                    {title}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  class="mobile-products__all"
+                  href={pageUrl('products', lang, base)}
+                  aria-current={page === 'products' ? 'page' : undefined}
+                >
+                  {products.all}
+                  <Icon name="arrow-right" />
+                </a>
+              </li>
+            </ul>
+          </details>
+          {nav.map(([id, label], index) => (
             <a
               class="mobile-link"
               href={pageUrl(id, lang, base)}
               aria-current={page === id ? 'page' : undefined}
+              style={`--i: ${index + 1}`}
             >
               {label}
             </a>
           ))}
-          <a class="mobile-link" href={`tel:${contact.phone}`}>
+          <a class="mobile-link" href={`tel:${contact.phone}`} style={`--i: ${nav.length + 1}`}>
             <Icon name="phone" />
             {phone}
           </a>
-          <a class="button mobile-enquiry" href={pageUrl('contact', lang, base)}>
+          <a
+            class="button mobile-enquiry"
+            href={pageUrl('contact', lang, base)}
+            style={`--i: ${nav.length + 2}`}
+          >
             <Icon name="mail" />
             {lang === 'cs' ? 'Napsat poptávku' : 'Send an enquiry'}
           </a>
@@ -133,11 +198,12 @@ const nav = [
     z-index: 100;
     background: var(--bg);
     border-bottom: 1px solid var(--line);
+    box-shadow: inset 0 -1px var(--glass-edge);
   }
   @supports (backdrop-filter: blur(1px)) {
     .site-header {
-      background: color-mix(in srgb, var(--bg) 84%, transparent);
-      backdrop-filter: blur(14px);
+      background: var(--glass);
+      backdrop-filter: blur(var(--frost));
     }
   }
   .header-inner {
@@ -178,25 +244,220 @@ const nav = [
     gap: 0.75rem;
   }
   .language-nav {
-    gap: 0.75rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 44px);
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--glass-solid);
+    isolation: isolate;
+  }
+  .language-indicator {
+    position: absolute;
+    z-index: -1;
+    inset: 3px auto 3px 3px;
+    width: 44px;
+    border: 1px solid var(--glass-edge);
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--bg);
+    transform: translateX(0);
+  }
+  .language-nav[data-active-language='en'] .language-indicator {
+    transform: translateX(100%);
+  }
+  :global(html[data-preference-transition='language']) .site-header {
+    view-transition-name: preference-header;
+  }
+  :global(html[data-preference-transition='language']) .language-indicator {
+    view-transition-name: preference-language;
+  }
+  :global(html[data-preference-transition='language']) .language-nav [lang='cs'] {
+    view-transition-name: preference-cs;
+  }
+  :global(html[data-preference-transition='language']) .language-nav [lang='en'] {
+    view-transition-name: preference-en;
   }
   .desktop-nav a,
+  .nav-products summary,
   .language-nav a,
-  .language-nav span {
+  .language-nav span[aria-current] {
     text-decoration: none;
     font-weight: 550;
     font-size: 0.92rem;
   }
   .desktop-nav a:hover,
+  .nav-products summary:hover,
+  .nav-products[open] > summary,
   .language-nav a:hover {
     color: var(--accent);
   }
+  .nav-products {
+    position: relative;
+  }
+  .nav-products summary,
+  .mobile-products summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  .nav-products summary::-webkit-details-marker,
+  .mobile-products summary::-webkit-details-marker {
+    display: none;
+  }
+  .nav-products summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: 44px;
+  }
+  .nav-products summary[data-current] span {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.55rem;
+  }
+  /* Opaque pane: the header's backdrop filter would leave a nested blur with nothing to blur. */
+  .products-panel {
+    position: absolute;
+    top: calc(100% + (var(--header-h) - 44px) / 2 + 1px);
+    left: -1.25rem;
+    display: grid;
+    gap: 0.5rem;
+    width: min(40rem, calc(100vw - 3rem));
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--bg);
+    box-shadow:
+      inset 1px 0 var(--glass-edge),
+      var(--lift);
+  }
+  /* Invisible bridge over the gap below the summary, so hover survives the move into the pane. */
+  .products-panel::before {
+    position: absolute;
+    inset: auto 0 100%;
+    height: calc((var(--header-h) - 44px) / 2 + 1px);
+    content: '';
+  }
+  .products-panel ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.125rem 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .products-panel a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--text);
+    line-height: 1.3;
+    transition:
+      background-color var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease);
+  }
+  .products-panel ul a {
+    gap: 0.75rem;
+  }
+  .products-panel__title {
+    flex: 1;
+  }
+  .products-panel__glyph {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--glass-solid);
+    box-shadow: inset 1px 1px var(--glass-edge);
+    color: var(--accent);
+    font-size: 0.95rem;
+    transition:
+      background-color var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease),
+      transform var(--dur-fast) var(--ease);
+  }
+  .products-panel a:hover .products-panel__glyph,
+  .products-panel a:focus-visible .products-panel__glyph,
+  .products-panel [aria-current='page'] .products-panel__glyph {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .products-panel a:hover .products-panel__glyph {
+    transform: scale(1.06);
+  }
+  .products-panel ul a :global([data-icon='arrow-right']) {
+    opacity: 0;
+    transform: translateX(-6px);
+    transition:
+      opacity var(--dur-fast) var(--ease),
+      transform var(--dur-fast) var(--ease);
+  }
+  .products-panel a:hover,
+  .products-panel a:focus-visible {
+    background: var(--surface);
+    color: var(--accent);
+  }
+  .products-panel ul a:hover :global([data-icon='arrow-right']),
+  .products-panel ul a:focus-visible :global([data-icon='arrow-right']) {
+    opacity: 1;
+    transform: none;
+  }
+  .products-panel [aria-current='page'] {
+    color: var(--accent);
+    text-decoration: none;
+    box-shadow: inset 2px 0 var(--accent);
+  }
+  .desktop-nav .products-panel__all {
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    padding-top: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .nav-products[open] .products-panel {
+    animation: header-panel-open 280ms var(--ease) backwards;
+  }
+  .nav-products[open] li {
+    animation: header-panel-item 260ms var(--ease) backwards;
+    animation-delay: calc(60ms + var(--i) * 22ms);
+  }
+  @keyframes header-panel-open {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+      clip-path: inset(0 -3rem 100% -3rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      clip-path: inset(0 -3rem -3rem -3rem);
+    }
+  }
+  @keyframes header-panel-item {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
   .language-nav a,
-  .language-nav span {
+  .language-nav span[aria-current] {
     display: inline-grid;
     place-items: center;
     min-width: 44px;
     min-height: 44px;
+  }
+  .language-nav [aria-current='page'] {
+    text-decoration: none;
+    font-weight: 700;
   }
   .header-phone {
     display: none;
@@ -221,7 +482,8 @@ const nav = [
     height: 44px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    background: transparent;
+    background: var(--glass-solid);
+    box-shadow: inset 0 1px var(--glass-edge);
     color: var(--text);
   }
   .theme-toggle svg {
@@ -249,16 +511,44 @@ const nav = [
   .mobile-menu {
     display: none;
   }
-  .mobile-menu summary {
+  .mobile-menu > summary {
     display: grid;
     place-items: center;
     width: 44px;
     height: 44px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font-size: 1.3rem;
     cursor: pointer;
     list-style: none;
+    transition:
+      background-color var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease);
   }
-  .mobile-menu summary::-webkit-details-marker {
+  .mobile-menu > summary::-webkit-details-marker {
     display: none;
+  }
+  .mobile-menu[open] > summary {
+    border-color: var(--line);
+    background: var(--glass-solid);
+    box-shadow: inset 0 1px var(--glass-edge);
+  }
+  .mobile-menu[open] .mobile-nav {
+    animation: header-menu-open 320ms var(--ease) backwards;
+  }
+  .mobile-menu[open] .mobile-nav > * {
+    animation: header-panel-item 280ms var(--ease) backwards;
+    animation-delay: calc(60ms + var(--i) * 35ms);
+  }
+  @keyframes header-menu-open {
+    from {
+      opacity: 0.4;
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0);
+    }
   }
   .mobile-nav {
     position: absolute;
@@ -278,6 +568,41 @@ const nav = [
     font-weight: 550;
     text-decoration: none;
     border-bottom: 1px solid var(--line);
+  }
+  .mobile-products > summary {
+    justify-content: space-between;
+  }
+  .mobile-products > summary[data-current] {
+    color: var(--accent);
+  }
+  .mobile-products[open] > summary {
+    border-bottom-color: transparent;
+  }
+  .mobile-products ul {
+    margin: 0;
+    padding: 0 0 0.5rem 1rem;
+    border-bottom: 1px solid var(--line);
+    list-style: none;
+  }
+  .mobile-products[open] ul {
+    animation: header-panel-item 240ms var(--ease) backwards;
+  }
+  .mobile-products a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .mobile-products [aria-current='page'] {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .mobile-products .mobile-products__all {
+    color: var(--accent);
+    font-weight: 600;
   }
   .mobile-enquiry {
     margin-top: 1rem;
@@ -304,9 +629,6 @@ const nav = [
     .tools {
       gap: 0.5rem;
     }
-    .language-nav {
-      gap: 0.375rem;
-    }
   }
   @media (max-width: 359px) {
     .brand-logo {
@@ -318,12 +640,86 @@ const nav = [
   }
 </style>
 <script>
-  // Escape closes the mobile menu and returns focus to its toggle.
+  // Native details stay usable without JS; this adds Escape, outside-click and focus-leave closing.
+  const openDisclosures = () =>
+    document.querySelectorAll<HTMLDetailsElement>('details[data-disclosure][open]');
+
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !(event.target instanceof Element)) return;
-    const menu = event.target.closest<HTMLDetailsElement>('.mobile-menu');
-    if (!menu?.open) return;
-    menu.open = false;
-    menu.querySelector('summary')?.focus();
+    // A panel opened by hover alone has no focus inside it, so fall back to it directly.
+    const disclosure =
+      event.target.closest<HTMLDetailsElement>('details[data-disclosure][open]') ??
+      document.querySelector<HTMLDetailsElement>('details[data-hover-open][open]');
+    if (!disclosure) return;
+    const hadFocus = disclosure.contains(document.activeElement);
+    disclosure.open = false;
+    if (hadFocus) disclosure.querySelector<HTMLElement>(':scope > summary')?.focus();
   });
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Node)) return;
+    for (const disclosure of openDisclosures()) {
+      if (!disclosure.contains(event.target)) disclosure.open = false;
+    }
+  });
+  document.addEventListener('focusout', ({ target, relatedTarget }) => {
+    if (!(target instanceof Node) || !(relatedTarget instanceof Node)) return;
+    for (const disclosure of openDisclosures()) {
+      // Nested product lists stay open while focus moves through the rest of the mobile menu.
+      if (disclosure.parentElement?.closest('details[data-disclosure]')) continue;
+      if (disclosure.contains(target) && !disclosure.contains(relatedTarget))
+        disclosure.open = false;
+    }
+  });
+
+  // A resting mouse opens the desktop product panel; clicking the summary then pins it open.
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const hoverTimers = new WeakMap<HTMLDetailsElement, number>();
+  const hoverDisclosure = (event: PointerEvent) => {
+    const disclosure =
+      event.target instanceof Element
+        ? event.target.closest<HTMLDetailsElement>('details[data-hover-open]')
+        : null;
+    if (!disclosure || event.pointerType !== 'mouse') return;
+    if (disclosure.contains(event.relatedTarget as Node | null)) return;
+    return disclosure;
+  };
+  const schedule = (disclosure: HTMLDetailsElement, delay: number, action: () => void) => {
+    window.clearTimeout(hoverTimers.get(disclosure));
+    hoverTimers.set(disclosure, window.setTimeout(action, delay));
+  };
+
+  document.addEventListener('pointerover', (event) => {
+    const disclosure = hoverDisclosure(event);
+    if (!disclosure || !finePointer.matches) return;
+    schedule(disclosure, 90, () => {
+      if (disclosure.open || !disclosure.isConnected) return;
+      disclosure.dataset.hovered = '';
+      disclosure.open = true;
+    });
+  });
+  document.addEventListener('pointerout', (event) => {
+    const disclosure = hoverDisclosure(event);
+    if (!disclosure) return;
+    schedule(disclosure, 240, () => {
+      if (disclosure.hasAttribute('data-hovered') && !disclosure.contains(document.activeElement))
+        disclosure.open = false;
+    });
+  });
+  document.addEventListener('click', (event) => {
+    const summary =
+      event.target instanceof Element
+        ? event.target.closest('details[data-hover-open][data-hovered] > summary')
+        : null;
+    if (!summary) return;
+    event.preventDefault();
+    summary.parentElement?.removeAttribute('data-hovered');
+  });
+  document.addEventListener(
+    'toggle',
+    (event) => {
+      if (event.target instanceof HTMLDetailsElement && !event.target.open)
+        event.target.removeAttribute('data-hovered');
+    },
+    true,
+  );
 </script>

@@ -5,21 +5,27 @@ lang: en
 alternate: /ochrana-osobnich-udaju/
 ---
 
-Updated 17 October 2026.
+Updated 18 October 2026.
 
 ## Controller and contact
 
 The controller for enquiries and projects is **SKLOSERVIS-BROD s.r.o.**, company ID **02596491**, with its registered office at **č.p. 314, 760 01 Březnice, Czech Republic**. The workshop is at Prakšická 281, 688 01 Uherský Brod.
 
-For privacy questions or rights requests, email [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) or call [+420 608 031 206](tel:+420608031206). The company owner has access to the contact mailbox.
+For privacy questions or rights requests, email [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) or call [+420 608 031 206](tel:+420608031206). Within the company, only the owner has access to the contact mailbox.
 
 ## Visiting the website
 
-This website presents products and services. It has no enquiry database, user accounts, online shop, advertising or analytics measurement.
+This website presents products and services. It has no enquiry database, user accounts, online shop, first-party advertising or analytics measurement.
 
-When you submit the contact form, your name, email address and message are sent to **FormSubmit**, which relays them to `skloservis.brod@gmail.com`. FormSubmit also receives technical request information, such as your IP address. We do not save form details in browser local storage. The form confirmation means acceptance by the service, not verified inbox delivery. The separate “Write an email” link still opens your own mail application.
+When you submit the contact form, your name, email address and message are sent to **FormSubmit**, which relays them to `skloservis.brod@gmail.com`. FormSubmit also receives technical request information, such as your IP address. We do not save form details in browser local storage. The form confirmation means acceptance by the service, not verified inbox delivery. The homepage's “Write an email” button leads to the Contact page. On that page, “Write an email” and the email address link use `mailto:`: they open your mail application with the recipient filled in and do not send a message themselves.
 
 When serving pages, GitHub Pages processes technical request information, such as your IP address and connection details, including for service security. This is distinct from storing an enquiry in a company database. See the [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
+
+## Optional Google map
+
+We load the Google map only after you select “Agree and load the map”. Until then, your browser makes no connection to Google for the map. “Without the map” leaves the address and external link available. We do not save consent; it applies only to the currently open map. “Close map” or navigating to another page removes the embed; opening it again requires fresh consent.
+
+Loading the map sends Google your IP address and technical browser and request information. Google may use cookies and similar storage and process data for its own purposes under [its privacy policy](https://policies.google.com/privacy?hl=en). The scope also depends on your browser and account settings and choices with Google. Closing the map does not undo earlier processing or erase any Google data or cookies. See the [cookies page](../cookies/) for storage controls and Google's cookie policy. The separate “Open in Google Maps” link opens the external service under its own policies.
 
 ## Enquiries and projects
 
@@ -32,6 +38,8 @@ An enquiry does not require marketing consent. Without enough project informatio
 ## Retention and retrievability
 
 This website does not save enquiries in a separate database. Email correspondence and paper or electronic material nevertheless remain retrievable while the enquiry is being handled.
+
+The owner handles retention and deletion; the website code does not delete Gmail messages or paper documents.
 
 **We retain an ordinary resolved enquiry and related material for one further month after it is resolved, so it can be retrieved.** A customer may email [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) to request longer retention for a specific continuation of discussions. We agree the purpose and additional period individually.
 

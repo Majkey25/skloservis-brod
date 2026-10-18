@@ -33,6 +33,14 @@ const formatDate = (date: string) =>
       <Icon name="clock" /> {cs ? 'Otevírací doba' : 'Opening hours'}
     </h2>
     <p class="hours-live" data-hours-live role="status" aria-atomic="true" hidden></p>
+    {hours.holidays_closed && (
+      <p class="hours-holidays">
+        <strong>{cs ? 'O českých svátcích zavřeno.' : 'Closed on Czech public holidays.'}</strong>{' '}
+        {cs
+          ? 'Včetně Velkého pátku a Velikonočního pondělí. Případné výjimky uvádíme níže.'
+          : 'Including Good Friday and Easter Monday. Any exceptions are listed below.'}
+      </p>
+    )}
     <table>
       <caption>
         {cs
@@ -125,7 +133,7 @@ const formatDate = (date: string) =>
       const cs = this.dataset.lang === 'cs';
       const now = new Date();
       const current = scheduleAt(this.hours, now);
-      // Highlight the weekly row only; a dated exception replaces the regular day.
+      // Highlight the weekly row only; exceptions and holidays replace the regular day.
       const today = current.source === 'weekly' ? current.day : '';
       this.querySelectorAll<HTMLElement>('[data-day]').forEach((element) =>
         element.toggleAttribute('data-today', element.dataset.day === today),
@@ -138,8 +146,18 @@ const formatDate = (date: string) =>
       const row = current.row;
       const note = row[cs ? 'note_cs' : 'note_en'];
       const intervals = row.slots.map((slot) => `${slot.opens}–${slot.closes}`).join(', ');
-      target.dataset.state =
-        !row.assumed && row.slots.length ? (current.isOpen ? 'open' : 'closed') : '';
+      const closedDay =
+        !row.assumed &&
+        !row.slots.length &&
+        (current.source === 'holiday' ||
+          (current.source === 'weekly' && (current.day === 'sat' || current.day === 'sun')));
+      target.dataset.state = closedDay
+        ? 'closed'
+        : !row.assumed && row.slots.length
+          ? current.isOpen
+            ? 'open'
+            : 'closed'
+          : '';
       const status = row.assumed
         ? ''
         : row.slots.length
@@ -240,6 +258,11 @@ const formatDate = (date: string) =>
   .hours-general-note {
     color: var(--muted, #52666f);
     margin: 1rem 0 0;
+  }
+  .hours-holidays {
+    padding: 0.85rem 1rem;
+    background: var(--surface, #edf7fa);
+    border-left: 3px solid var(--accent, #087fa0);
   }
   .hours-exceptions ul {
     list-style: none;

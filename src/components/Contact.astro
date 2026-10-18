@@ -3,6 +3,8 @@ import { getContact, getSettings } from '../content';
 import { pageUrl, type Language } from '../lib/urls';
 import Hours from './Hours.astro';
 import Icon from './Icon.astro';
+import MapPreview from './MapPreview.astro';
+import Reputation from './Reputation.astro';
 
 interface Props {
   lang: Language;
@@ -16,9 +18,18 @@ const copy = {
     call: 'Zavolat',
     email: 'Napsat e-mail',
     copy: 'Kopírovat e-mail',
+    copyPhone: 'Kopírovat telefon',
+    phoneCopied: 'Telefonní číslo zkopírováno.',
+    phoneCopyFailed: 'Číslo se nepodařilo zkopírovat. Označte a zkopírujte telefonní číslo výše.',
     copied: 'E-mailová adresa zkopírována.',
     copyFailed: 'Adresu se nepodařilo zkopírovat. Označte a zkopírujte e-mailovou adresu výše.',
     mailHelp: 'Odkaz otevře vaši e-mailovou aplikaci. Zprávu odešlete až v ní.',
+    contactHelp:
+      'Na stránce Kontakty nám můžete napsat přímo z formuláře nebo otevřít e-mailovou aplikaci.',
+    messageHelp:
+      'Pro rychlejší přípravu nabídky a omezení doplňujících dotazů uveďte výrobek a jeho použití, počet kusů, rozměry včetně jednotek, tloušťku, druh a barvu skla, opracování hran, otvory či výřezy a případné kalení. Připište, zda požadujete montáž a kde, nebo osobní odběr. Pokud si některým parametrem nejste jistí, rádi poradíme.',
+    messageExample:
+      'Dobrý den, prosím o nabídku 1 kusu skla na interiérovou polici: rozměr 200 × 200 mm (20 × 20 cm), tloušťka 6 mm, šedé kouřové, kalené. Všechny hrany broušené a leštěné, rohy zaoblené R5, bez otvorů a výřezů. Bez montáže, osobní odběr v Uherském Brodě. Prosím o cenu a předpokládaný termín zhotovení. Děkuji.\n\nToto je pouze příklad. Napište vlastní zadání.',
     privacy: 'Jak zpracováváme osobní údaje',
     formNote:
       'Formulář předá vaše jméno, e-mail a zprávu službě FormSubmit k přeposlání na náš e-mail. Pole označená * jsou povinná.',
@@ -43,9 +54,17 @@ const copy = {
     call: 'Call us',
     email: 'Write an email',
     copy: 'Copy email address',
+    copyPhone: 'Copy phone number',
+    phoneCopied: 'Phone number copied.',
+    phoneCopyFailed: 'The number could not be copied. Select and copy the phone number above.',
     copied: 'Email address copied.',
     copyFailed: 'The address could not be copied. Select and copy the email address above.',
     mailHelp: 'The link opens your email application. You send the message from there.',
+    contactHelp: 'On the Contact page you can use our enquiry form or open your email application.',
+    messageHelp:
+      'For a faster quotation with fewer follow-up questions, include the product and its use, quantity, dimensions with units, thickness, glass type and colour, edge finish, holes or cut-outs and any tempering. Tell us whether you need installation and where, or workshop collection. We can advise if you are unsure about any specification.',
+    messageExample:
+      'Hello, please quote for 1 glass pane for an indoor shelf: 200 × 200 mm (20 × 20 cm), 6 mm thick, grey smoked, tempered glass. All edges ground and polished, rounded corners R5, no holes or cut-outs. No installation, collection from your Uherský Brod workshop. Please include the price and estimated completion date. Thank you.\n\nThis is only an example. Write your own requirements.',
     privacy: 'How we process personal data',
     formNote:
       'The form sends your name, email and message to FormSubmit for forwarding to our email address. Fields marked * are required.',
@@ -110,7 +129,14 @@ const enquiryTexts = JSON.stringify({
           </a>
         </div>
         <div class="contact__actions">
-          <a class="button" href={`mailto:${settings.contact_email}`}>
+          <a
+            class="button"
+            href={
+              compact
+                ? pageUrl('contact', lang, import.meta.env.BASE_URL)
+                : `mailto:${settings.contact_email}`
+            }
+          >
             <Icon name="mail" />
             {copy.email}
           </a>
@@ -121,7 +147,7 @@ const enquiryTexts = JSON.stringify({
           <button
             class="text-link contact__copy"
             type="button"
-            data-copy-email={settings.contact_email}
+            data-copy-value={settings.contact_email}
             data-copied={copy.copied}
             data-copy-failed={copy.copyFailed}
             hidden
@@ -129,8 +155,19 @@ const enquiryTexts = JSON.stringify({
             <Icon name="copy" />
             {copy.copy}
           </button>
+          <button
+            class="text-link contact__copy"
+            type="button"
+            data-copy-value={contact.phone}
+            data-copied={copy.phoneCopied}
+            data-copy-failed={copy.phoneCopyFailed}
+            hidden
+          >
+            <Icon name="copy" />
+            {copy.copyPhone}
+          </button>
         </div>
-        <p class="contact__help muted">{copy.mailHelp}</p>
+        <p class="contact__help muted">{compact ? copy.contactHelp : copy.mailHelp}</p>
         {compact && (
           <p class="contact__privacy">
             <a class="text-link" href={pageUrl('privacy', lang, import.meta.env.BASE_URL)}>
@@ -168,6 +205,7 @@ const enquiryTexts = JSON.stringify({
                 name="name"
                 type="text"
                 autocomplete="name"
+                placeholder="Jan Novák"
                 maxlength={limits.name}
                 required
               />
@@ -185,6 +223,7 @@ const enquiryTexts = JSON.stringify({
                 name="email"
                 type="email"
                 autocomplete="email"
+                placeholder="example@gmail.com"
                 maxlength={limits.email}
                 required
               />
@@ -196,11 +235,16 @@ const enquiryTexts = JSON.stringify({
                   *
                 </span>
               </label>
+              <p class="contact__form-note muted" id="contact-message-help">
+                {copy.messageHelp}
+              </p>
               <textarea
                 class="contact__input"
                 id="contact-message"
                 name="message"
-                rows="6"
+                rows="10"
+                placeholder={copy.messageExample}
+                aria-describedby="contact-message-help"
                 maxlength={limits.message}
                 required
               ></textarea>
@@ -231,7 +275,7 @@ const enquiryTexts = JSON.stringify({
         )}
         {compact && (
           <a class="text-link" href={pageUrl('contact', lang, import.meta.env.BASE_URL)}>
-            {copy.allContact} <span aria-hidden="true">→</span>
+            {copy.allContact} <Icon name="arrow-right" />
           </a>
         )}
       </div>
@@ -274,8 +318,10 @@ const enquiryTexts = JSON.stringify({
         </div>
       )}
     </div>
+    <MapPreview lang={lang} />
   </div>
 </section>
+{!compact && <Reputation lang={lang} />}
 
 <script>
   import { sendEnquiry } from '../lib/enquiry';
@@ -295,16 +341,16 @@ const enquiryTexts = JSON.stringify({
   const activeRequests = new Map<HTMLFormElement, AbortController>();
 
   function initializeContactCopy() {
-    document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((button) => {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy-value]').forEach((button) => {
       if (button.dataset.copyBound) return;
       button.dataset.copyBound = 'true';
       button.hidden = false;
       button.addEventListener('click', async () => {
-        const email = button.dataset.copyEmail;
+        const value = button.dataset.copyValue;
         const status = button.closest('[data-contact]')?.querySelector('[data-copy-status]');
-        if (!email || !status) return;
+        if (!value || !status) return;
         try {
-          await navigator.clipboard.writeText(email);
+          await navigator.clipboard.writeText(value);
           status.textContent = button.dataset.copied ?? '';
         } catch {
           status.textContent = button.dataset.copyFailed ?? '';
@@ -547,6 +593,11 @@ const enquiryTexts = JSON.stringify({
   textarea.contact__input {
     min-height: 9rem;
     resize: vertical;
+  }
+
+  .contact__input::placeholder {
+    color: var(--muted);
+    opacity: 1;
   }
 
   .contact__business {

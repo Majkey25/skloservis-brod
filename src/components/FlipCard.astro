@@ -1,0 +1,360 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  id: string;
+  openLabel: string;
+  closeLabel: string;
+  class?: string;
+  /** Pointer rest time before a hover flip; longer lets a photo expand first. */
+  hoverDelay?: number;
+}
+
+const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.props;
+---
+
+<div class:list={['flip-card', className]} data-flip-card data-flip-delay={hoverDelay}>
+  <div class="flip-card__inner">
+    <div class="flip-card__face flip-card__front" id={`${id}-front`}>
+      <slot name="front" />
+      <button
+        type="button"
+        class="flip-card__toggle"
+        data-flip-open
+        aria-controls={`${id}-back`}
+        aria-expanded="false"
+        hidden
+      >
+        <Icon name="flip" />
+        <span class="sr-only">{openLabel}</span>
+      </button>
+    </div>
+    <div class="flip-card__face flip-card__back" id={`${id}-back`}>
+      <slot name="back" />
+      <button type="button" class="text-link flip-card__close" data-flip-close hidden>
+        <Icon name="arrow-left" />
+        {closeLabel}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Hidden faces are inert, so they leave the tab order and the accessibility tree.
+  function setFace(face: HTMLElement, hidden: boolean) {
+    face.inert = hidden;
+    if (hidden) face.setAttribute('aria-hidden', 'true');
+    else face.removeAttribute('aria-hidden');
+  }
+
+  function setFlipped(card: HTMLElement, flipped: boolean) {
+    const front = card.querySelector<HTMLElement>('.flip-card__front');
+    const back = card.querySelector<HTMLElement>('.flip-card__back');
+    const open = card.querySelector<HTMLButtonElement>('[data-flip-open]');
+    if (!front || !back || !open) return;
+    card.toggleAttribute('data-flipped', flipped);
+    setFace(front, flipped);
+    setFace(back, !flipped);
+    open.setAttribute('aria-expanded', String(flipped));
+  }
+
+  function flip(card: HTMLElement, flipped: boolean) {
+    setFlipped(card, flipped);
+    const target = card.querySelector<HTMLButtonElement>(
+      flipped ? '[data-flip-close]' : '[data-flip-open]',
+    );
+    target?.focus({ preventScroll: true });
+  }
+
+  // Controls appear only after this script runs, so cards without JS stay fully readable.
+  function initFlipCards() {
+    document
+      .querySelectorAll<HTMLElement>('[data-flip-card]:not([data-flip-ready])')
+      .forEach((card) => {
+        card.setAttribute('data-flip-ready', '');
+        card
+          .querySelectorAll<HTMLButtonElement>('[data-flip-open], [data-flip-close]')
+          .forEach((button) => {
+            button.hidden = false;
+          });
+        setFlipped(card, false);
+      });
+  }
+
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const timers = new WeakMap<HTMLElement, number>();
+  let lastPointer = '';
+
+  const readyCard = (target: EventTarget | null) =>
+    target instanceof Element
+      ? target.closest<HTMLElement>('[data-flip-card][data-flip-ready]')
+      : null;
+
+  // Mouse hover flips after a short rest, so sweeping across a grid never flickers.
+  function hoverFlip(card: HTMLElement, flipped: boolean) {
+    window.clearTimeout(timers.get(card));
+    const delay = flipped ? Number(card.dataset.flipDelay) || 140 : 180;
+    timers.set(
+      card,
+      window.setTimeout(() => {
+        if (!card.isConnected || card.hasAttribute('data-flipped') === flipped) return;
+        // Reduced motion may have been switched on during the delay; buttons still work then.
+        if (!finePointer.matches || reducedMotion.matches) return;
+        // Focus inside the face being hidden would be stranded in an inert face, so move it.
+        const hiding = card.querySelector(flipped ? '.flip-card__front' : '.flip-card__back');
+        if (hiding?.contains(document.activeElement)) flip(card, flipped);
+        else setFlipped(card, flipped);
+      }, delay),
+    );
+  }
+
+  document.addEventListener('pointerover', (event) => {
+    const card = readyCard(event.target);
+    if (!card || card.contains(event.relatedTarget as Node | null)) return;
+    if (event.pointerType === 'mouse' && finePointer.matches && !reducedMotion.matches) {
+      hoverFlip(card, true);
+    }
+  });
+  document.addEventListener('pointerout', (event) => {
+    const card = readyCard(event.target);
+    if (!card || card.contains(event.relatedTarget as Node | null)) return;
+    if (event.pointerType === 'mouse') hoverFlip(card, false);
+  });
+  document.addEventListener('pointerdown', (event) => {
+    lastPointer = event.pointerType;
+  });
+
+  // Document-level listeners survive ClientRouter swaps; handlers only act on live cards.
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const button = event.target.closest<HTMLButtonElement>('[data-flip-open], [data-flip-close]');
+    const card = button?.closest<HTMLElement>('[data-flip-card]');
+    if (button && card) {
+      window.clearTimeout(timers.get(card));
+      flip(card, button.hasAttribute('data-flip-open'));
+      return;
+    }
+    // Touch has no hover: a tap on a face outside its links turns the card.
+    const tapped = readyCard(event.target);
+    if (tapped && lastPointer !== 'mouse' && !event.target.closest('a, button')) {
+      setFlipped(tapped, !tapped.hasAttribute('data-flipped'));
+    }
+  });
+
+  // Keyboard flips close again when focus moves on to another part of the page.
+  document.addEventListener('focusout', (event) => {
+    const card = readyCard(event.target);
+    if (!card?.hasAttribute('data-flipped') || card.contains(event.relatedTarget as Node | null)) {
+      return;
+    }
+    if (event.relatedTarget && !card.matches(':hover')) setFlipped(card, false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !(event.target instanceof Element)) return;
+    const card = event.target
+      .closest<HTMLElement>('.flip-card__back')
+      ?.closest<HTMLElement>('[data-flip-card]');
+    if (!card?.hasAttribute('data-flipped')) return;
+    event.preventDefault();
+    flip(card, false);
+  });
+
+  initFlipCards();
+  document.addEventListener('astro:page-load', initFlipCards);
+</script>
+
+<style>
+  .flip-card {
+    --flip-glint: rgb(255 255 255 / 0.55);
+    --flip-etch: rgb(7 114 143 / 0.05);
+    position: relative;
+    height: 100%;
+    transition: translate var(--dur-bleed) var(--ease);
+  }
+
+  :global(:root[data-theme='dark']) .flip-card {
+    --flip-glint: rgb(148 229 245 / 0.14);
+    --flip-etch: rgb(148 229 245 / 0.05);
+  }
+
+  /* Both faces share one pane style. Padding leaves room for photo bleed inside the pane. */
+  .flip-card__face {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: inset 1px 1px 0 var(--glass-edge);
+    transition:
+      border-color var(--dur-bleed) var(--ease),
+      box-shadow var(--dur-bleed) var(--ease);
+  }
+
+  /* One light pass across the pane on hover; it never covers controls. */
+  .flip-card__face::after {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(105deg, transparent 38%, var(--flip-glint) 50%, transparent 62%)
+      100% 0 / 250% 100% no-repeat;
+    opacity: 0;
+    pointer-events: none;
+    content: '';
+    transition:
+      background-position var(--dur-glint) var(--ease),
+      opacity var(--dur-fast) var(--ease);
+  }
+
+  .flip-card__toggle {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--glass-solid);
+    color: var(--accent);
+    box-shadow: inset 1px 1px 0 var(--glass-edge);
+    transition:
+      background-color var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease);
+  }
+
+  .flip-card__toggle:not([hidden]) {
+    display: grid;
+    place-items: center;
+  }
+
+  .flip-card__close:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+    min-height: 44px;
+    margin-top: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+  }
+
+  .flip-card[data-flip-ready] {
+    perspective: 1400px;
+  }
+
+  .flip-card[data-flip-ready] .flip-card__inner {
+    display: grid;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform var(--dur-flip) var(--ease-flip, cubic-bezier(0.65, 0, 0.35, 1));
+  }
+
+  /* Both faces share one grid cell, so the card height is the tallest face on both sides. */
+  .flip-card[data-flip-ready] .flip-card__face {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* The back is etched glass: a tinted pane with a fine diagonal hairline. */
+  .flip-card[data-flip-ready] .flip-card__back {
+    transform: rotateY(180deg);
+    background-color: var(--glass-solid);
+    background-image: repeating-linear-gradient(
+      115deg,
+      var(--flip-etch) 0 1px,
+      transparent 1px 9px
+    );
+  }
+
+  .flip-card[data-flipped] .flip-card__inner {
+    transform: rotateY(180deg);
+  }
+
+  /* Back content settles in after the turn passes its midpoint. */
+  .flip-card[data-flip-ready] .flip-card__back > :global(*) {
+    opacity: 0;
+    translate: 0 10px;
+    transition:
+      opacity 320ms var(--ease),
+      translate 420ms var(--ease);
+  }
+
+  .flip-card[data-flipped] .flip-card__back > :global(*) {
+    opacity: 1;
+    translate: none;
+    transition-delay: 240ms;
+  }
+
+  .flip-card[data-flipped] .flip-card__back > :global(:nth-child(2)) {
+    transition-delay: 300ms;
+  }
+
+  .flip-card[data-flipped] .flip-card__back > :global(:nth-child(3)) {
+    transition-delay: 360ms;
+  }
+
+  .flip-card[data-flipped] .flip-card__back > :global(:nth-child(n + 4)) {
+    transition-delay: 420ms;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .flip-card__toggle:hover {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .flip-card[data-flip-ready]:hover {
+      translate: 0 -5px;
+    }
+
+    .flip-card[data-flip-ready]:hover .flip-card__face {
+      border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+      box-shadow:
+        inset 1px 1px 0 var(--glass-edge),
+        var(--lift);
+    }
+
+    .flip-card[data-flip-ready]:hover .flip-card__face::after {
+      opacity: 1;
+      background-position: 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flip-card[data-flip-ready]:hover {
+      translate: none;
+    }
+
+    .flip-card[data-flip-ready] .flip-card__inner,
+    .flip-card[data-flipped] .flip-card__inner {
+      transform: none;
+    }
+
+    .flip-card[data-flip-ready] .flip-card__back {
+      transform: none;
+      visibility: hidden;
+    }
+
+    .flip-card[data-flipped] .flip-card__front {
+      visibility: hidden;
+    }
+
+    .flip-card[data-flipped] .flip-card__back {
+      visibility: visible;
+    }
+
+    .flip-card[data-flip-ready] .flip-card__back > :global(*) {
+      opacity: 1;
+      translate: none;
+    }
+  }
+</style>

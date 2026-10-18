@@ -8,7 +8,9 @@ Přihlášení, uložení změny a její zveřejnění byly ověřeny 18. říjn
 
 V části otevírací doby upravte příslušný den. Časy zapisujte jako `08:00`, každý otevřený interval musí končit později, než začíná. Prázdný seznam intervalů znamená, že pro návštěvy není zveřejněná otevírací doba. Poznámka může uvádět například páteční montáže.
 
-Pondělí až čtvrtek jsou podle současné kontaktní stránky otevřené od 8:00 do 15:00. V pátek probíhají montáže. Víkendové hodiny nejsou v původním zdroji uvedené; nepotvrzené hodnoty nepovažujte za ověřenou dostupnost.
+Pondělí až čtvrtek je otevřeno od 8:00 do 15:00. V pátek probíhají montáže. Majitel potvrdil, že v sobotu a neděli je zavřeno; pro domluvu návštěvníci mohou zavolat nebo napsat e-mail.
+
+Volba „O českých svátcích zavřeno“ automaticky zahrnuje i pohyblivý Velký pátek a Velikonoční pondělí v dalších letech. Konkrétní datovaná výjimka má před tímto pravidlem přednost.
 
 Výjimka pro dovolenou nebo svátek nahrazuje běžnou otevírací dobu i poznámky ve vybraném období. Vyplňte obě data jako `RRRR-MM-DD`; první i poslední den do období patří. Prázdné intervaly znamenají, že nejsou uvedené návštěvní hodiny. Pro dovolenou proto doplňte výslovnou poznámku o uzavření česky i anglicky. Období výjimek se nesmí překrývat ani společným krajním dnem. Poznámky k otevírací době vyplňujte vždy v obou jazycích.
 
@@ -25,6 +27,10 @@ Prázdné datum „od“ nebo „do“ znamená neomezený začátek nebo konec.
 Fotografii nahrajte do médií galerie a přidejte ji do seznamu galerie. Vyplňte věcný český i anglický popis a správnou kategorii. Nevkládejte jména zákazníků, adresy zakázek ani jiné soukromé údaje bez souhlasu. Pořadí položek určuje pořadí fotografií.
 
 Stejně lze upravit firemní údaje, texty, produkty a popisy pro vyhledávače. Stabilní adresy produktových stránek zachovejte. Jejich změna může poškodit existující odkazy a vyžaduje plán přesměrování.
+
+V kontaktu lze upravit odkaz na Google Maps a volitelnou URL vložené mapy. Z Google Maps → Sdílet → Vložení mapy zkopírujte pouze adresu `src`, ne celý HTML kód, a ověřte polohu provozovny. Prázdná URL vložení mapu vypne. Mapa se načítá až po souhlasu návštěvníka; externí odkaz funguje i bez JavaScriptu.
+
+Firemní údaje zahrnují zkušenosti, roční čísla a čtyři skupiny služeb. Hodnocení Firmy.cz uvádí zdroj, počet a datum ověření; při změně ověřte aktuální profil. Vymazáním všech jeho polí se hodnocení skryje. Nedoplňujte neověřená ocenění nebo certifikace.
 
 V části „Soukromí a právní informace“ lze upravit české i anglické dokumenty. Změna zásad musí odpovídat skutečnému fungování firmy. Běžné vyřízené poptávky mají podle potvrzené politiky lhůtu jeden měsíc od vyřízení; zákazník může e-mailem požádat o odůvodněné prodloužení nebo o výmaz elektronických i papírových podkladů. Zákonné povinnosti uchování zůstávají zachované. Web sám nemaže firemní schránku ani fyzické dokumenty.
 

@@ -1,6 +1,9 @@
-/* Route swaps need no full-page bitmap; keep motion on individual controls and images. */
+/* Only an explicit language/theme choice may capture a full-page bitmap. */
 html:root {
   view-transition-name: none;
+}
+html:root[data-preference-transition] {
+  view-transition-name: root;
 }
 
 :root {
@@ -31,6 +34,19 @@ html:root {
   --header-h: 72px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 160ms;
+  --dur-lang: 480ms;
+  --dur-theme: 560ms;
+  --dur-flip: 620ms;
+  --dur-bleed: 360ms;
+  --dur-glint: 700ms;
+  --bleed-x: 0.75rem;
+  --bleed-y: 1rem;
+  --glass: color-mix(in srgb, var(--bg) 78%, transparent);
+  --glass-solid: color-mix(in srgb, var(--accent) 9%, var(--bg));
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --frost: 14px;
+  --glint: linear-gradient(110deg, transparent 35%, rgb(255 255 255 / 0.08), transparent 65%);
+  --lift: 0 16px 42px rgb(7 30 40 / 0.12);
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -46,6 +62,8 @@ html:root {
   --attention-line: #f0b44c;
   --warning-bg: #3b1714;
   --warning-line: #ff8a7a;
+  --glass-edge: rgba(148, 229, 245, 0.2);
+  --lift: 0 16px 42px rgb(0 0 0 / 0.28);
 }
 /* Without JS there is no data-theme, so the device setting applies here. */
 @media (prefers-color-scheme: dark) {
@@ -63,6 +81,8 @@ html:root {
     --attention-line: #f0b44c;
     --warning-bg: #3b1714;
     --warning-line: #ff8a7a;
+    --glass-edge: rgba(148, 229, 245, 0.2);
+    --lift: 0 16px 42px rgb(0 0 0 / 0.28);
   }
 }
 * {
@@ -184,17 +204,12 @@ summary:focus-visible {
   color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
-  background-image: linear-gradient(
-    110deg,
-    transparent 35%,
-    rgb(255 255 255 / 0.08),
-    transparent 65%
-  );
+  background-image: var(--glint);
   background-size: 250% 100%;
   background-position: 100% 0;
   transition:
     background-color var(--dur-fast) var(--ease),
-    background-position 360ms var(--ease),
+    background-position var(--dur-glint) var(--ease),
     color var(--dur-fast) var(--ease),
     transform var(--dur-fast) var(--ease);
 }
@@ -291,6 +306,92 @@ summary:focus-visible {
 .prose li + li {
   margin-top: 0.4rem;
 }
+
+/* Disable UA crossfades; the two deliberate gestures have separate motion. */
+::view-transition-group(root) {
+  animation: none;
+}
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+/* Keep the header steady while its independently captured segment slides between CZ/EN. */
+::view-transition-group(preference-header) {
+  z-index: 1;
+  animation: none;
+}
+::view-transition-old(preference-header),
+::view-transition-old(preference-cs),
+::view-transition-old(preference-en) {
+  display: none;
+}
+::view-transition-new(preference-header),
+::view-transition-new(preference-cs),
+::view-transition-new(preference-en),
+::view-transition-old(preference-language),
+::view-transition-new(preference-language) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-group(preference-language) {
+  z-index: 2;
+  animation-duration: var(--dur-fast);
+  animation-timing-function: var(--ease);
+}
+::view-transition-group(preference-cs),
+::view-transition-group(preference-en) {
+  z-index: 3;
+  animation: none;
+}
+html[data-preference-transition='theme']::view-transition-old(root) {
+  z-index: 1;
+}
+html[data-preference-transition='theme']::view-transition-new(root) {
+  z-index: 2;
+  animation: theme-reveal var(--dur-theme) var(--ease) both;
+}
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-x) var(--theme-y));
+  }
+  to {
+    clip-path: circle(var(--theme-radius) at var(--theme-x) var(--theme-y));
+  }
+}
+html[data-preference-transition='language']::view-transition-old(root) {
+  transform-origin: center left;
+  animation: glass-door-out var(--dur-lang) var(--ease) both;
+}
+html[data-preference-transition='language']::view-transition-new(root) {
+  transform-origin: center right;
+  box-shadow: inset 2px 0 var(--glass-edge);
+  animation: glass-door-in var(--dur-lang) var(--ease) both;
+}
+@keyframes glass-door-out {
+  to {
+    opacity: 0;
+    transform: perspective(1400px) translateX(calc(var(--lang-sign) * -9%))
+      rotateY(calc(var(--lang-sign) * -9deg));
+    filter: blur(2px);
+  }
+}
+@keyframes glass-door-in {
+  from {
+    opacity: 0;
+    transform: perspective(1400px) translateX(calc(var(--lang-sign) * 9%))
+      rotateY(calc(var(--lang-sign) * 9deg));
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1400px) translateX(0) rotateY(0);
+    filter: blur(0);
+  }
+}
 @media (max-width: 950px) {
   :root {
     --header-h: 64px;
@@ -305,6 +406,14 @@ summary:focus-visible {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  html:root[data-preference-transition] {
+    view-transition-name: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
   .button:hover:not(:disabled),
   .button:active:not(:disabled) {
     transform: none;

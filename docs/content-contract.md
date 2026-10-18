@@ -46,8 +46,43 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
   string), `address`, `billing_address`; required bilingual pairs `title`, `text`,
   `enquiry_title`, `enquiry_text`, `seo_description`. Each address has required `street`,
   `city`, `postal_code` (`NNN NN`) and `country: CZ`. Email comes from settings.
+  Required `map_url` is a valid HTTPS URL for the current Google Maps workshop profile.
+  Optional `map_embed_url` accepts only `https://www.google.com/maps/embed?pb=`
+  followed by the generated map payload; omission, `null` and `''` disable the embed.
+  Obtain this URL from Google Maps Share → Embed a map and verify its pin before
+  publishing; never invent a payload or assume an old embed still has the right location.
+  Load the external iframe only after explicit visitor consent; keep the map link
+  usable without JavaScript and do not add persistent consent storage.
 - `about.yaml`: required bilingual pairs `title`, `lead`, `body`; optional `photo`.
-- `hours.yaml`: required `weekly` with exactly one row for each
+  Additional required fields:
+  - `experience_years`: positive integer, seeded as `40`. Render as **over 40 years
+    of glassworking experience**, never as the age of the present legal entity.
+  - `metrics_title_cs/en`: `Náš rok v číslech` / `Our year in numbers` in the seed.
+  - `metrics`: exactly four strict objects `{value, label_cs, label_en}`; `value`
+    is a positive integer and both labels are nonblank. Seed order is `3000`
+    completed orders, `300` complete projects, `100` tonnes of processed glass,
+    `28000` km of ground glass edges. Render **over** or `+` for every figure;
+    the numeric values and labels themselves contain neither. These are
+    owner-confirmed annual figures, not a live counter or independently audited data.
+  - `service_groups`: exactly four strict objects with unique `id` values
+    `processing | doors | showers | structures`, required bilingual pairs `title`,
+    `summary`, `text`, and `link`. Summary is the front-face copy; text supplies the
+    details. Links are stable `PageId` values: `services` or one of the existing
+    eight Czech service slugs. Resolve through `pageUrl` with language and base.
+  - Bilingual pairs `special_glass_title`, `special_glass_text`, `consultation_title`,
+    `consultation_text`. No specific resistance classes or certifications are implied.
+    Optional `reputation` is a strict object `{source, url, rating, count, verified_on}`.
+    Source is nonblank; URL must be an HTTPS Firmy.cz detail with ID `13749142`;
+    rating is numeric in inclusive range `0..5`; count is a positive integer;
+    verification date is a real `YYYY-MM-DD`. Omission, `null`, `''`, `{}` or an object
+    containing only empty known child fields normalize to `undefined`. Partially
+    filled objects and unknown keys fail. In Pages CMS, clear all five child fields
+    to remove the rating. Do not default rating/count/date: that would prevent clearing.
+    Display the source, count, date and profile link together. No review quotations,
+    award claims, Google branding or self-serving `aggregateRating` structured data.
+    `About` and `Contact` remain inferred from their collections; no additional getter
+    or parallel manually maintained type is needed.
+- `hours.yaml`: `holidays_closed` is a boolean (default false, seed true). Required `weekly` has exactly one row for each
   `mon,tue,wed,thu,fri,sat,sun`; optional `exceptions`; optional bilingual `note`.
   A weekly row has `day`, `slots`, optional bilingual `note`, `assumed` (default false).
   An exception has required `from`, `to`, plus the same `slots`, `note`, `assumed` fields.
@@ -59,7 +94,9 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
   walk-in interval**; show the row's notes, especially for installation-only Fridays.
 - Exceptions use real `YYYY-MM-DD` dates (years 0001–9999), both required. Bounds are
   inclusive; reversed or overlapping ranges fail. An exception replaces the entire
-  weekly row for that day, including notes and slots. No holiday closure is inferred.
+  weekly row for that day, including notes and slots. When `holidays_closed` is true,
+  Czech public holidays, including calculated Good Friday and Easter Monday, are closed.
+  Explicit dated exceptions take precedence over holiday closure, then weekly hours apply.
 - `banners.yaml`: ordered list of `{enabled, level, from?, to?, text_cs, text_en}`.
   `level` is `info | attention | warning`; text is required in both languages.
   Optional date bounds are inclusive, validated real dates, and must not be reversed.
@@ -98,7 +135,7 @@ it with native TypeScript stripping. It exports:
 - `activeNotices(notices, instant)`: enabled notices within local date bounds, ordered
   warning → attention → info, then original file order. Does not mutate input.
 - `scheduleAt(hours, instant)`: `{date, time, day, source, row, isOpen}`; `source` is
-  `weekly | exception`; `row` contains slots/notes/assumption. Intervals are half-open:
+  `weekly | holiday | exception`; `row` contains slots/notes/assumption. Intervals are half-open:
   open at `opens`, closed at `closes`. Missing weekday throws instead of implying closed.
 
 All inputs to runtime predicates must already be schema validated. Pass a fresh
@@ -121,15 +158,33 @@ address/phone have not been reused. This content does not replace a reviewed pri
 notice or authorize a mail service.
 
 Po–Čt 08:00–15:00 and Friday “Realizace montáží” are archived source facts, not a fresh
-verification of current operation. Weekend hours are unconfirmed; show the bilingual
-instruction to call, never an asserted closure. The `assumed` flag records that uncertainty
-for renderers and structured data. No dated exception has been supplied.
+verification of current operation. The owner subsequently confirmed Saturday, Sunday
+and Czech public holidays closed, with phone/email available for arrangements.
+These seed weekend rows are confirmed (`assumed: false`). No dated exception has been supplied.
 Broad offerings follow pages 1388/1390 and product pages 1898/1942/1955/1971/1980/1990/
-2003/2017. Translations preserve that meaning. Current product availability, specific
-glass thicknesses/certifications, coverage and commercial terms remain unverified;
-technical specifications, free-service claims, ratings, metrics and “over 30 years”
-are omitted. CMS access, save/build/deploy, form delivery and production launch are
-outside this foundation's verification.
+2003/2017. The owner confirmed on 2026-10-18 that the original business copy remains
+substantially current, including coverage of the Zlín Region and other regions,
+the four service groups and free planning, detailed quotation, advice and measuring.
+The restored bilingual copy preserves that scope. The same owner explicitly
+confirmed all four annual figures as **over** their stored values and updated the
+glassworking experience to **over 40 years**. This is owner provenance, not an audit;
+it does not alter the incorporation date of SKLOSERVIS-BROD s.r.o.
+
+The [Firmy.cz profile](https://www.firmy.cz/detail/13749142-skloservis-brod-uhersky-brod.html)
+was checked on 2026-10-18: rating **5.0 from 4 ratings**, operating address Prakšická 281
+and IČO 02596491. It also lists insulating double/triple glazing, security,
+bullet-resistant and fire-resistant glass. No specific classes, certification or
+award were verified. Ratings are a dated snapshot; recheck the profile before updates.
+Other profile fields do not override the separately confirmed enquiry recipient or
+published hours. The Mapy.com firm ID is 13749142. The owner selected Google Maps for
+the embedded map; its current profile shows Prakšická 281 and the matching telephone.
+
+Pages CMS mirrors the new shapes using its documented
+[number fields](https://pagescms.org/docs/configuration/fields/number/) and
+[optional object fields](https://pagescms.org/docs/configuration/fields/object/).
+The build remains authoritative for integer constraints, unique service-group IDs,
+real calendar dates, nonblank copy and full URL validity. This data change alone
+does not verify a live CMS save, new UI behavior, form delivery or production launch.
 
 `createSchemas(imageSchema)` and `yamlItems(raw, shape)` are exported by the content
 config for regression tests. The loader uses `js-yaml` `CORE_SCHEMA`, validates all

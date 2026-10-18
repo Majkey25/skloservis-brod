@@ -1,0 +1,286 @@
+---
+import { getContact } from '../content';
+import type { Language } from '../lib/urls';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Language;
+}
+
+const { lang } = Astro.props;
+const contact = await getContact();
+const copy = {
+  cs: {
+    title: 'Zastavte se u nás',
+    place: 'Provozovna v areálu Horní Dvůr',
+    load: 'Souhlasit a načíst mapu',
+    decline: 'Bez mapy',
+    declined: 'Mapa zůstává vypnutá. Adresa i odkaz jsou stále dostupné.',
+    close: 'Zavřít mapu',
+    external: 'Otevřít v Google Maps',
+    mapTitle: 'Mapa provozovny Skloservis Brod, Prakšická 281',
+    privacy:
+      'Interaktivní mapa se načte až po vašem souhlasu. Poté se prohlížeč spojí se službou Google Maps, která zpracuje IP adresu a technické údaje a může používat vlastní cookies.',
+    terms: 'Soukromí služby Google',
+    session: 'Souhlas platí jen pro tuto otevřenou mapu. Volbu neukládáme.',
+  },
+  en: {
+    title: 'Visit our workshop',
+    place: 'Workshop in the Horní Dvůr complex',
+    load: 'Agree and load the map',
+    decline: 'Without the map',
+    declined: 'The map stays off. The address and external link remain available.',
+    close: 'Close map',
+    external: 'Open in Google Maps',
+    mapTitle: 'Map of Skloservis Brod workshop, Prakšická 281',
+    privacy:
+      'The interactive map loads only with your consent. Your browser then connects to Google Maps, which processes your IP address and technical information and may use its own cookies.',
+    terms: 'Google privacy information',
+    session: 'Consent applies only to this open map. We do not save your choice.',
+  },
+}[lang];
+---
+
+<location-map
+  class="location-map"
+  data-embed={contact.map_embed_url}
+  data-frame-title={copy.mapTitle}
+  data-declined={copy.declined}
+>
+  <div class="location-map__heading">
+    <div>
+      <h2>{copy.title}</h2>
+      <p class="muted">{copy.place}</p>
+    </div>
+    <a class="text-link" href={contact.map_url} target="_blank" rel="noopener noreferrer">
+      <Icon name="location" />
+      {copy.external}
+    </a>
+  </div>
+  <div class="location-map__pane" data-map-pane>
+    <div class="location-map__preview" data-map-placeholder>
+      <div class="location-map__pin" aria-hidden="true">
+        <Icon name="location" />
+      </div>
+      <address>
+        <strong>{contact.address.street}</strong>
+        {contact.address.postal_code} {contact.address.city}
+      </address>
+      <p class="location-map__privacy muted">{copy.privacy}</p>
+      {contact.map_embed_url && (
+        <div class="location-map__choices" data-map-choices hidden>
+          <button class="button" type="button" data-map-load>
+            <Icon name="location" />
+            {copy.load}
+          </button>
+          <button class="button button--secondary" type="button" data-map-decline>
+            {copy.decline}
+          </button>
+        </div>
+      )}
+      <p class="location-map__status muted" data-map-status role="status"></p>
+      <a
+        class="location-map__terms text-link"
+        href={`https://policies.google.com/privacy?hl=${lang}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {copy.terms}
+      </a>
+    </div>
+    <div class="location-map__loaded" data-map-loaded hidden>
+      <div class="location-map__frame" data-map-target></div>
+      <button class="location-map__close button button--secondary" type="button" data-map-close>
+        {copy.close}
+      </button>
+    </div>
+  </div>
+  <p class="location-map__session muted">{copy.session}</p>
+</location-map>
+
+<script>
+  class LocationMap extends HTMLElement {
+    #events?: AbortController;
+
+    connectedCallback() {
+      this.#events?.abort();
+      this.#events = new AbortController();
+      const load = this.querySelector<HTMLButtonElement>('[data-map-load]');
+      const choices = this.querySelector<HTMLElement>('[data-map-choices]');
+      const decline = this.querySelector<HTMLButtonElement>('[data-map-decline]');
+      const status = this.querySelector<HTMLElement>('[data-map-status]');
+      const close = this.querySelector<HTMLButtonElement>('[data-map-close]');
+      const placeholder = this.querySelector<HTMLElement>('[data-map-placeholder]');
+      const loaded = this.querySelector<HTMLElement>('[data-map-loaded]');
+      const target = this.querySelector<HTMLElement>('[data-map-target]');
+      const pane = this.querySelector<HTMLElement>('[data-map-pane]');
+      const embed = this.dataset.embed;
+      if (!load || !choices || !close || !placeholder || !loaded || !target || !embed) return;
+
+      choices.hidden = false;
+      decline?.addEventListener(
+        'click',
+        () => {
+          if (status) status.textContent = this.dataset.declined ?? '';
+        },
+        { signal: this.#events.signal },
+      );
+      load.addEventListener(
+        'click',
+        () => {
+          if (target.childElementCount) return;
+          if (status) status.textContent = '';
+          // Match the consent pane's real height, including wrapped mobile copy.
+          pane?.style.setProperty(
+            '--map-height',
+            `${placeholder.getBoundingClientRect().height}px`,
+          );
+          const frame = document.createElement('iframe');
+          frame.src = embed;
+          frame.title = this.dataset.frameTitle ?? 'Google Maps';
+          frame.referrerPolicy = 'no-referrer';
+          frame.loading = 'lazy';
+          target.replaceChildren(frame);
+          placeholder.hidden = true;
+          loaded.hidden = false;
+          close.focus({ preventScroll: true });
+        },
+        { signal: this.#events.signal },
+      );
+      close.addEventListener(
+        'click',
+        () => {
+          target.replaceChildren();
+          loaded.hidden = true;
+          placeholder.hidden = false;
+          pane?.style.removeProperty('--map-height');
+          load.focus({ preventScroll: true });
+        },
+        { signal: this.#events.signal },
+      );
+    }
+
+    disconnectedCallback() {
+      this.#events?.abort();
+    }
+  }
+
+  if (!customElements.get('location-map')) customElements.define('location-map', LocationMap);
+</script>
+
+<style>
+  .location-map {
+    display: block;
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+  .location-map__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .location-map__heading h2 {
+    margin-bottom: 0.75rem;
+  }
+  .location-map__heading .text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+  }
+  .location-map__pane {
+    --map-height: 32rem;
+    position: relative;
+    min-height: var(--map-height);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .location-map__preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: var(--map-height);
+    padding: 2rem 1.25rem;
+    background-image: linear-gradient(
+      120deg,
+      transparent 43%,
+      var(--bg) 43.2%,
+      var(--bg) 56.8%,
+      transparent 57%
+    );
+    text-align: center;
+  }
+  .location-map__preview[hidden],
+  .location-map__loaded[hidden],
+  .location-map__choices[hidden] {
+    display: none;
+  }
+  .location-map__pin {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--accent);
+    font-size: 2rem;
+    transition: transform 320ms var(--ease);
+  }
+  .location-map__preview:has(.button:hover) .location-map__pin {
+    transform: translateY(-4px) rotate(-6deg);
+  }
+  .location-map address {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-style: normal;
+  }
+  .location-map__privacy {
+    max-width: 66ch;
+    font-size: var(--step--1);
+  }
+  .location-map__choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .location-map__status:empty {
+    display: none;
+  }
+  .location-map__terms,
+  .location-map__session {
+    font-size: var(--step--1);
+  }
+  .location-map__session {
+    margin-top: 0.75rem;
+  }
+  .location-map__loaded {
+    position: relative;
+  }
+  .location-map__frame,
+  .location-map__frame :global(iframe) {
+    display: block;
+    width: 100%;
+    height: var(--map-height);
+    border: 0;
+  }
+  .location-map__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--bg);
+    box-shadow: var(--lift, 0 6px 20px rgb(7 30 40 / 0.15));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .location-map__pin {
+      transition: none;
+      transform: none !important;
+    }
+  }
+</style>

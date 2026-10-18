@@ -69,6 +69,8 @@ Na neveřejném testovacím cíli nebo lokálně ověřit:
 - Všechny adresy z [mapy cest](routes.md), obě jazykové verze, obrázky, odkazy a skutečnou neznámou 404.
 - Produkční samoodkazující canonical, vzájemné `cs`/`en`/`x-default`, sitemap a robots. Produkce nesmí obsahovat `noindex` na známých stránkách ani prefix `/skloservis-brod/`; náhled musí `noindex` zachovat.
 - Kontakty, platnost hlášek, výjimky otevírací doby, klávesnici galerie, oba motivy a mobil. Údaje ve strukturovaných datech musí odpovídat viditelnému obsahu.
+- Zavřenou sobotu, neděli a české svátky včetně pohyblivých Velikonoc; konkrétní datovaná výjimka má přednost. U přepínání jazyka ověřit zachování rozpracované poptávky a pozice stránky.
+- Google Maps až po souhlasu návštěvníka: před souhlasem ani po odmítnutí se mapa nesmí načítat. Ověřit správnou polohu Prakšická 281, zavření mapy, funkční externí odkaz a shodu s českou i anglickou informací o soukromí. Případná pravidla cílového hostingu nesmí blokovat schválené vložení nebo formulář.
 - Staré aliasy řešit skutečným HTTP 301 na odpovídající stránku. Statický HTML/JavaScript přechod není 301. Staré mediální adresy zachovat nebo jednotlivě přesměrovat na odpovídající soubory; neházet všechny ztracené adresy na úvodní stranu.
 - Poptávku podle skutečně povoleného způsobu odesílání. Úspěšná HTTP odpověď relaye sama nepotvrzuje přijetí e-mailu.
 

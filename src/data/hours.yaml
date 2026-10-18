@@ -1,4 +1,5 @@
-# Source: contact page 1393. No invented Friday walk-in interval or holiday closures.
+# Source: contact page 1393; weekend and Czech public holiday closures confirmed by owner.
+holidays_closed: true
 weekly:
   - day: mon
     slots: [{ opens: '08:00', closes: '15:00' }]
@@ -14,14 +15,12 @@ weekly:
     note_en: Installation work
   - day: sat
     slots: []
-    assumed: true
-    note_cs: Otevírací dobu o víkendu ověřte telefonicky.
-    note_en: Please call to check weekend opening hours.
+    note_cs: Zavřeno
+    note_en: Closed
   - day: sun
     slots: []
-    assumed: true
-    note_cs: Otevírací dobu o víkendu ověřte telefonicky.
-    note_en: Please call to check weekend opening hours.
+    note_cs: Zavřeno
+    note_en: Closed
 exceptions: []
-note_cs: V pátek probíhají montáže. Před návštěvou mimo uvedené hodiny nám prosím zavolejte.
-note_en: Fridays are reserved for installation work. Please call before visiting outside the listed hours.
+note_cs: V pátek probíhají montáže. Pro individuální domluvu nám prosím zavolejte nebo napište e-mail.
+note_en: Fridays are reserved for installation work. Please call or email us to make individual arrangements.

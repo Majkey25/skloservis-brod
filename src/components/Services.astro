@@ -2,6 +2,8 @@
 import { Picture } from 'astro:assets';
 import { getAbout, getContact, getGallery, getServices, getSettings } from '../content';
 import { pageUrl, type Language } from '../lib/urls';
+import Icon from './Icon.astro';
+import ProductIcon from './ProductIcon.astro';
 
 interface Props {
   lang: Language;
@@ -22,12 +24,16 @@ const labels = {
     process: 'Jak probíhá zakázka',
     enquiry: 'Nezávazná poptávka',
     gallery: 'Prohlédnout realizace',
+    groups: 'Co pro vás vyrobíme',
+    offer: 'Zobrazit nabídku',
     steps: ['Návrh', 'Zaměření', 'Výroba', 'Montáž'],
   },
   en: {
     process: 'How your project takes shape',
     enquiry: 'Project enquiry',
     gallery: 'View our work',
+    groups: 'What we make for you',
+    offer: 'See the offer',
     steps: ['Planning', 'Measuring', 'Manufacture', 'Installation'],
   },
 }[lang];
@@ -36,7 +42,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 
 <section class="section" aria-labelledby="services-title">
   <div class="wrap services-intro">
-    <div>
+    <div data-reveal="rise">
       <h1 id="services-title">{settings[`services_title_${lang}`]}</h1>
       <p class="lead">{settings[`services_text_${lang}`]}</p>
       <div class="services-actions">
@@ -67,9 +73,42 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   </div>
 </section>
 
+<section class="section services-groups" aria-labelledby="services-groups-title">
+  <div class="wrap">
+    <h2 class="section-title" id="services-groups-title" data-reveal="rise">
+      {labels.groups}
+    </h2>
+    <div class="services-groups__grid">
+      {about.service_groups.map((group) => (
+        <article class="services-group" data-reveal="rise">
+          <h3>{group[`title_${lang}`]}</h3>
+          <p class="services-group__summary">{group[`summary_${lang}`]}</p>
+          <p>{group[`text_${lang}`]}</p>
+          <a class="text-link services-group__link" href={url(group.link)}>
+            {labels.offer} <Icon name="arrow-right" />
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap services-offers">
+    <article data-reveal="rise">
+      <h2>{about[`special_glass_title_${lang}`]}</h2>
+      <p>{about[`special_glass_text_${lang}`]}</p>
+    </article>
+    <article data-reveal="rise">
+      <h2>{about[`consultation_title_${lang}`]}</h2>
+      <p>{about[`consultation_text_${lang}`]}</p>
+    </article>
+  </div>
+</section>
+
 <section class="section services-process" aria-labelledby="services-process-title">
   <div class="wrap services-columns">
-    <div>
+    <div data-reveal="rise">
       <h2 class="section-title" id="services-process-title">
         {labels.process}
       </h2>
@@ -79,14 +118,16 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         ))}
       </ol>
     </div>
-    <div>
+    <div data-reveal="rise">
       <p class="lead">{settings[`process_${lang}`]}</p>
       <p>{contact[`enquiry_text_${lang}`]}</p>
       <a class="text-link" href={url('contact')}>
         {contact[`enquiry_title_${lang}`]}
       </a>
       <details class="services-about">
-        <summary>{about[`title_${lang}`]}</summary>
+        <summary>
+          {about[`title_${lang}`]} <Icon name="chevron-down" />
+        </summary>
         <p class="lead">{about[`lead_${lang}`]}</p>
         {paragraphs.map((paragraph) => (
           <p>{paragraph}</p>
@@ -98,17 +139,21 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 
 <section class="section" aria-labelledby="services-products-title">
   <div class="wrap services-columns">
-    <div>
+    <div data-reveal="rise">
       <h2 class="section-title" id="services-products-title">
         {settings[`products_title_${lang}`]}
       </h2>
       <p class="muted">{settings[`products_text_${lang}`]}</p>
     </div>
-    <ul class="services-product-links">
+    <ul class="services-product-links" data-reveal="rise">
       {services.map((service) => (
         <li>
-          <a class="text-link" href={url(service.slug)}>
-            {service[`title_${lang}`]}
+          <a href={url(service.slug)}>
+            <span class="services-product-links__glyph">
+              <ProductIcon slug={service.slug} />
+            </span>
+            <span class="services-product-links__title">{service[`title_${lang}`]}</span>
+            <Icon name="arrow-right" />
           </a>
         </li>
       ))}
@@ -157,8 +202,62 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     object-fit: cover;
   }
 
+  .services-groups {
+    background: var(--surface);
+  }
+
+  .services-groups__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem clamp(2rem, 4vw, 4rem);
+  }
+
+  .services-group {
+    min-width: 0;
+  }
+
+  .services-group h3 {
+    margin-bottom: 0.75rem;
+    font-size: var(--step-2);
+    line-height: 1.25;
+  }
+
+  .services-group__summary {
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .services-group p {
+    max-width: 65ch;
+  }
+
+  .services-group__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    margin-top: 0.5rem;
+  }
+
+  .services-offers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+
+  .services-offers h2 {
+    margin-bottom: 0.75rem;
+    font-size: var(--step-2);
+    line-height: 1.25;
+  }
+
+  .services-offers p {
+    max-width: 65ch;
+    color: var(--muted);
+  }
+
   .services-process {
-    background: var(--surface, #edf7fa);
+    background: var(--surface);
   }
 
   .services-steps {
@@ -219,8 +318,49 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   }
 
   .services-product-links a {
-    display: block;
-    padding: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: 3.75rem;
+    padding: 0.6rem 0;
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease);
+  }
+
+  .services-product-links__title {
+    flex: 1;
+  }
+
+  .services-product-links__glyph {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+    border-radius: 50%;
+    background: var(--glass-solid);
+    color: var(--accent);
+    transition:
+      background-color var(--dur-bleed) var(--ease),
+      color var(--dur-bleed) var(--ease);
+  }
+
+  .services-product-links a :global([data-icon='arrow-right']) {
+    color: var(--accent);
+  }
+
+  .services-product-links a:hover,
+  .services-product-links a:focus-visible {
+    color: var(--accent);
+  }
+
+  .services-product-links a:hover .services-product-links__glyph,
+  .services-product-links a:focus-visible .services-product-links__glyph {
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   .services-about {
@@ -240,7 +380,9 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 
   @media (max-width: 47.99rem) {
     .services-intro,
-    .services-columns {
+    .services-columns,
+    .services-groups__grid,
+    .services-offers {
       grid-template-columns: minmax(0, 1fr);
     }
   }

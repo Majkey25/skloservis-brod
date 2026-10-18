@@ -1,0 +1,186 @@
+---
+import { getAbout, type About } from '../content';
+import { pageUrl, type Language } from '../lib/urls';
+import FlipCard from './FlipCard.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Language;
+}
+
+type GroupId = About['service_groups'][number]['id'];
+
+const { lang } = Astro.props;
+const about = await getAbout();
+const base = import.meta.env.BASE_URL;
+const labels = {
+  cs: {
+    heading: 'Co pro vás vyrobíme',
+    more: 'Více o',
+    back: 'Zpět',
+    offer: 'Zobrazit nabídku',
+  },
+  en: {
+    heading: 'What we make for you',
+    more: 'More about',
+    back: 'Back',
+    offer: 'See the offer',
+  },
+}[lang];
+
+// Line drawings on a 48-unit grid, one list of paths per service group.
+const pictograms: Record<GroupId, readonly string[]> = {
+  processing: ['M10 8h22v32H10Z', 'M10 30 32 18', 'M24 40h16V24'],
+  doors: ['M12 6h24v36H12Z', 'M24 6v36', 'M19 23v6', 'M29 23v6'],
+  showers: ['M8 42h32', 'M8 8v34', 'M24 8v34', 'M8 8h16', 'M31 16v8'],
+  structures: ['M6 14h36', 'M10 14v28', 'M38 14v28', 'M10 22h28', 'M10 34h28'],
+};
+---
+
+<section class="section service-highlights" aria-labelledby="service-highlights-title">
+  <div class="wrap">
+    <h2 class="section-title" id="service-highlights-title" data-reveal="rise">
+      {labels.heading}
+    </h2>
+    <div class="service-highlights__grid">
+      {about.service_groups.map((group) => {
+        const title = group[`title_${lang}`];
+        return (
+          <div class="service-highlights__item" data-reveal="rise">
+            <FlipCard
+              id={`highlight-${group.id}`}
+              openLabel={`${labels.more}: ${title}`}
+              closeLabel={labels.back}
+            >
+              <Fragment slot="front">
+                <span class="service-highlights__ring" aria-hidden="true">
+                  <svg
+                    class="service-highlights__pictogram"
+                    data-reveal="draw"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    focusable="false"
+                  >
+                    {pictograms[group.id].map((d) => (
+                      <path d={d} pathLength="1" />
+                    ))}
+                  </svg>
+                </span>
+                <h3>{title}</h3>
+                <p>{group[`summary_${lang}`]}</p>
+              </Fragment>
+              <Fragment slot="back">
+                <p>{group[`text_${lang}`]}</p>
+                <a
+                  class="text-link service-highlights__offer"
+                  href={pageUrl(group.link, lang, base)}
+                >
+                  {labels.offer} <Icon name="arrow-right" />
+                </a>
+              </Fragment>
+            </FlipCard>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .service-highlights {
+    background: var(--surface);
+  }
+
+  .service-highlights__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .service-highlights__item {
+    min-width: 0;
+  }
+
+  .service-highlights__ring {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+    border-radius: 50%;
+    background: var(--glass-solid);
+    box-shadow: inset 1px 1px 0 var(--glass-edge);
+    color: var(--accent);
+    transition:
+      background-color var(--dur-bleed) var(--ease),
+      color var(--dur-bleed) var(--ease),
+      border-color var(--dur-bleed) var(--ease);
+  }
+
+  .service-highlights__pictogram {
+    display: block;
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  /* The pictogram redraws itself once when its card is pointed at. */
+  .service-highlights__pictogram path {
+    stroke-dasharray: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .service-highlights__item:hover .service-highlights__ring {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .service-highlights__item:hover .service-highlights__pictogram path {
+      animation: service-pictogram-draw 760ms var(--ease) both;
+    }
+  }
+
+  @keyframes service-pictogram-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .service-highlights h3 {
+    margin-bottom: 0.75rem;
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+
+  .service-highlights__item p {
+    color: var(--muted);
+  }
+
+  .service-highlights__offer {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.5rem;
+    min-height: 44px;
+  }
+
+  @media (max-width: 63.99rem) {
+    .service-highlights__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 39.99rem) {
+    .service-highlights__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

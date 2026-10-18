@@ -180,6 +180,20 @@ content:
     path: src/data/contact.yaml
     format: yaml
     fields:
+      - name: map_url
+        label: Odkaz na provozovnu v Google Maps
+        type: string
+        required: true
+        pattern:
+          regex: ^https://\S+$
+          message: Použijte platnou HTTPS adresu aktuálního profilu provozovny.
+      - name: map_embed_url
+        label: Oficiální URL pro vložení mapy (volitelné)
+        description: Google Maps → Sdílet → Vložení mapy. Vložte pouze URL z atributu src, ne celý iframe. Ověřte polohu provozovny. Vymazáním vloženou mapu vypnete.
+        type: string
+        pattern:
+          regex: ^https://www\.google\.com/maps/embed\?pb=[A-Za-z0-9!%._-]+$
+          message: Použijte vygenerovanou URL https://www.google.com/maps/embed?pb=…
       - name: phone
         label: Telefon (+420 a devět číslic)
         type: string
@@ -325,12 +339,158 @@ content:
         type: image
         options:
           media: gallery
+      - name: experience_years
+        label: Přes kolik let sklenářských zkušeností (nikoli stáří s.r.o.)
+        type: number
+        required: true
+        options: { min: 1 }
+      - {
+          name: metrics_title_cs,
+          label: 'Nadpis ročních údajů — česky',
+          type: string,
+          required: true,
+        }
+      - {
+          name: metrics_title_en,
+          label: 'Nadpis ročních údajů — anglicky',
+          type: string,
+          required: true,
+        }
+      - name: metrics
+        label: Čtyři roční údaje potvrzené vlastníkem
+        description: Kladná celá čísla v pořadí zakázky, realizace, tuny skla, km hran. Web sám přidává „přes“ nebo +.
+        type: object
+        required: true
+        list: { min: 4, max: 4 }
+        fields:
+          - name: value
+            label: Hodnota (kladné celé číslo bez +)
+            type: number
+            required: true
+            options: { min: 1 }
+          - { name: label_cs, label: 'Popisek — česky', type: string, required: true }
+          - { name: label_en, label: 'Popisek — anglicky', type: string, required: true }
+      - name: service_groups
+        label: Čtyři skupiny služeb (každá právě jednou)
+        type: object
+        required: true
+        list: { min: 4, max: 4 }
+        fields:
+          - name: id
+            label: Stálý identifikátor skupiny
+            type: select
+            required: true
+            options:
+              values: [processing, doors, showers, structures]
+          - { name: title_cs, label: 'Nadpis — česky', type: string, required: true }
+          - { name: title_en, label: 'Nadpis — anglicky', type: string, required: true }
+          - { name: summary_cs, label: 'Přední strana — česky', type: text, required: true }
+          - { name: summary_en, label: 'Přední strana — anglicky', type: text, required: true }
+          - { name: text_cs, label: 'Podrobnosti — česky', type: text, required: true }
+          - { name: text_en, label: 'Podrobnosti — anglicky', type: text, required: true }
+          - name: link
+            label: Cílová stránka
+            type: select
+            required: true
+            options:
+              values:
+                - services
+                - sklenene-dvere
+                - sklenene-zabradli
+                - skleneny-sprchovy-kout
+                - sklenena-stena
+                - skleneny-obklad-do-kuchyne
+                - sklenene-strisky-zaskleni-pergol-zastreseni
+                - sklenene-dekorace-gravirovani-fotek
+                - sklenene-nahrobni-desky
+      - {
+          name: special_glass_title_cs,
+          label: 'Nadpis speciálních skel — česky',
+          type: string,
+          required: true,
+        }
+      - {
+          name: special_glass_title_en,
+          label: 'Nadpis speciálních skel — anglicky',
+          type: string,
+          required: true,
+        }
+      - {
+          name: special_glass_text_cs,
+          label: 'Nabídka speciálních skel — česky',
+          type: text,
+          required: true,
+        }
+      - {
+          name: special_glass_text_en,
+          label: 'Nabídka speciálních skel — anglicky',
+          type: text,
+          required: true,
+        }
+      - {
+          name: consultation_title_cs,
+          label: 'Nadpis konzultace — česky',
+          type: string,
+          required: true,
+        }
+      - {
+          name: consultation_title_en,
+          label: 'Nadpis konzultace — anglicky',
+          type: string,
+          required: true,
+        }
+      - {
+          name: consultation_text_cs,
+          label: 'Nabídka konzultace — česky',
+          type: text,
+          required: true,
+        }
+      - {
+          name: consultation_text_en,
+          label: 'Nabídka konzultace — anglicky',
+          type: text,
+          required: true,
+        }
+      - name: reputation
+        label: Ověřené hodnocení Firmy.cz / Mapy.com (volitelné)
+        description: Pro skrytí vymažte všechna vnořená pole. Vyplněné hodnocení vyžaduje všech pět údajů. Bez citací recenzí či tvrzení o ocenění.
+        type: object
+        fields:
+          - { name: source, label: Název zdroje, type: string, required: true }
+          - name: url
+            label: Odkaz na profil Firmy.cz 13749142
+            type: string
+            required: true
+            pattern:
+              regex: ^https://(www\.)?firmy\.cz/detail/13749142-[a-z0-9-]+\.html$
+              message: Použijte HTTPS odkaz na detail Firmy.cz s ID 13749142.
+          - name: rating
+            label: Hodnocení od 0 do 5
+            type: number
+            required: true
+            options: { min: 0, max: 5 }
+          - name: count
+            label: Počet hodnocení (kladné celé číslo)
+            type: number
+            required: true
+            options: { min: 1 }
+          - name: verified_on
+            label: Datum ověření
+            type: date
+            required: true
+            options:
+              time: false
+              format: yyyy-MM-dd
   - name: hours
     label: Otevírací doba a výjimky
     type: file
     path: src/data/hours.yaml
     format: yaml
     fields:
+      - name: holidays_closed
+        label: O českých svátcích zavřeno
+        description: Zahrnuje Velký pátek a Velikonoční pondělí. Výslovná výjimka pro konkrétní datum má přednost.
+        type: boolean
       - name: weekly
         label: Běžný týden — přesně jeden řádek pro každý den
         type: object

@@ -5,21 +5,27 @@ lang: cs
 alternate: /en/privacy/
 ---
 
-Aktualizováno 17. října 2026.
+Aktualizováno 18. října 2026.
 
 ## Správce a kontakt
 
 Správcem údajů při vyřizování poptávek a zakázek je **SKLOSERVIS-BROD s.r.o.**, IČO **02596491**, se sídlem **č.p. 314, 760 01 Březnice, Česká republika**. Provozovna je na adrese Prakšická 281, 688 01 Uherský Brod.
 
-S dotazy k soukromí a žádostmi o uplatnění práv se obraťte na [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) nebo na [+420 608 031 206](tel:+420608031206). Ke kontaktní schránce má přístup majitel firmy.
+S dotazy k soukromí a žádostmi o uplatnění práv se obraťte na [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) nebo na [+420 608 031 206](tel:+420608031206). Ve firmě má ke kontaktní schránce přístup pouze majitel.
 
 ## Návštěva webu
 
-Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani reklamní a analytické měření.
+Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani vlastní reklamní a analytické měření.
 
-Kontaktní formulář po vašem odeslání předá jméno, e-mail a zprávu službě **FormSubmit**, která zajišťuje předání do schránky `skloservis.brod@gmail.com`. FormSubmit obdrží také technické údaje požadavku, například IP adresu. Údaje z formuláře neukládáme do místního úložiště prohlížeče. Potvrzení formuláře znamená přijetí službou, nikoli ověření doručení do schránky. Odkaz „Napsat e-mail“ nadále otevírá vaši vlastní poštovní aplikaci.
+Kontaktní formulář po vašem odeslání předá jméno, e-mail a zprávu službě **FormSubmit**, která zajišťuje předání do schránky `skloservis.brod@gmail.com`. FormSubmit obdrží také technické údaje požadavku, například IP adresu. Údaje z formuláře neukládáme do místního úložiště prohlížeče. Potvrzení formuláře znamená přijetí službou, nikoli ověření doručení do schránky. Tlačítko „Napsat e-mail“ na úvodní stránce vede na stránku Kontakt. Tam tlačítko „Napsat e-mail“ a odkaz na e-mailovou adresu používají `mailto:`: otevřou vaši poštovní aplikaci s připraveným adresátem, zprávu samy neodešlou.
 
 Při načtení stránek zpracovává GitHub Pages technické údaje požadavku, například IP adresu a údaje o spojení, mimo jiné pro zabezpečení služby. To není ukládání poptávky do firemní databáze. Další informace uvádí [prohlášení GitHubu o soukromí](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
+
+## Volitelná mapa Google
+
+Mapu Google načteme pouze po stisku „Souhlasit a načíst mapu“. Do té doby se kvůli mapě prohlížeč s Googlem nespojuje. Volba „Bez mapy“ ponechá adresu i externí odkaz dostupné. Souhlas neukládáme a platí jen pro právě otevřenou mapu. „Zavřít mapu“ nebo přechod na jinou stránku odstraní její vložení; při dalším otevření je nutný nový souhlas.
+
+Načtením mapy předáte Googlu IP adresu a technické údaje prohlížeče a požadavku. Google může používat cookies a podobná úložiště a údaje zpracovávat pro vlastní účely podle [svých zásad soukromí](https://policies.google.com/privacy?hl=cs). Rozsah závisí také na nastavení prohlížeče, účtu a vašich volbách u Googlu. Zavření mapy nezruší předchozí zpracování ani nevymaže případná data či cookies Googlu. Správu úložiště a odkaz na pravidla Googlu popisuje [stránka o cookies](../cookies/). Samostatný odkaz „Otevřít v Google Maps“ otevře externí službu podle jejích pravidel.
 
 ## Poptávky a zakázky
 
@@ -32,6 +38,8 @@ Zaslání nezávazné poptávky není podmíněno souhlasem s marketingem. Bez d
 ## Uchování a dohledatelnost
 
 Poptávky se z tohoto webu neukládají do samostatné databáze. E-mailová komunikace a případné papírové nebo elektronické podklady však zůstávají po dobu vyřízení dohledatelné.
+
+Uchování a odstranění podkladů zajišťuje majitel; kód webu nemaže zprávy v Gmailu ani papírové dokumenty.
 
 **Běžnou vyřízenou poptávku a související podklady uchováváme ještě jeden měsíc od jejího vyřízení pro zpětné dohledání.** Zákazník může na [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) požádat o delší uchování pro konkrétní pokračování jednání. Účel a další dobu uchování s ním dohodneme individuálně.
 
