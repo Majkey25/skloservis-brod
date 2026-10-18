@@ -69,7 +69,6 @@ html:root {
   box-sizing: border-box;
 }
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 6rem;
 }
 body {
@@ -306,9 +305,6 @@ summary:focus-visible {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   .button:hover:not(:disabled),
   .button:active:not(:disabled) {
     transform: none;
