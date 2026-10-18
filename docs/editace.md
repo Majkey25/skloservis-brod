@@ -2,7 +2,7 @@
 
 Obsah se upravuje přes [Pages CMS](https://app.pagescms.org/). Přihlaste se účtem, který má přístup do repozitáře `Majkey25/skloservis-brod`, a vyberte větev `main`. Soubor `.pages.yml` určuje dostupné formuláře.
 
-Přihlášení a načtení editoru tohoto repozitáře byly ověřeny 18. října 2026. [Přímý odkaz na editor](https://app.pagescms.org/majkey25/skloservis-brod/main/file/settings) fungoval i tehdy, když hledání projekt nezobrazilo. Skutečné uložení však vrátilo HTTP 403 a nevytvořilo commit. Oprávnění k zápisu a celý průchod nasazením proto ještě vyžadují ověření; správa instalace na GitHubu nyní žádá vlastníka o „Confirm access“. WordPress k úpravám nového webu nepoužívejte.
+Přihlášení, uložení změny a její zveřejnění byly ověřeny 18. října 2026. [Editor tohoto repozitáře](https://app.pagescms.org/majkey25/skloservis-brod/main/file/settings) vytvořil commit se změnou českého i anglického textu galerie; [navazující kontroly a nasazení](https://github.com/Majkey25/skloservis-brod/actions/runs/39081477798) uspěly a oba texty byly ověřeny na veřejném webu. WordPress k úpravám nového webu nepoužívejte.
 
 ## Otevírací doba
 

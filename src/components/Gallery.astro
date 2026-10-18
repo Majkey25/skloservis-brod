@@ -82,7 +82,7 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
         <h2 class="section-title" id="gallery-heading">
           {labels.heading}
         </h2>
-        <p class="lead">{labels.lead}</p>
+        <p class="muted">{labels.lead}</p>
       </div>
     )}
 
@@ -302,6 +302,8 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
             // Native showModal unsupported: do not prevent default full-image link navigation
             return;
           }
+          // Keep browser handling for modified or non-primary clicks (new tab, new window, download)
+          if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
           e.preventDefault();
           const idx = parseInt(card.getAttribute('data-index') || '0', 10);
           openDialog(idx, card);
@@ -346,16 +348,18 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     margin-bottom: 1.5rem;
   }
 
-  .gallery-header .lead {
-    max-width: 55ch;
+  .gallery-header .muted {
+    max-width: 48ch;
+    justify-self: end;
   }
 
   @media (min-width: 48rem) {
     .gallery-header {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
-      gap: 1rem 3rem;
-      align-items: end;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 2rem;
+      align-items: start;
+      margin-bottom: 2rem;
     }
   }
 

@@ -101,7 +101,10 @@ document.addEventListener(
       manualTheme = savePreference(THEME_KEY, currentTheme() === 'dark' ? 'light' : 'dark');
       applyTheme();
     }
-    if (event.target.closest('button[data-theme-system]')) {
+    const resetButton = event.target.closest<HTMLButtonElement>('button[data-theme-system]');
+    if (resetButton) {
+      // applyTheme hides this button, which would drop keyboard focus to the body.
+      const hadFocus = document.activeElement === resetButton;
       manualTheme = undefined;
       try {
         localStorage.removeItem(THEME_KEY);
@@ -109,6 +112,10 @@ document.addEventListener(
         // Reset applies for this page even when storage is unavailable.
       }
       applyTheme();
+      if (hadFocus) {
+        const footerLink = document.querySelector<HTMLAnchorElement>('.site-footer nav a');
+        footerLink?.focus({ preventScroll: true });
+      }
     }
     const languageLink = event.target.closest<HTMLAnchorElement>('a[data-language]');
     const language = languageLink?.dataset.language;
