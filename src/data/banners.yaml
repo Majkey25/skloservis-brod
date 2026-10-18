@@ -1,2 +1,4 @@
-# No real dated notice has been supplied. All future notices are public in the static artifact.
-[]
+- enabled: false
+  level: info
+  text_cs: Z důvodu dovolené bude skloservis-brod zavřený.
+  text_en: Due to vacation skloservis-brod will be closed.
