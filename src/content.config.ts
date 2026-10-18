@@ -20,31 +20,49 @@ const mapEmbedUrl = httpsUrl.regex(
   /^https:\/\/www\.google\.com\/maps\/embed\?pb=[A-Za-z0-9!%._-]+$/,
   'Use the Google Maps Share > Embed a map URL (https://www.google.com/maps/embed?pb=...)',
 );
+const rating = z.number().min(0).max(5);
 const reputationFields = {
   source: text,
   url: httpsUrl.regex(/^https:\/\/(www\.)?firmy\.cz\/detail\/13749142-[a-z0-9-]+\.html$/),
-  rating: z.number().min(0).max(5),
+  rating,
   count: z.number().int().positive(),
   verified_on: date,
 };
-const reputation = z.preprocess(
-  (value) => {
-    // Pages CMS can serialize a cleared optional object as empty child fields.
-    if (
+const googleReview = z.strictObject({
+  author: text.max(40),
+  rating: z.number().int().min(1).max(5),
+  text: text.max(400),
+});
+const googleReputationFields = {
+  url: httpsUrl.regex(
+    /^https:\/\/www\.google\.com\/maps\?cid=\d+$/,
+    'Use the Google Maps profile link https://www.google.com/maps?cid=...',
+  ),
+  rating,
+  count: z.number().int().positive(),
+  verified_on: date,
+  reviews: optional(z.array(googleReview).max(4)),
+};
+// Pages CMS can serialize a cleared optional object as empty child fields or empty lists.
+const clearable = <T extends z.ZodRawShape>(fields: T) =>
+  z.preprocess(
+    (value) =>
       typeof value === 'object' &&
       value !== null &&
       !Array.isArray(value) &&
       Object.entries(value).every(
         ([key, field]) =>
-          Object.hasOwn(reputationFields, key) &&
-          (field == null || (typeof field === 'string' && field.trim() === '')),
+          Object.hasOwn(fields, key) &&
+          (field == null ||
+            (typeof field === 'string' && field.trim() === '') ||
+            (Array.isArray(field) && field.length === 0)),
       )
-    )
-      return undefined;
-    return value;
-  },
-  optional(z.strictObject(reputationFields)),
-);
+        ? undefined
+        : value,
+    optional(z.strictObject(fields)),
+  );
+const reputation = clearable(reputationFields);
+const googleReputation = clearable(googleReputationFields);
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use HH:MM');
 const slot = z
   .strictObject({ opens: time, closes: time })
@@ -174,6 +192,7 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
     consultation_text_cs: text,
     consultation_text_en: text,
     reputation,
+    google_reputation: googleReputation,
   });
   const hours = z
     .strictObject({

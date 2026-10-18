@@ -1,9 +1,10 @@
 const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
 const revealed = new WeakSet<Element>();
 const pending = new Set<HTMLElement>();
-// Running animations and count loops, keyed by element. cancel() puts the element back.
-const active = new Map<HTMLElement, { cancel(): void }>();
-const EASE = 'cubic-bezier(.16,1,.3,1)';
+// A prepared reveal holds its first frame until played; cancel() always restores the final state.
+type Reveal = { play(delay: number): void; cancel(): void };
+const prepared = new Map<HTMLElement, Reveal>();
+const EASE = 'cubic-bezier(.25,1,.5,1)';
 const REVEAL_SELECTOR = [
   "main [data-reveal='photo']",
   'main .home-product__media picture',
@@ -20,20 +21,34 @@ function stopMotion() {
   observer?.disconnect();
   observer = undefined;
   pending.clear();
-  for (const item of active.values()) item.cancel();
-  active.clear();
+  for (const reveal of prepared.values()) reveal.cancel();
+  prepared.clear();
   page = undefined;
 }
 
-function track(element: HTMLElement, animation: Animation) {
-  active.set(element, animation);
-  animation.onfinish = () => {
-    active.delete(element);
+// Paused animations show their first keyframe immediately, so an element waiting below the
+// viewport is already in its start state and never jumps when the reveal begins.
+function hold(element: HTMLElement, animations: Animation[], stagger = 0): Reveal {
+  for (const animation of animations) animation.pause();
+  return {
+    play(delay) {
+      animations.forEach((animation, index) => {
+        animation.effect?.updateTiming({ delay: delay + index * stagger });
+        animation.play();
+      });
+      Promise.all(animations.map((animation) => animation.finished)).then(
+        () => prepared.delete(element),
+        () => undefined,
+      );
+    },
+    cancel() {
+      for (const animation of animations) animation.cancel();
+    },
   };
 }
 
-// Counts up to four numbers in one container with a single frame loop.
-function countUp(container: HTMLElement) {
+// Counts up to four numbers in one container with a single frame loop, starting from zero.
+function holdCount(container: HTMLElement): Reveal | undefined {
   const formatter = new Intl.NumberFormat(document.documentElement.lang);
   const counts = Array.from(container.querySelectorAll<HTMLElement>('[data-count-number]'))
     .slice(0, 4)
@@ -59,89 +74,80 @@ function countUp(container: HTMLElement) {
   for (const { span, width } of counts) {
     span.style.display = 'inline-block';
     span.style.minWidth = `${width}px`;
+    span.textContent = formatter.format(0);
   }
-
-  const start = performance.now();
-  const step = (now: number) => {
-    const progress = Math.min((now - start) / 1600, 1);
-    const eased = progress === 1 ? 1 : 1 - 2 ** (-10 * progress);
-    for (const { span, value } of counts) {
-      span.textContent = formatter.format(Math.round(value * eased));
-    }
-    if (progress < 1) {
+  return {
+    play(delay) {
+      const start = performance.now() + delay;
+      const step = (now: number) => {
+        const progress = Math.min(Math.max((now - start) / 1400, 0), 1);
+        const eased = 1 - (1 - progress) ** 4;
+        for (const { span, value } of counts) {
+          span.textContent = formatter.format(Math.round(value * eased));
+        }
+        if (progress < 1) {
+          frame = requestAnimationFrame(step);
+          return;
+        }
+        restore();
+        prepared.delete(container);
+      };
       frame = requestAnimationFrame(step);
-      return;
-    }
-    restore();
-    active.delete(container);
+    },
+    cancel: restore,
   };
-  active.set(container, { cancel: restore });
-  step(start);
 }
 
-function reveal(element: HTMLElement, delay: number) {
-  const timing: KeyframeAnimationOptions = { delay, easing: EASE, fill: 'backwards' };
+function prepare(element: HTMLElement): Reveal | undefined {
+  const timing: KeyframeAnimationOptions = { easing: EASE, fill: 'backwards' };
   switch (element.dataset.reveal) {
     case 'count':
-      countUp(element);
-      return;
+      return holdCount(element);
     case 'draw': {
       // Line icons are drawn stroke by stroke; paths use pathLength="1" with stroke-dasharray: 1.
       const strokes = Array.from(element.querySelectorAll<SVGPathElement>('path'))
         .slice(0, 12)
-        .map((path, index) =>
+        .map((path) =>
           path.animate([{ strokeDashoffset: '1' }, { strokeDashoffset: '0' }], {
             ...timing,
-            delay: delay + index * 110,
-            duration: 1000,
+            duration: 900,
           }),
         );
-      if (!strokes.length) return;
-      active.set(element, { cancel: () => strokes.forEach((stroke) => stroke.cancel()) });
-      Promise.all(strokes.map((stroke) => stroke.finished)).then(
-        () => active.delete(element),
-        () => undefined,
-      );
-      return;
+      return strokes.length ? hold(element, strokes, 90) : undefined;
     }
     case 'rise':
-      track(
-        element,
+      return hold(element, [
         element.animate(
           [
-            { opacity: 0.2, transform: 'translateY(28px)' },
+            { opacity: 0, transform: 'translateY(18px)' },
             { opacity: 1, transform: 'none' },
           ],
-          { ...timing, duration: 760 },
+          { ...timing, duration: 700 },
         ),
-      );
-      return;
+      ]);
     case 'line':
       // The connector is the ::before pseudo-element. Leave it drawn where that cannot animate.
       try {
-        track(
-          element,
+        return hold(element, [
           element.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], {
             ...timing,
-            duration: 1100,
+            duration: 1000,
             pseudoElement: '::before',
           }),
-        );
+        ]);
       } catch {
-        // Unsupported: the connector stays fully drawn.
+        return undefined;
       }
-      return;
     default:
-      track(
-        element,
+      return hold(element, [
         element.animate(
           [
-            { opacity: 0.35, transform: 'scale(1.08)' },
-            { opacity: 1, transform: 'scale(1)' },
+            { opacity: 0, transform: 'scale(1.04)' },
+            { opacity: 1, transform: 'none' },
           ],
           { ...timing, duration: 900 },
         ),
-      );
+      ]);
   }
 }
 
@@ -167,16 +173,15 @@ function initializeMotion() {
         if (!entry.isIntersecting || !pending.delete(element)) continue;
         observer?.unobserve(element);
         revealed.add(element);
-        if (element.closest('a')?.contains(document.activeElement)) continue;
-        reveal(element, Math.min(batch++ * 80, 320));
+        prepared.get(element)?.play(Math.min(batch++ * 70, 280));
       }
       if (!pending.size) {
         observer?.disconnect();
         observer = undefined;
       }
-      // Start a little inside the viewport so each reveal is actually seen.
     },
-    { rootMargin: '0px 0px -10% 0px' },
+    // Start a little inside the viewport so each reveal is actually seen.
+    { rootMargin: '0px 0px -6% 0px' },
   );
 
   const elements = document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR);
@@ -187,6 +192,9 @@ function initializeMotion() {
       revealed.add(element);
       continue;
     }
+    const reveal = prepare(element);
+    if (!reveal) continue;
+    prepared.set(element, reveal);
     pending.add(element);
     observer.observe(element);
   }
@@ -196,17 +204,23 @@ function initializeMotion() {
   }
 }
 
-document.addEventListener('focusin', (event) => {
-  if (!(event.target instanceof Node)) return;
-  for (const element of [...pending, ...active.keys()]) {
-    if (!element.contains(event.target) && !element.closest('a')?.contains(event.target)) continue;
+// Anything reached by keyboard or printed is shown in its final state at once.
+const settle = (shouldSettle: (element: HTMLElement) => boolean) => {
+  for (const [element, reveal] of prepared) {
+    if (!shouldSettle(element)) continue;
     observer?.unobserve(element);
     pending.delete(element);
     revealed.add(element);
-    active.get(element)?.cancel();
-    active.delete(element);
+    reveal.cancel();
+    prepared.delete(element);
   }
+};
+document.addEventListener('focusin', (event) => {
+  if (!(event.target instanceof Node)) return;
+  const target = event.target;
+  settle((element) => element.contains(target) || !!element.closest('a')?.contains(target));
 });
+window.addEventListener('beforeprint', () => settle(() => true));
 motionQuery?.addEventListener?.('change', () => {
   stopMotion();
   if (!motionQuery.matches) initializeMotion();
@@ -225,10 +239,10 @@ document.addEventListener('astro:after-swap', () => {
       }),
     );
 });
-// Module scope keeps these names out of the shared global script scope.
-export {};
 window.addEventListener('pagehide', stopMotion);
 window.addEventListener('pageshow', (event) => {
   if (event.persisted) initializeMotion();
 });
 initializeMotion();
+// Module scope keeps these names out of the shared global script scope.
+export {};

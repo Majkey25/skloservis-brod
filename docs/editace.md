@@ -32,6 +32,8 @@ V kontaktu lze upravit odkaz na Google Maps a volitelnou URL vložené mapy. Z G
 
 Firemní údaje zahrnují zkušenosti, roční čísla a čtyři skupiny služeb. Hodnocení Firmy.cz uvádí zdroj, počet a datum ověření; při změně ověřte aktuální profil. Vymazáním všech jeho polí se hodnocení skryje. Nedoplňujte neověřená ocenění nebo certifikace.
 
+Hodnocení Google opište z veřejného profilu firmy na Google Maps: odkaz `https://www.google.com/maps?cid=…`, průměr, počet recenzí a datum, kdy jste je zkontrolovali. Nejvýše čtyři vybrané recenze vkládejte doslova, s počtem hvězd a autorem ve tvaru jméno a iniciála. Smazaná nebo změněná recenze na Google znamená, že ji odstraníte nebo upravíte i zde. Pokud autor požádá o odstranění citace, smažte ji. Vymazáním všech polí se blok Google skryje.
+
 V části „Soukromí a právní informace“ lze upravit české i anglické dokumenty. Změna zásad musí odpovídat skutečnému fungování firmy. Běžné vyřízené poptávky mají podle potvrzené politiky lhůtu jeden měsíc od vyřízení; zákazník může e-mailem požádat o odůvodněné prodloužení nebo o výmaz elektronických i papírových podkladů. Zákonné povinnosti uchování zůstávají zachované. Web sám nemaže firemní schránku ani fyzické dokumenty.
 
 ## Zveřejnění

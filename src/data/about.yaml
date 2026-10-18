@@ -75,3 +75,20 @@ reputation:
   rating: 5
   count: 4
   verified_on: '2026-10-18'
+# Public Google Business Profile, read signed out on 2026-10-18. Reviews are quoted verbatim
+# from that profile; Google itself labels its reviews as not verified.
+google_reputation:
+  url: https://www.google.com/maps?cid=1666475050247901811
+  rating: 4.6
+  count: 36
+  verified_on: '2026-10-18'
+  reviews:
+    - author: Petr K.
+      rating: 5
+      text: Objednával jsem sklo na saunu. Neměl jsem moc představu co potřebuji, ale zde mi poradili, vyrobili přesně dle domluvených parametrů a pomohli s instalací. Můžu všem jen doporučit.
+    - author: Radka S.
+      rating: 5
+      text: Naprosto skvělý přístup k zákazníkovi! Palec nahoru.
+    - author: Damian M.
+      rating: 5
+      text: Rychlá komunikace, příjemný personál a dobré ceny.

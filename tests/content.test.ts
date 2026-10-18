@@ -179,9 +179,15 @@ test('company figures and service groups preserve owner-confirmed values and rej
 
 test('reputation validates source, rating bounds and real dates while allowing CMS clearing', async () => {
   const about = schemas.about.parse(await read('about'));
-  assert.equal(about.reputation?.rating, 5);
-  assert.equal(about.reputation?.count, 4);
-  assert.equal(about.reputation?.verified_on, '2026-10-18');
+  // A fixed sample keeps these checks valid when editors update or clear the live rating.
+  const firmy = {
+    source: 'Firmy.cz / Mapy.com',
+    url: 'https://www.firmy.cz/detail/13749142-skloservis-brod-uhersky-brod.html',
+    rating: 5,
+    count: 4,
+    verified_on: '2026-10-18',
+  };
+  assert.equal(schemas.about.parse({ ...about, reputation: firmy }).reputation?.count, 4);
   for (const patch of [
     { rating: -0.1 },
     { rating: 5.1 },
@@ -196,7 +202,7 @@ test('reputation validates source, rating bounds and real dates while allowing C
     { award: 'unverified' },
   ]) {
     assert.equal(
-      schemas.about.safeParse({ ...about, reputation: { ...about.reputation, ...patch } }).success,
+      schemas.about.safeParse({ ...about, reputation: { ...firmy, ...patch } }).success,
       false,
     );
   }
@@ -204,7 +210,7 @@ test('reputation validates source, rating bounds and real dates while allowing C
     assert.equal(
       schemas.about.safeParse({
         ...about,
-        reputation: { ...about.reputation, rating, verified_on: '2024-02-29' },
+        reputation: { ...firmy, rating, verified_on: '2024-02-29' },
       }).success,
       true,
     );
@@ -221,6 +227,61 @@ test('reputation validates source, rating bounds and real dates while allowing C
   for (const reputation of [{ source: 'Firmy.cz' }, { unknown: '' }]) {
     assert.equal(schemas.about.safeParse({ ...about, reputation }).success, false);
   }
+});
+
+test('Google reputation validates the profile link, bounds, quoted reviews and CMS clearing', async () => {
+  const about = schemas.about.parse(await read('about'));
+  // A fixed sample keeps these checks valid when editors update or clear the live rating.
+  const review = { author: 'Jana N.', rating: 5, text: 'Rychlá a pečlivá práce.' };
+  const google = {
+    url: 'https://www.google.com/maps?cid=1666475050247901811',
+    rating: 4.6,
+    count: 36,
+    verified_on: '2026-10-18',
+    reviews: [review],
+  };
+  assert.equal(
+    schemas.about.parse({ ...about, google_reputation: google }).google_reputation?.reviews?.length,
+    1,
+  );
+  for (const patch of [
+    { url: 'https://www.google.com/maps/place/skloservis' },
+    { url: 'https://www.google.com.evil.example/maps?cid=1' },
+    { rating: 5.1 },
+    { rating: '4.6' },
+    { count: 0 },
+    { verified_on: '2026-02-30' },
+    { reviews: [{ ...review, rating: 6 }] },
+    { reviews: [{ ...review, rating: 4.5 }] },
+    { reviews: [{ ...review, author: '' }] },
+    { reviews: [{ ...review, text: 'x'.repeat(401) }] },
+    { reviews: [{ ...review, date: '2020-01-01' }] },
+    { reviews: Array.from({ length: 5 }, () => review) },
+    { award: 'unverified' },
+  ]) {
+    assert.equal(
+      schemas.about.safeParse({ ...about, google_reputation: { ...google, ...patch } }).success,
+      false,
+    );
+  }
+  assert.deepEqual(
+    schemas.about.parse({ ...about, google_reputation: { ...google, reviews: null } })
+      .google_reputation?.reviews,
+    undefined,
+  );
+  for (const google_reputation of [
+    undefined,
+    null,
+    '',
+    {},
+    { url: '', rating: null, count: null, verified_on: '', reviews: [] },
+  ]) {
+    assert.equal(schemas.about.parse({ ...about, google_reputation }).google_reputation, undefined);
+  }
+  assert.equal(
+    schemas.about.safeParse({ ...about, google_reputation: { url: google.url } }).success,
+    false,
+  );
 });
 
 test('map links require HTTPS and embeds accept only the official generated host and path', async () => {

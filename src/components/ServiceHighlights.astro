@@ -16,13 +16,13 @@ const base = import.meta.env.BASE_URL;
 const labels = {
   cs: {
     heading: 'Co pro vás vyrobíme',
-    more: 'Více o',
+    more: 'Podrobnosti',
     back: 'Zpět',
     offer: 'Zobrazit nabídku',
   },
   en: {
     heading: 'What we make for you',
-    more: 'More about',
+    more: 'Details',
     back: 'Back',
     offer: 'See the offer',
   },
@@ -50,6 +50,7 @@ const pictograms: Record<GroupId, readonly string[]> = {
             <FlipCard
               id={`highlight-${group.id}`}
               openLabel={`${labels.more}: ${title}`}
+              toggleLabel={labels.more}
               closeLabel={labels.back}
             >
               <Fragment slot="front">

@@ -3,14 +3,17 @@ import Icon from './Icon.astro';
 
 interface Props {
   id: string;
+  /** Full accessible name of the turn button, for example "Více o: Skleněné dveře". */
   openLabel: string;
+  /** Short visible label of the turn button on touch screens. */
+  toggleLabel: string;
   closeLabel: string;
   class?: string;
-  /** Pointer rest time before a hover flip; longer lets a photo expand first. */
+  /** Pointer rest time before a hover turn; a longer delay lets a photo expand first. */
   hoverDelay?: number;
 }
 
-const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.props;
+const { id, openLabel, toggleLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.props;
 ---
 
 <div class:list={['flip-card', className]} data-flip-card data-flip-delay={hoverDelay}>
@@ -23,10 +26,13 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
         data-flip-open
         aria-controls={`${id}-back`}
         aria-expanded="false"
+        aria-label={openLabel}
         hidden
       >
         <Icon name="flip" />
-        <span class="sr-only">{openLabel}</span>
+        <span class="flip-card__toggle-text" aria-hidden="true">
+          {toggleLabel}
+        </span>
       </button>
     </div>
     <div class="flip-card__face flip-card__back" id={`${id}-back`}>
@@ -84,17 +90,16 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const timers = new WeakMap<HTMLElement, number>();
-  let lastPointer = '';
 
   const readyCard = (target: EventTarget | null) =>
     target instanceof Element
       ? target.closest<HTMLElement>('[data-flip-card][data-flip-ready]')
       : null;
 
-  // Mouse hover flips after a short rest, so sweeping across a grid never flickers.
+  // A mouse resting on the card turns it; the outer box never moves, so the pointer stays inside.
   function hoverFlip(card: HTMLElement, flipped: boolean) {
     window.clearTimeout(timers.get(card));
-    const delay = flipped ? Number(card.dataset.flipDelay) || 140 : 180;
+    const delay = flipped ? Number(card.dataset.flipDelay) || 140 : 160;
     timers.set(
       card,
       window.setTimeout(() => {
@@ -121,28 +126,18 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
     if (!card || card.contains(event.relatedTarget as Node | null)) return;
     if (event.pointerType === 'mouse') hoverFlip(card, false);
   });
-  document.addEventListener('pointerdown', (event) => {
-    lastPointer = event.pointerType;
-  });
 
   // Document-level listeners survive ClientRouter swaps; handlers only act on live cards.
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return;
     const button = event.target.closest<HTMLButtonElement>('[data-flip-open], [data-flip-close]');
     const card = button?.closest<HTMLElement>('[data-flip-card]');
-    if (button && card) {
-      window.clearTimeout(timers.get(card));
-      flip(card, button.hasAttribute('data-flip-open'));
-      return;
-    }
-    // Touch has no hover: a tap on a face outside its links turns the card.
-    const tapped = readyCard(event.target);
-    if (tapped && lastPointer !== 'mouse' && !event.target.closest('a, button')) {
-      setFlipped(tapped, !tapped.hasAttribute('data-flipped'));
-    }
+    if (!button || !card) return;
+    window.clearTimeout(timers.get(card));
+    flip(card, button.hasAttribute('data-flip-open'));
   });
 
-  // Keyboard flips close again when focus moves on to another part of the page.
+  // Keyboard turns close again when focus moves on to another part of the page.
   document.addEventListener('focusout', (event) => {
     const card = readyCard(event.target);
     if (!card?.hasAttribute('data-flipped') || card.contains(event.relatedTarget as Node | null)) {
@@ -167,15 +162,12 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
 
 <style>
   .flip-card {
-    --flip-glint: rgb(255 255 255 / 0.55);
     --flip-etch: rgb(7 114 143 / 0.05);
     position: relative;
     height: 100%;
-    transition: translate var(--dur-bleed) var(--ease);
   }
 
   :global(:root[data-theme='dark']) .flip-card {
-    --flip-glint: rgb(148 229 245 / 0.14);
     --flip-etch: rgb(148 229 245 / 0.05);
   }
 
@@ -195,42 +187,28 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
       box-shadow var(--dur-bleed) var(--ease);
   }
 
-  /* One light pass across the pane on hover; it never covers controls. */
-  .flip-card__face::after {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(105deg, transparent 38%, var(--flip-glint) 50%, transparent 62%)
-      100% 0 / 250% 100% no-repeat;
-    opacity: 0;
-    pointer-events: none;
-    content: '';
-    transition:
-      background-position var(--dur-glint) var(--ease),
-      opacity var(--dur-fast) var(--ease);
-  }
-
   .flip-card__toggle {
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
     z-index: 1;
-    width: 44px;
-    height: 44px;
-    padding: 0;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 0.85rem;
     border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border-radius: 999px;
     background: var(--glass-solid);
     color: var(--accent);
     box-shadow: inset 1px 1px 0 var(--glass-edge);
-    transition:
-      background-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 600;
   }
 
   .flip-card__toggle:not([hidden]) {
-    display: grid;
-    place-items: center;
+    display: inline-flex;
   }
 
   .flip-card__close:not([hidden]) {
@@ -254,7 +232,9 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
     display: grid;
     height: 100%;
     transform-style: preserve-3d;
-    transition: transform var(--dur-flip) var(--ease-flip, cubic-bezier(0.65, 0, 0.35, 1));
+    transition:
+      transform var(--dur-flip) var(--ease-flip, cubic-bezier(0.65, 0, 0.35, 1)),
+      translate var(--dur-bleed) var(--ease);
   }
 
   /* Both faces share one grid cell, so the card height is the tallest face on both sides. */
@@ -279,41 +259,34 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
     transform: rotateY(180deg);
   }
 
-  /* Back content settles in after the turn passes its midpoint. */
+  /* Back content brightens once the turn has passed its midpoint; nothing slides. */
   .flip-card[data-flip-ready] .flip-card__back > :global(*) {
     opacity: 0;
-    translate: 0 10px;
-    transition:
-      opacity 320ms var(--ease),
-      translate 420ms var(--ease);
+    transition: opacity 260ms var(--ease);
   }
 
   .flip-card[data-flipped] .flip-card__back > :global(*) {
     opacity: 1;
-    translate: none;
-    transition-delay: 240ms;
-  }
-
-  .flip-card[data-flipped] .flip-card__back > :global(:nth-child(2)) {
-    transition-delay: 300ms;
-  }
-
-  .flip-card[data-flipped] .flip-card__back > :global(:nth-child(3)) {
-    transition-delay: 360ms;
-  }
-
-  .flip-card[data-flipped] .flip-card__back > :global(:nth-child(n + 4)) {
-    transition-delay: 420ms;
+    transition-delay: 280ms;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .flip-card__toggle:hover {
-      background: var(--accent);
-      color: var(--on-accent);
+    /* Mouse users turn cards by hovering; the button stays for keyboard focus. */
+    .flip-card__toggle {
+      opacity: 0;
+      transition: opacity var(--dur-fast) var(--ease);
     }
 
-    .flip-card[data-flip-ready]:hover {
-      translate: 0 -5px;
+    .flip-card__toggle:focus-visible {
+      opacity: 1;
+    }
+
+    .flip-card__toggle-text {
+      display: none;
+    }
+
+    .flip-card[data-flip-ready]:hover .flip-card__inner {
+      translate: 0 -4px;
     }
 
     .flip-card[data-flip-ready]:hover .flip-card__face {
@@ -322,15 +295,30 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
         inset 1px 1px 0 var(--glass-edge),
         var(--lift);
     }
+  }
 
-    .flip-card[data-flip-ready]:hover .flip-card__face::after {
+  /* A touch screen next to a mouse still needs the visible button; mouse hover keeps working. */
+  @media (any-pointer: coarse) {
+    .flip-card__toggle {
       opacity: 1;
-      background-position: 0 0;
+    }
+
+    .flip-card__toggle-text {
+      display: inline;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flip-card[data-flip-ready]:hover {
+    /* Without hover turns, the labelled button is the way to turn a card for every pointer. */
+    .flip-card__toggle {
+      opacity: 1;
+    }
+
+    .flip-card__toggle-text {
+      display: inline;
+    }
+
+    .flip-card[data-flip-ready]:hover .flip-card__inner {
       translate: none;
     }
 
@@ -354,7 +342,6 @@ const { id, openLabel, closeLabel, class: className, hoverDelay = 140 } = Astro.
 
     .flip-card[data-flip-ready] .flip-card__back > :global(*) {
       opacity: 1;
-      translate: none;
     }
   }
 </style>

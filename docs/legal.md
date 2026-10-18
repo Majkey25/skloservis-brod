@@ -26,6 +26,10 @@ Current host information and actual privacy practices can be documented independ
 
 The form validates input, POSTs only on submission, omits provider cookies in AJAX requests, and preserves input when acceptance is not confirmed. It loads no external CAPTCHA or analytics script. Without JavaScript it uses native FormSubmit POST and that service's own result page. Query parameters never establish success. [FormSubmit documentation](https://formsubmit.co/documentation) states a 30-day submission archive, distinct from the owner's one-month retention after resolution. Its [published privacy terms](https://formsubmit.co/privacy.pdf) do not establish every processing location or account-specific transfer safeguard; these remain supplier checks, not proven legal compliance.
 
+## Quoted reviews
+
+The Google rating block repeats the public average, count and check date and links to the Google profile. It loads nothing from Google. Quoted reviews are copied verbatim from the public profile with the author's first name and initial only. Remove a quote when the author asks or when the review changes or disappears on Google.
+
 ## Optional Google Maps embed
 
 The owner selected Google Maps, replacing the unshipped Mapy candidate. `src/components/MapPreview.astro` uses the official Share → Embed a map URL. This integration uses no API key or new account and requires no purchase; do not introduce a paid Maps API or billing configuration.

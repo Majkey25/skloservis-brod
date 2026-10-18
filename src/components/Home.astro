@@ -95,7 +95,6 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         fetchpriority="high"
         decoding="async"
       />
-      <span class="home-hero__glint" data-reveal="hero" aria-hidden="true"></span>
     </figure>
   )}
 </section>
@@ -340,6 +339,8 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     position: relative;
     display: block;
     aspect-ratio: 3 / 2;
+    /* A transparent resting shadow keeps the filter layer stable, so expansion never flashes. */
+    filter: drop-shadow(0 0 0 rgb(7 30 40 / 0));
     transition: filter var(--dur-bleed) var(--ease);
   }
 
@@ -436,8 +437,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
     transition:
       border-color var(--dur-bleed) var(--ease),
       box-shadow var(--dur-bleed) var(--ease),
-      color var(--dur-fast) var(--ease),
-      translate var(--dur-bleed) var(--ease);
+      color var(--dur-fast) var(--ease);
   }
 
   .home-other-products__title {
@@ -478,44 +478,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         inset 1px 1px 0 var(--glass-edge),
         var(--lift);
       color: var(--accent);
-      translate: 0 -3px;
     }
 
     .home-other-products a:hover .home-other-products__glyph {
       border-color: var(--accent);
       background: var(--accent);
       color: var(--on-accent);
-    }
-  }
-
-  /* A single light pass over the hero photo on first load; the photo itself never animates. */
-  .home-hero__media {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .home-hero__glint {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      105deg,
-      transparent 35%,
-      rgb(255 255 255 / 0.32) 50%,
-      transparent 65%
-    );
-    pointer-events: none;
-    transform: translateX(100%);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .home-hero__glint {
-      animation: home-hero-glint 1400ms var(--ease) 450ms backwards;
-    }
-  }
-
-  @keyframes home-hero-glint {
-    from {
-      transform: translateX(-100%);
     }
   }
 
@@ -693,12 +661,6 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   @media (max-width: 29.99rem) {
     .home-other-products {
       grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .home-other-products a:hover {
-      translate: none;
     }
   }
 </style>

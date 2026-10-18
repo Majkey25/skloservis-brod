@@ -34,18 +34,16 @@ html:root[data-preference-transition] {
   --header-h: 72px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 160ms;
-  --dur-lang: 480ms;
+  --dur-lang: 380ms;
   --dur-theme: 560ms;
   --dur-flip: 620ms;
   --dur-bleed: 360ms;
-  --dur-glint: 700ms;
   --bleed-x: 0.75rem;
   --bleed-y: 1rem;
   --glass: color-mix(in srgb, var(--bg) 78%, transparent);
   --glass-solid: color-mix(in srgb, var(--accent) 9%, var(--bg));
   --glass-edge: rgba(255, 255, 255, 0.75);
   --frost: 14px;
-  --glint: linear-gradient(110deg, transparent 35%, rgb(255 255 255 / 0.08), transparent 65%);
   --lift: 0 16px 42px rgb(7 30 40 / 0.12);
 }
 :root[data-theme='dark'] {
@@ -204,18 +202,15 @@ summary:focus-visible {
   color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
-  background-image: var(--glint);
-  background-size: 250% 100%;
-  background-position: 100% 0;
   transition:
     background-color var(--dur-fast) var(--ease),
-    background-position var(--dur-glint) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    box-shadow 240ms var(--ease),
     color var(--dur-fast) var(--ease),
-    transform var(--dur-fast) var(--ease);
+    transform 240ms var(--ease);
 }
 .button:focus-visible {
   background-color: var(--accent-hover);
-  background-position: 0 0;
 }
 .button:active:not(:disabled) {
   transform: translateY(1px);
@@ -230,8 +225,7 @@ summary:focus-visible {
 @media (hover: hover) and (pointer: fine) {
   .button:hover:not(:disabled) {
     background-color: var(--accent-hover);
-    background-position: 0 0;
-    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -14px var(--accent);
   }
   .button--secondary:hover:not(:disabled) {
     background-color: var(--surface);
@@ -307,7 +301,7 @@ summary:focus-visible {
   margin-top: 0.4rem;
 }
 
-/* Disable UA crossfades; the two deliberate gestures have separate motion. */
+/* Disable UA crossfades; the two deliberate gestures have their own motion. */
 ::view-transition-group(root) {
   animation: none;
 }
@@ -319,19 +313,15 @@ summary:focus-visible {
   animation: none;
   mix-blend-mode: normal;
 }
-/* Keep the header steady while its independently captured segment slides between CZ/EN. */
+/* The header changes language at once while only its underline glides to the chosen language. */
 ::view-transition-group(preference-header) {
   z-index: 1;
   animation: none;
 }
-::view-transition-old(preference-header),
-::view-transition-old(preference-cs),
-::view-transition-old(preference-en) {
+::view-transition-old(preference-header) {
   display: none;
 }
 ::view-transition-new(preference-header),
-::view-transition-new(preference-cs),
-::view-transition-new(preference-en),
 ::view-transition-old(preference-language),
 ::view-transition-new(preference-language) {
   animation: none;
@@ -339,13 +329,8 @@ summary:focus-visible {
 }
 ::view-transition-group(preference-language) {
   z-index: 2;
-  animation-duration: var(--dur-fast);
+  animation-duration: 360ms;
   animation-timing-function: var(--ease);
-}
-::view-transition-group(preference-cs),
-::view-transition-group(preference-en) {
-  z-index: 3;
-  animation: none;
 }
 html[data-preference-transition='theme']::view-transition-old(root) {
   z-index: 1;
@@ -362,34 +347,14 @@ html[data-preference-transition='theme']::view-transition-new(root) {
     clip-path: circle(var(--theme-radius) at var(--theme-x) var(--theme-y));
   }
 }
-html[data-preference-transition='language']::view-transition-old(root) {
-  transform-origin: center left;
-  animation: glass-door-out var(--dur-lang) var(--ease) both;
-}
+/* The new language settles over the opaque old page: no movement and no see-through frame. */
 html[data-preference-transition='language']::view-transition-new(root) {
-  transform-origin: center right;
-  box-shadow: inset 2px 0 var(--glass-edge);
-  animation: glass-door-in var(--dur-lang) var(--ease) both;
+  animation: language-in var(--dur-lang) var(--ease) both;
 }
-@keyframes glass-door-out {
-  to {
-    opacity: 0;
-    transform: perspective(1400px) translateX(calc(var(--lang-sign) * -9%))
-      rotateY(calc(var(--lang-sign) * -9deg));
-    filter: blur(2px);
-  }
-}
-@keyframes glass-door-in {
+@keyframes language-in {
   from {
     opacity: 0;
-    transform: perspective(1400px) translateX(calc(var(--lang-sign) * 9%))
-      rotateY(calc(var(--lang-sign) * 9deg));
     filter: blur(3px);
-  }
-  to {
-    opacity: 1;
-    transform: perspective(1400px) translateX(0) rotateY(0);
-    filter: blur(0);
   }
 }
 @media (max-width: 950px) {

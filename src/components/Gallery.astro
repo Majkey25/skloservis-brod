@@ -534,6 +534,8 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     position: relative;
     aspect-ratio: 3 / 2;
     background: var(--surface, #edf7fa);
+    /* A transparent resting shadow keeps the filter layer stable, so expansion never flashes. */
+    filter: drop-shadow(0 0 0 rgb(7 30 40 / 0));
     transition: filter var(--dur-bleed) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
   }
 
@@ -545,18 +547,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     transition: clip-path var(--dur-bleed) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
   }
 
-  /* One glint pass: the band starts off the left edge and sweeps across on expand */
-  .gallery-card__image-wrap :global(picture)::after {
-    position: absolute;
-    inset: 0;
-    background-image: var(--glint);
-    background-position: 100% 0;
-    background-repeat: no-repeat;
-    background-size: 300% 100%;
-    content: '';
-    pointer-events: none;
-  }
-
   .gallery-card__image-wrap :global(img) {
     display: block;
     width: 100%;
@@ -565,17 +555,16 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
   }
 
   /* Expanded photo: real pixels past the frame. Focus always, hover only with a fine pointer. */
+  .gallery-card:focus-visible {
+    z-index: 2;
+  }
+
   .gallery-card:focus-visible .gallery-card__image-wrap {
     filter: drop-shadow(0 18px 24px rgb(7 30 40 / 0.22));
   }
 
   .gallery-card:focus-visible .gallery-card__image-wrap :global(picture) {
     clip-path: inset(0);
-  }
-
-  .gallery-card:focus-visible .gallery-card__image-wrap :global(picture)::after {
-    background-position: 0 0;
-    transition: background-position var(--dur-glint) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -589,11 +578,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
 
     .gallery-card:hover .gallery-card__image-wrap :global(picture) {
       clip-path: inset(0);
-    }
-
-    .gallery-card:hover .gallery-card__image-wrap :global(picture)::after {
-      background-position: 0 0;
-      transition: background-position var(--dur-glint) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
     }
   }
 

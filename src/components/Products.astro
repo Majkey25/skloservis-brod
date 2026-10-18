@@ -22,14 +22,14 @@ const labels = {
     detail: 'Detail',
     enquiry: 'Nezávazná poptávka',
     process: 'Jak probíhá zakázka',
-    more: 'Více o',
+    more: 'Podrobnosti',
     back: 'Zpět',
   },
   en: {
     detail: 'Details',
     enquiry: 'Project enquiry',
     process: 'How your project takes shape',
-    more: 'More about',
+    more: 'Details',
     back: 'Back',
   },
 }[lang];
@@ -50,8 +50,9 @@ const labels = {
             <FlipCard
               id={`product-${service.slug}`}
               openLabel={`${labels.more}: ${title}`}
+              toggleLabel={labels.more}
               closeLabel={labels.back}
-              hoverDelay={460}
+              hoverDelay={320}
             >
               <Fragment slot="front">
                 {!photo && (

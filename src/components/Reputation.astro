@@ -1,142 +1,228 @@
 ---
 import { getAbout } from '../content';
 import type { Language } from '../lib/urls';
+import Icon from './Icon.astro';
+import RatingStars from './RatingStars.astro';
 
 interface Props {
   lang: Language;
 }
 
 const { lang } = Astro.props;
-const { reputation } = await getAbout();
+const { reputation, google_reputation: google } = await getAbout();
+const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
+const plural = new Intl.PluralRules(locale);
 const copy = {
   cs: {
     title: 'Jak nás hodnotí zákazníci',
-    reviews: 'hodnocení',
-    link: 'Přečíst hodnocení na Firmy.cz',
+    note: 'Průměrné hodnocení a počet recenzí z veřejných profilů firmy.',
+    googleCount: (count: number) => (plural.select(count) === 'other' ? 'recenzí' : 'recenze'),
+    firmyCount: () => 'hodnocení',
+    googleLink: 'Přečíst recenze na Google',
+    firmyLink: 'Přečíst hodnocení na Firmy.cz',
     checked: 'Ověřeno',
-    note: 'Hodnocení zákazníků na profilu Firmy.cz a Mapy.com.',
+    reviewSource: 'recenze na Google',
+    stars: (count: number) => `${count} z 5 hvězd`,
+    original: '',
   },
   en: {
-    title: 'What our customers think',
-    reviews: 'reviews',
-    link: 'Read reviews on Firmy.cz',
+    title: 'What our customers say',
+    note: 'Average rating and number of reviews from our public business profiles.',
+    googleCount: (count: number) => (plural.select(count) === 'one' ? 'review' : 'reviews'),
+    firmyCount: (count: number) => (plural.select(count) === 'one' ? 'rating' : 'ratings'),
+    googleLink: 'Read reviews on Google',
+    firmyLink: 'Read ratings on Firmy.cz',
     checked: 'Checked',
-    note: 'Customer ratings on our Firmy.cz and Mapy.com profile.',
+    reviewSource: 'Google review',
+    stars: (count: number) => `${count} out of 5 stars`,
+    original: 'Reviews are quoted in their original Czech.',
   },
 }[lang];
-const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
-const rating = reputation?.rating.toLocaleString(locale, { minimumFractionDigits: 1 });
-const date = reputation
-  ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(
-      new Date(`${reputation.verified_on}T12:00:00Z`),
-    )
-  : '';
-const star = 'M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.85L12 16.9l-5.25 2.75 1-5.85L3.5 9.7l5.9-.9Z';
+const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' });
+const score = (rating: number) => rating.toLocaleString(locale, { minimumFractionDigits: 1 });
+const checkedOn = (date: string) => dateFormat.format(new Date(`${date}T12:00:00Z`));
+
+interface Source {
+  platform: string;
+  url: string;
+  rating: number;
+  count: number;
+  noun: string;
+  verifiedOn: string;
+  link: string;
+}
+const sources: Source[] = [];
+if (google)
+  sources.push({
+    platform: 'Google',
+    url: google.url,
+    rating: google.rating,
+    count: google.count,
+    noun: copy.googleCount(google.count),
+    verifiedOn: google.verified_on,
+    link: copy.googleLink,
+  });
+if (reputation)
+  sources.push({
+    platform: reputation.source,
+    url: reputation.url,
+    rating: reputation.rating,
+    count: reputation.count,
+    noun: copy.firmyCount(reputation.count),
+    verifiedOn: reputation.verified_on,
+    link: copy.firmyLink,
+  });
+const reviews = google?.reviews ?? [];
 ---
 
-{reputation && (
+{sources.length > 0 && (
   <section class="section reputation" aria-labelledby="reputation-title">
-    <div class="wrap reputation__layout" data-reveal="rise">
-      <div>
+    <div class="wrap">
+      <div class="reputation__head" data-reveal="rise">
         <h2 id="reputation-title">{copy.title}</h2>
         <p class="muted">{copy.note}</p>
-        <a class="text-link" href={reputation.url} target="_blank" rel="noopener noreferrer">
-          {copy.link}
-        </a>
       </div>
-      <div class="reputation__rating">
-        <p class="reputation__source">{reputation.source}</p>
-        <p class="reputation__value">
-          <strong>{rating}</strong>
-          <span>/ 5</span>
-        </p>
-        <span
-          class="reputation__stars"
-          aria-hidden="true"
-          style={`--rating: ${reputation.rating / 5}`}
-        >
-          {['outline', 'fill'].map((layer) => (
-            <span class:list={['reputation__stars-row', `reputation__stars-row--${layer}`]}>
-              {[0, 1, 2, 3, 4].map(() => (
-                <svg viewBox="0 0 24 24" focusable="false">
-                  <path d={star} />
-                </svg>
-              ))}
-            </span>
-          ))}
-        </span>
-        <p>
-          {reputation.count} {copy.reviews}
-        </p>
-        <p class="reputation__date muted">
-          {copy.checked} <time datetime={reputation.verified_on}>{date}</time>
-        </p>
-      </div>
+      <ul class="reputation__sources">
+        {sources.map((source) => (
+          <li class="reputation__badge" data-reveal="rise">
+            <p class="reputation__platform">{source.platform}</p>
+            <p class="reputation__score">
+              <strong>{score(source.rating)}</strong>
+              <span>/ 5</span>
+            </p>
+            <RatingStars value={source.rating} />
+            <p>
+              {source.count} {source.noun}
+            </p>
+            <p class="reputation__date muted">
+              {copy.checked}{' '}
+              <time datetime={source.verifiedOn}>{checkedOn(source.verifiedOn)}</time>
+            </p>
+            <a
+              class="text-link reputation__link"
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>{source.link}</span>
+              <Icon name="arrow-right" />
+            </a>
+          </li>
+        ))}
+      </ul>
+      {reviews.length > 0 && (
+        <>
+          <ul class="reputation__reviews">
+            {reviews.map((review) => (
+              <li data-reveal="rise">
+                <figure class="reputation__review">
+                  <RatingStars value={review.rating} size="small" />
+                  <span class="sr-only">{copy.stars(review.rating)}</span>
+                  <blockquote lang="cs">
+                    <p>„{review.text}“</p>
+                  </blockquote>
+                  <figcaption>
+                    {review.author}, {copy.reviewSource}
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+          {copy.original && <p class="reputation__original muted">{copy.original}</p>}
+        </>
+      )}
     </div>
   </section>
 )}
 
 <style>
-  .reputation__layout {
+  .reputation__head {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
-    align-items: center;
-    gap: clamp(2rem, 6vw, 5rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: end;
+    margin-bottom: 2rem;
   }
-  .reputation h2 {
+  .reputation__head h2 {
     max-width: 18ch;
-    margin-bottom: 1.25rem;
+    margin: 0;
   }
-  .reputation .text-link {
-    display: inline-block;
-    margin-top: 1.25rem;
-    padding-block: 0.5rem;
+  .reputation__head p {
+    max-width: 44ch;
+    margin: 0;
+    justify-self: end;
   }
-  .reputation__rating {
-    border-left: 1px solid var(--line);
-    padding-left: clamp(1.5rem, 4vw, 3rem);
+  .reputation__sources,
+  .reputation__reviews {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
-  .reputation__source {
-    font-weight: 600;
+  .reputation__sources {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   }
-  .reputation__value {
+  /* Each source is a glass pane; the whole pane opens the profile through its single link. */
+  .reputation__badge {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--glass-solid);
+    box-shadow: inset 1px 1px 0 var(--glass-edge);
+    transition:
+      border-color var(--dur-bleed) var(--ease),
+      box-shadow var(--dur-bleed) var(--ease);
+  }
+  .reputation__badge p {
+    margin: 0;
+  }
+  .reputation__platform {
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  .reputation__score {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    color: var(--accent);
+  }
+  .reputation__score strong {
+    font-size: clamp(3rem, 6vw, 4.25rem);
+    font-weight: 550;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+  .reputation__date {
+    font-size: var(--step--1);
+  }
+  .reputation__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: fit-content;
+    min-height: 44px;
     margin-top: 0.5rem;
-    color: var(--accent);
   }
-  /* Decorative stars mirror the verified rating; the number above stays the accessible value. */
-  .reputation__stars {
-    display: inline-grid;
-    margin-top: 0.75rem;
-    color: var(--accent);
-    font-size: 1.75rem;
-  }
-  .reputation__stars-row {
-    display: flex;
-    grid-area: 1 / 1;
-    gap: 0.2rem;
-  }
-  .reputation__stars svg {
-    width: 1em;
-    height: 1em;
-    stroke: currentColor;
-    stroke-linejoin: round;
-    stroke-width: 1.4;
-  }
-  .reputation__stars-row--outline svg {
-    fill: none;
-    opacity: 0.4;
-  }
-  .reputation__stars-row--fill {
-    clip-path: inset(0 calc((1 - var(--rating)) * 100%) 0 0);
-  }
-  .reputation__stars-row--fill svg {
-    fill: currentColor;
+  .reputation__link::after {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    content: '';
   }
   @media (hover: hover) and (pointer: fine) {
-    .reputation__rating:hover .reputation__stars-row--fill {
+    .reputation__badge:hover {
+      border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+      box-shadow:
+        inset 1px 1px 0 var(--glass-edge),
+        var(--lift);
+    }
+    /* The stars refill once from the left when a source is pointed at. */
+    .reputation__badge:hover :global(.rating-stars__row--fill) {
       animation: reputation-stars-fill 900ms var(--ease) both;
     }
   }
@@ -145,24 +231,45 @@ const star = 'M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.85L12 16.9l-5.25 2.75 1-5.85L3.
       clip-path: inset(0 100% 0 0);
     }
   }
-  .reputation__value strong {
-    font-size: clamp(4rem, 9vw, 6.5rem);
-    font-weight: 550;
-    line-height: 1;
-    letter-spacing: -0.06em;
+  .reputation__reviews {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    margin-top: 1.25rem;
   }
-  .reputation__rating .reputation__date {
-    margin-top: 0.5rem;
+  .reputation__review {
+    display: grid;
+    align-content: start;
+    gap: 0.85rem;
+    height: 100%;
+    margin: 0;
+    padding: 1.5rem;
+    border-top: 2px solid var(--accent);
+    background: var(--bg);
+  }
+  .reputation__review blockquote {
+    margin: 0;
+  }
+  .reputation__review blockquote p {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .reputation__review figcaption {
+    color: var(--muted);
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+  .reputation__original {
+    margin: 1rem 0 0;
     font-size: var(--step--1);
   }
-  @media (max-width: 39.99rem) {
-    .reputation__layout {
+  @media (max-width: 47.99rem) {
+    .reputation__head {
       grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
     }
-    .reputation__rating {
-      border-left: 0;
-      border-top: 1px solid var(--line);
-      padding: 1.5rem 0 0;
+    .reputation__head p {
+      justify-self: start;
     }
   }
 </style>

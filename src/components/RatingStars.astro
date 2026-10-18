@@ -1,0 +1,64 @@
+---
+interface Props {
+  /** Rating from 0 to 5; the filled row is clipped to this share of the five stars. */
+  value: number;
+  size?: 'small' | 'large';
+}
+
+const { value, size = 'large' } = Astro.props;
+const share = Math.min(Math.max(value / 5, 0), 1);
+const star = 'M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.85L12 16.9l-5.25 2.75 1-5.85L3.5 9.7l5.9-.9Z';
+---
+
+<span
+  class:list={['rating-stars', `rating-stars--${size}`]}
+  aria-hidden="true"
+  style={`--share: ${share}`}
+>
+  {['outline', 'fill'].map((layer) => (
+    <span class:list={['rating-stars__row', `rating-stars__row--${layer}`]}>
+      {[0, 1, 2, 3, 4].map(() => (
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d={star} />
+        </svg>
+      ))}
+    </span>
+  ))}
+</span>
+
+<style>
+  /* Decorative stars mirror a verified rating; the number beside them is the accessible value. */
+  /* Content width keeps the clip proportional to the stars, even inside stretching grids. */
+  .rating-stars {
+    display: inline-grid;
+    justify-self: start;
+    width: fit-content;
+    color: var(--accent);
+    font-size: 1.6rem;
+  }
+  .rating-stars--small {
+    font-size: 1rem;
+  }
+  .rating-stars__row {
+    display: flex;
+    grid-area: 1 / 1;
+    gap: 0.15em;
+  }
+  .rating-stars svg {
+    width: 1em;
+    height: 1em;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    stroke-width: 1.4;
+  }
+  .rating-stars__row--outline svg {
+    fill: none;
+    opacity: 0.4;
+  }
+  .rating-stars__row--fill {
+    clip-path: inset(0 calc((1 - var(--share)) * 100%) 0 0);
+  }
+  .rating-stars__row--fill svg {
+    fill: currentColor;
+  }
+</style>

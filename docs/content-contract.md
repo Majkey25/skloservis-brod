@@ -78,8 +78,16 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
     containing only empty known child fields normalize to `undefined`. Partially
     filled objects and unknown keys fail. In Pages CMS, clear all five child fields
     to remove the rating. Do not default rating/count/date: that would prevent clearing.
-    Display the source, count, date and profile link together. No review quotations,
-    award claims, Google branding or self-serving `aggregateRating` structured data.
+    Display the source, count, date and profile link together. No award claims, logos
+    or self-serving `aggregateRating` structured data.
+    Optional `google_reputation` is a strict object `{url, rating, count, verified_on, reviews}`.
+    URL must be `https://www.google.com/maps?cid=<digits>`; rating, count and date follow the
+    same rules as above. Optional `reviews` holds at most four strict `{author, rating, text}`
+    entries: nonblank author up to 40 characters (first name and initial), integer rating
+    `1..5`, nonblank verbatim text up to 400 characters. Clearing every field, including an
+    empty review list, removes the block. Copy values only from the public Google profile and
+    record the check date; Google labels its reviews as not verified, so never present them
+    as certified.
     `About` and `Contact` remain inferred from their collections; no additional getter
     or parallel manually maintained type is needed.
 - `hours.yaml`: `holidays_closed` is a boolean (default false, seed true). Required `weekly` has exactly one row for each

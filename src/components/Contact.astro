@@ -128,6 +128,14 @@ const enquiryTexts = JSON.stringify({
             {settings.contact_email}
           </a>
         </div>
+        {/* Copy buttons are laid out from the first paint, so enhancing them never shifts the page. */}
+        <noscript>
+          <style is:inline>
+            .contact__copy {
+              display: none !important;
+            }
+          </style>
+        </noscript>
         <div class="contact__actions">
           <a
             class="button"
@@ -150,7 +158,6 @@ const enquiryTexts = JSON.stringify({
             data-copy-value={settings.contact_email}
             data-copied={copy.copied}
             data-copy-failed={copy.copyFailed}
-            hidden
           >
             <Icon name="copy" />
             {copy.copy}
@@ -161,7 +168,6 @@ const enquiryTexts = JSON.stringify({
             data-copy-value={contact.phone}
             data-copied={copy.phoneCopied}
             data-copy-failed={copy.phoneCopyFailed}
-            hidden
           >
             <Icon name="copy" />
             {copy.copyPhone}
@@ -344,7 +350,6 @@ const enquiryTexts = JSON.stringify({
     document.querySelectorAll<HTMLButtonElement>('[data-copy-value]').forEach((button) => {
       if (button.dataset.copyBound) return;
       button.dataset.copyBound = 'true';
-      button.hidden = false;
       button.addEventListener('click', async () => {
         const value = button.dataset.copyValue;
         const status = button.closest('[data-contact]')?.querySelector('[data-copy-status]');
@@ -529,7 +534,7 @@ const enquiryTexts = JSON.stringify({
     cursor: pointer;
   }
 
-  .contact__copy:not([hidden]) {
+  .contact__copy {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;

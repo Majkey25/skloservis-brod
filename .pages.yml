@@ -481,6 +481,55 @@ content:
             options:
               time: false
               format: yyyy-MM-dd
+      - name: google_reputation
+        label: Ověřené hodnocení Google (volitelné)
+        description: Údaje opište z veřejného profilu Google. Pro skrytí vymažte všechna pole i recenze. Recenze citujte doslova, se jménem a iniciálou autora; nic nevymýšlejte.
+        type: object
+        fields:
+          - name: url
+            label: Odkaz na profil Google Maps
+            type: string
+            required: true
+            pattern:
+              regex: ^https://www\.google\.com/maps\?cid=\d+$
+              message: Použijte odkaz ve tvaru https://www.google.com/maps?cid=… z profilu firmy.
+          - name: rating
+            label: Hodnocení od 0 do 5
+            type: number
+            required: true
+            options: { min: 0, max: 5 }
+          - name: count
+            label: Počet recenzí (kladné celé číslo)
+            type: number
+            required: true
+            options: { min: 1 }
+          - name: verified_on
+            label: Datum ověření
+            type: date
+            required: true
+            options:
+              time: false
+              format: yyyy-MM-dd
+          - name: reviews
+            label: Vybrané recenze (nejvýše 4)
+            type: object
+            list: { max: 4 }
+            fields:
+              - name: author
+                label: Autor (jméno a iniciála)
+                type: string
+                required: true
+                options: { maxlength: 40 }
+              - name: rating
+                label: Počet hvězd (1–5)
+                type: number
+                required: true
+                options: { min: 1, max: 5 }
+              - name: text
+                label: Text recenze (doslova)
+                type: text
+                required: true
+                options: { maxlength: 400 }
   - name: hours
     label: Otevírací doba a výjimky
     type: file
