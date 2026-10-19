@@ -207,11 +207,13 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
     font-size: var(--step--1);
     color: var(--muted);
   }
+  /* The row gap must exceed the credit link's 0.75rem target overhang, so a wrapped row
+     (such as the theme reset) never shares hit area with the link. */
   .footer-legal {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0 1rem;
+    gap: 1rem;
   }
   .footer-legal p {
     max-width: none;
