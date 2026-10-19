@@ -66,8 +66,8 @@ const { id, openLabel, toggleLabel, closeLabel, class: className, hoverDelay = 1
 
   function flip(card: HTMLElement, flipped: boolean) {
     setFlipped(card, flipped);
-    const target = card.querySelector<HTMLButtonElement>(
-      flipped ? '[data-flip-close]' : '[data-flip-open]',
+    const target = card.querySelector<HTMLElement>(
+      flipped ? '.flip-card__back a[href], [data-flip-close]' : '[data-flip-open]',
     );
     target?.focus({ preventScroll: true });
   }

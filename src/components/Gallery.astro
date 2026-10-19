@@ -660,6 +660,13 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
         if (!filterLinks.length) return;
         const selected = filterLinks.find((link) => link.hash === location.hash) ?? filterLinks[0]!;
         const value = selected.dataset.galleryFilter!;
+        if (root.dataset.galleryKey === 'gallery') {
+          document.querySelectorAll<HTMLAnchorElement>('a[data-language]').forEach((link) => {
+            const target = new URL(link.href);
+            target.hash = selected.hash === location.hash ? selected.hash : '';
+            link.href = target.href;
+          });
+        }
         if (value === selectedCategory) return;
         if (activeDialog.open) {
           closing = false;

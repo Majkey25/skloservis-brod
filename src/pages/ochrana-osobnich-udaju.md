@@ -43,7 +43,7 @@ Uchování a odstranění podkladů zajišťuje majitel; kód webu nemaže zprá
 
 **Běžnou vyřízenou poptávku a související podklady uchováváme ještě jeden měsíc od jejího vyřízení pro zpětné dohledání.** Zákazník může [e-mailem](../kontakt/#contact-methods) požádat o delší uchování pro konkrétní pokračování jednání. Účel a další dobu uchování s ním dohodneme individuálně.
 
-Na stejný e-mail můžete kdykoli poslat žádost o odstranění osobních údajů, včetně e-mailů, elektronických souborů a papírových podkladů. Výmaz se posuzuje podle podmínek GDPR. Nevztahuje se na údaje, které musíme dále uchovávat kvůli zákonné povinnosti nebo oprávněné ochraně konkrétních právních nároků.
+[E-mailem](../kontakt/#contact-methods) můžete kdykoli poslat žádost o odstranění osobních údajů, včetně e-mailů, elektronických souborů a papírových podkladů. Výmaz se posuzuje podle podmínek GDPR. Nevztahuje se na údaje, které musíme dále uchovávat kvůli zákonné povinnosti nebo oprávněné ochraně konkrétních právních nároků.
 
 Pokud vznikne zakázka, údaje potřebné k jejímu plnění se uchovávají po dobu zakázky a řešení souvisejících povinností a nároků. Účetní, daňové a další povinné doklady mají vlastní zákonné lhůty podle druhu dokumentu. Jednoměsíční lhůta pro vyřízenou poptávku nenahrazuje tyto povinnosti ani retenční pravidla poskytovatelů hostingu a e-mailu.
 

@@ -117,8 +117,8 @@ podpora rozšíření Google z těchto zdrojů není doložena. Není slíbená 
   Odkaz `https://www.facebook.com/skloservisbrod/` byl 18. října 2026 ověřen v HTML
   [původního firemního webu](https://www.skloservis-brod.cz/). Vymazání pole v CMS odstraní
   i `sameAs`. [Google uvádí sociální profily jako příklad tohoto pole](https://developers.google.com/search/docs/appearance/structured-data/organization).
-  Vyhledávací odkaz mapy není identitou profilu. Telefon, potvrzený e-mail, IČO a adresa
-  provozovny zůstávají stejné jako viditelné kontakty. Právní stránky rozlišují sídlo
+  Vyhledávací odkaz mapy není identitou profilu. IČO a adresa provozovny odpovídají
+  viditelným údajům; telefon a e-mail schema záměrně vynechává. Právní stránky rozlišují sídlo
   v Březnici od provozovny v Uherském Brodě; nevytváří se druhá firemní entita.
 - Týdenní strukturované hodiny se vynechávají, pokud CMS obsahuje datované výjimky
   **nebo zavírání o českých svátcích**. Je to záměrné konzervativní rozhodnutí:
@@ -146,8 +146,11 @@ služeb na ní samotné se neopakuje. Popisný text pomáhá návštěvníkovi i
 Astro používá `build.inlineStylesheets: 'auto'`: větší styly vydá jako místní
 soubory, které může prohlížeč znovu použít mezi stránkami. Malé styly ponechá v HTML;
 viz [konfigurace Astro](https://docs.astro.build/en/reference/configuration-reference/#buildinlinestylesheets).
-Nejde o odložené načítání stylů. Před nasazením změny se porovnává první zobrazení,
-přenos při procházení a výsledný vzhled; laboratorní skóre není měřením pořadí.
+Nejde o odložené načítání stylů. Dosavadní lokální porovnání naměřilo méně
+přenesených dat při procházení, ale přibližně o 150 ms pomalejší první načtení
+úvodu kvůli dvěma požadavkům na styly. Nastavení proto nepovažujeme za obecné
+zrychlení webu. Před změnou se porovnává první zobrazení, přenos při procházení
+a výsledný vzhled; laboratorní skóre není měřením pořadí.
 
 Ruční volba jazyka a motivu i výchozí nastavení zařízení zůstávají beze změny.
 Pouze náhled může při čerstvé návštěvě české homepage bez parametrů, fragmentu
@@ -235,7 +238,7 @@ na veřejný firemní profil; formulář bez skriptu neposílá údaje na vlastn
 Stejné pravidlo platí pro cíl formuláře, meta popis a právní stránky. JSON-LD
 ponechává firemní identitu/adresu/profily, ale záměrně nepublikuje telefon ani e-mail.
 Jde o kompromis proti jednoduchému sběru, ne SEO výhodu nebo šifrování. Údaje lze
-získat spuštěním prohlížeče, z veřejných profilů i historie veřejného zdrojového kódu.
+získat spuštěním prohlížeče, z veřejných profilů i veřejného zdrojového kódu a jeho historie.
 
 Zpětné odkazy získává firma skutečnými realizacemi, vlastními aktuálními profily
 a relevantními zmínkami. Nezakládáme prázdné profily, nepřidáváme placené či

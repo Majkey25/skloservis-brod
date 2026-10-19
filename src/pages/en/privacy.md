@@ -43,7 +43,7 @@ The owner handles retention and deletion; the website code does not delete Gmail
 
 **We retain an ordinary resolved enquiry and related material for one further month after it is resolved, so it can be retrieved.** A customer may [email us](../contact/#contact-methods) to request longer retention for a specific continuation of discussions. We agree the purpose and additional period individually.
 
-You may use the same email address at any time to request deletion of personal information, including emails, electronic files and paper material. Erasure is assessed under GDPR conditions. It does not cover information that must still be retained to meet a legal duty or legitimately protect specific legal claims.
+You may also [email us](../contact/#contact-methods) at any time to request deletion of personal information, including emails, electronic files and paper material. Erasure is assessed under GDPR conditions. It does not cover information that must still be retained to meet a legal duty or legitimately protect specific legal claims.
 
 If an enquiry becomes a project, information needed for performance is retained for the project and related duties and claims. Accounting, tax and other mandatory documents follow the statutory periods applicable to their category. The one-month period for a resolved enquiry does not replace those duties or the hosting and email providers' own retention rules.
 

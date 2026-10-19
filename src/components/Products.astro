@@ -42,7 +42,7 @@ const labels = {
       <p class="lead">{settings[`products_text_${lang}`]}</p>
     </header>
     <div class="products-grid">
-      {services.map((service) => {
+      {services.map((service, index) => {
         const photo = gallery.find((item) => item.category === service.slug);
         const title = service[`title_${lang}`];
         return (
@@ -66,9 +66,16 @@ const labels = {
                       src={photo.image}
                       alt={photo[`alt_${lang}`]}
                       formats={['avif', 'webp']}
-                      widths={[320, 480, 720].filter((width) => width <= photo.image.width)}
+                      widths={[
+                        ...new Set(
+                          [320, 480, Math.min(720, photo.image.width)].filter(
+                            (width) => width <= photo.image.width,
+                          ),
+                        ),
+                      ]}
                       sizes="(min-width: 70rem) 24rem, (min-width: 60rem) 30vw, (min-width: 40rem) 46vw, 100vw"
-                      loading="lazy"
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      fetchpriority={index === 0 ? 'high' : undefined}
                       decoding="async"
                     />
                   </span>

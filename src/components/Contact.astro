@@ -119,6 +119,7 @@ const enquiryTexts = JSON.stringify({
         <noscript>
           <style is:inline>
             .contact__copy,
+            .contact__actions [data-contact-value],
             .contact__form {
               display: none !important;
             }
@@ -539,11 +540,6 @@ const enquiryTexts = JSON.stringify({
 
   .contact__status:empty {
     margin: 0;
-  }
-
-  .contact__status {
-    overflow-wrap: anywhere;
-    user-select: all;
   }
 
   .contact__form {
