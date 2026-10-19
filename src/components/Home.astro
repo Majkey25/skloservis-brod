@@ -79,15 +79,18 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
     <p class="lead">{settings[`hero_text_${lang}`]}</p>
     <div class="home-actions">
       <a class="button" href={url('contact')}>
+        <Icon name="mail" />
         {labels.enquiry}
       </a>
       <a class="button button--secondary" href={url('gallery')}>
+        <Icon name="image" />
         {labels.projects}
       </a>
     </div>
     <p class="home-call muted">
       {labels.call}
       <a class="text-link" href={`tel:${contact.phone}`}>
+        <Icon name="phone" />
         {phone}
       </a>
     </p>
@@ -406,7 +409,24 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
   .home-call .text-link {
     display: inline-flex;
     align-items: center;
+    gap: 0.4rem;
     min-height: 44px;
+  }
+
+  .home-call :global([data-icon='phone'] path) {
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .home-call a:focus-visible :global([data-icon='phone'] path) {
+      transform: rotate(-10deg);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .home-call a:hover :global([data-icon='phone'] path) {
+      transform: rotate(-10deg);
+    }
   }
 
   .home-hero__media {

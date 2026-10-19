@@ -184,7 +184,8 @@ address/phone have not been reused. This content does not replace a reviewed pri
 notice or authorize a mail service.
 
 The owner confirmed on 2026-10-19 that Monday–Thursday visiting hours are
-08:00–11:30 and 12:30–15:00, with a lunch break 11:30–12:30 shown on each day.
+08:00–11:30 and 12:30–15:00. The owner subsequently removed duplicate lunch notes;
+the split intervals still close the workshop from 11:30 to 12:30 each day.
 Friday remains “Realizace montáží”. The owner also confirmed Saturday, Sunday
 and Czech public holidays closed, with phone/email available for arrangements.
 These seed weekend rows are confirmed (`assumed: false`). No dated exception has been supplied.

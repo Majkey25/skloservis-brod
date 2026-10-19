@@ -58,7 +58,8 @@ function holdCount(container: HTMLElement): Reveal | undefined {
       span,
       text: span.textContent,
       value: Number(span.dataset.countNumber),
-      width: span.getBoundingClientRect().width,
+      widthEm:
+        span.getBoundingClientRect().width / Number.parseFloat(getComputedStyle(span).fontSize),
     }))
     .filter(({ value }) => Number.isFinite(value));
   if (!counts.length) return;
@@ -72,10 +73,10 @@ function holdCount(container: HTMLElement): Reveal | undefined {
       span.style.minWidth = '';
     }
   };
-  // Reserve the final width so the digits do not shift while counting.
-  for (const { span, width } of counts) {
+  // Keep the final width relative to the font so resizing cannot leave an oversized count slot.
+  for (const { span, widthEm } of counts) {
     span.style.display = 'inline-block';
-    span.style.minWidth = `${width}px`;
+    span.style.minWidth = `${widthEm}em`;
     span.textContent = formatter.format(0);
   }
   return {

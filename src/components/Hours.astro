@@ -33,14 +33,6 @@ const formatDate = (date: string) =>
       <Icon name="clock" /> {cs ? 'Otevírací doba' : 'Opening hours'}
     </h2>
     <p class="hours-live" data-hours-live role="status" aria-atomic="true" hidden></p>
-    {hours.holidays_closed && (
-      <p class="hours-holidays">
-        <strong>{cs ? 'O českých svátcích zavřeno.' : 'Closed on Czech public holidays.'}</strong>{' '}
-        {cs
-          ? 'Včetně Velkého pátku a Velikonočního pondělí. Případné výjimky uvádíme níže.'
-          : 'Including Good Friday and Easter Monday. Any exceptions are listed below.'}
-      </p>
-    )}
     <table>
       <caption>
         {cs
@@ -63,6 +55,9 @@ const formatDate = (date: string) =>
         })}
       </tbody>
     </table>
+    {hours.holidays_closed && (
+      <p class="hours-holidays">{cs ? 'O svátcích zavřeno.' : 'Closed on public holidays.'}</p>
+    )}
     {note(hours) && <p class="hours-general-note">{note(hours)}</p>}
     {hours.exceptions.length > 0 && (
       <div class="hours-exceptions">
@@ -260,9 +255,8 @@ const formatDate = (date: string) =>
     margin: 1rem 0 0;
   }
   .hours-holidays {
-    padding: 0.85rem 1rem;
-    background: var(--surface, #edf7fa);
-    border-left: 3px solid var(--accent, #087fa0);
+    margin: 0.75rem 0 0;
+    color: var(--muted, #52666f);
   }
   .hours-exceptions ul {
     list-style: none;

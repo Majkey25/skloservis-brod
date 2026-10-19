@@ -3,20 +3,12 @@ holidays_closed: true
 weekly:
   - day: mon
     slots: [{ opens: '08:00', closes: '11:30' }, { opens: '12:30', closes: '15:00' }]
-    note_cs: Přestávka 11:30–12:30
-    note_en: Lunch break 11:30–12:30
   - day: tue
     slots: [{ opens: '08:00', closes: '11:30' }, { opens: '12:30', closes: '15:00' }]
-    note_cs: Přestávka 11:30–12:30
-    note_en: Lunch break 11:30–12:30
   - day: wed
     slots: [{ opens: '08:00', closes: '11:30' }, { opens: '12:30', closes: '15:00' }]
-    note_cs: Přestávka 11:30–12:30
-    note_en: Lunch break 11:30–12:30
   - day: thu
     slots: [{ opens: '08:00', closes: '11:30' }, { opens: '12:30', closes: '15:00' }]
-    note_cs: Přestávka 11:30–12:30
-    note_en: Lunch break 11:30–12:30
   - day: fri
     slots: []
     note_cs: Realizace montáží

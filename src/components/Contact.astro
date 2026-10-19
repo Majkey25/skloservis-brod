@@ -89,6 +89,7 @@ const copy = {
 const titleId = compact ? 'contact-enquiry-title' : 'contact-title';
 const Heading = compact ? 'h2' : 'h1';
 const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
+const [emailName, emailDomain] = settings.contact_email.split('@');
 const limits = { name: 100, email: 254, message: 5000 };
 const enquiryTexts = JSON.stringify({
   required: copy.required,
@@ -122,10 +123,15 @@ const enquiryTexts = JSON.stringify({
         )}
         <div class="contact__direct">
           <a class="contact__phone" href={`tel:${contact.phone}`}>
-            {phone}
+            <Icon name="phone" />
+            <span>{phone}</span>
           </a>
           <a class="text-link contact__email" href={`mailto:${settings.contact_email}`}>
-            {settings.contact_email}
+            <Icon name="mail" />
+            <span>
+              {emailName}@<wbr />
+              {emailDomain}
+            </span>
           </a>
         </div>
         {/* Copy buttons are laid out from the first paint, so enhancing them never shifts the page. */}
@@ -505,6 +511,17 @@ const enquiryTexts = JSON.stringify({
     margin-block: 1.5rem;
   }
 
+  .contact__direct > a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    max-width: 100%;
+  }
+
+  .contact__direct > a > span {
+    min-width: 0;
+  }
+
   .contact__phone {
     color: inherit;
     font-size: var(--step-3, clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem));
@@ -512,6 +529,11 @@ const enquiryTexts = JSON.stringify({
     line-height: 1.2;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
+  }
+
+  .contact__phone :global(svg) {
+    width: 0.75em;
+    height: 0.75em;
   }
 
   .contact__email {
