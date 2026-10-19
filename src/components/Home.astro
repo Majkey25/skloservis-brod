@@ -248,7 +248,8 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
   }
 
   /* First-load entrance, played by motion.ts once the page has painted (state set in Base.astro).
-     Only transform and opacity animate, so the compositor runs it without main-thread jank. */
+     Only the photo and headline move; the text, actions and phone are visible and usable from the
+     first paint. The entrance animates transforms without changing the layout. */
   .home-hero__word {
     display: inline-block;
     padding-block: 0.12em 0.16em;
@@ -328,22 +329,6 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
       animation: home-hero-word 950ms cubic-bezier(0.16, 1, 0.3, 1) both;
       animation-delay: calc(180ms + var(--i) * 70ms);
     }
-
-    :global(html[data-entry='pending']) :is(.home-hero .lead, .home-actions, .home-call) {
-      opacity: 0;
-    }
-
-    :global(html[data-entry='play']) .home-hero .lead {
-      animation: home-hero-rise 850ms var(--ease) 620ms both;
-    }
-
-    :global(html[data-entry='play']) .home-actions {
-      animation: home-hero-rise 850ms var(--ease) 740ms both;
-    }
-
-    :global(html[data-entry='play']) .home-call {
-      animation: home-hero-rise 850ms var(--ease) 860ms both;
-    }
   }
 
   @keyframes home-hero-word {
@@ -367,13 +352,6 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
   @keyframes home-hero-settle {
     from {
       transform: scale(1.12);
-    }
-  }
-
-  @keyframes home-hero-rise {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
     }
   }
 
@@ -411,22 +389,6 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
     align-items: center;
     gap: 0.4rem;
     min-height: 44px;
-  }
-
-  .home-call :global([data-icon='phone'] path) {
-    transform-origin: center;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .home-call a:focus-visible :global([data-icon='phone'] path) {
-      transform: rotate(-10deg);
-    }
-  }
-
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .home-call a:hover :global([data-icon='phone'] path) {
-      transform: rotate(-10deg);
-    }
   }
 
   .home-hero__media {
@@ -747,26 +709,32 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
       grid-template-columns: minmax(0, 1fr);
     }
 
+    /* The same single photo becomes the backdrop of the copy, so the copy alone sets the height.
+       A veil in the page colour shows the photo behind the headline and frosts it below, where
+       the smaller text needs full contrast in both themes. */
     .home-hero {
+      position: relative;
       min-height: 0;
     }
 
     .home-hero__copy {
+      position: relative;
+      z-index: 1;
       padding: 3rem 1.5rem;
+      background: linear-gradient(
+        color-mix(in srgb, var(--bg) var(--photo-veil), transparent),
+        color-mix(in srgb, var(--bg) 90%, transparent) 9rem
+      );
+    }
+
+    .home-hero__media {
+      position: absolute;
+      inset: 0;
     }
 
     .home-hero h1 {
       max-width: 17ch;
       font-size: clamp(2.25rem, 9vw, 3rem);
-    }
-
-    .home-hero__media :global(picture) {
-      height: auto;
-    }
-
-    .home-hero__media :global(img) {
-      height: auto;
-      aspect-ratio: 4 / 3;
     }
 
     .home-section-heading {
@@ -790,6 +758,11 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
   }
 
   @media (max-width: 640px) {
+    /* Leave room for the photo bleed and its 1.04 reveal scale without clipping either. */
+    .home-product-grid {
+      margin-inline: 0.5rem;
+    }
+
     .home-hero__copy {
       padding-inline: 1rem;
     }

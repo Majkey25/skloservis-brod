@@ -241,6 +241,11 @@ const products = {
     line-height: 1.15;
     text-decoration: none;
   }
+  .brand-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .brand-logo {
     width: 32px;
     height: 32px;
@@ -371,9 +376,6 @@ const products = {
   .header-phone:focus-visible::after {
     transform: scaleX(1);
   }
-  .header-phone :global([data-icon='phone']) {
-    transition: rotate 380ms var(--ease);
-  }
   @media (hover: hover) and (pointer: fine) {
     .desktop-nav > a:hover::after,
     .nav-products > summary:hover::after,
@@ -389,12 +391,6 @@ const products = {
     }
     .mobile-menu:not([open]) > summary:hover :global([data-icon='menu'] path:nth-child(2)) {
       transform: scaleX(0.6);
-    }
-  }
-  /* A tilt rather than a ring: a transition reverses smoothly when the pointer leaves early. */
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .header-phone:hover :global([data-icon='phone']) {
-      rotate: -14deg;
     }
   }
   .nav-products {

@@ -151,7 +151,7 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
         <li>
           <a href={url(service.slug)}>
             <span class="services-product-links__glyph">
-              <ProductIcon slug={service.slug} />
+              <ProductIcon slug={service.slug} reveal />
             </span>
             <span class="services-product-links__title">{service[`title_${lang}`]}</span>
             <Icon name="arrow-right" />

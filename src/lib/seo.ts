@@ -4,6 +4,8 @@ import type { Hours } from './schedule.ts';
 
 export type BuildTarget = 'preview' | 'production';
 
+export const SITE_NAME = 'Skloservis Brod';
+
 /** One explicit opt-in; NODE_ENV and Astro's default production mode never enable indexing. */
 export function deployment(target: string = 'preview') {
   if (target !== 'preview' && target !== 'production') {
@@ -168,6 +170,18 @@ export function pageSeo(context: SeoContext, pathname: string, lang: Language) {
         ]
       : [],
     business: indexable && route.id === 'contact',
+    website: indexable && route.id === 'home' && lang === 'cs',
+  };
+}
+
+/** The visible brand as Google's preferred site name, on the root homepage only; no rank claim. */
+export function website(context: SeoContext) {
+  if (context.target !== 'production') return undefined;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: `${context.site}/`,
   };
 }
 
@@ -371,7 +385,11 @@ export function localBusiness(
 
 /** JSON-LD is data, not executable code; prevent CMS text from closing its script element. */
 export function jsonLd(
-  value: NonNullable<ReturnType<typeof localBusiness> | ReturnType<typeof serviceBreadcrumbs>>,
+  value: NonNullable<
+    | ReturnType<typeof localBusiness>
+    | ReturnType<typeof serviceBreadcrumbs>
+    | ReturnType<typeof website>
+  >,
 ): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }

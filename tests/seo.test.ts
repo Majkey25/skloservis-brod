@@ -16,6 +16,7 @@ import {
   robotsText,
   sitemapXml,
   localBusiness,
+  website,
   jsonLd,
   workflowTarget,
 } from '../src/lib/seo.ts';
@@ -375,6 +376,7 @@ test('every preview page and unknown path excludes discovery claims in initial m
         canonical: undefined,
         alternates: [],
         business: false,
+        website: false,
       });
     }
   }
@@ -398,6 +400,8 @@ test('production pairs have absolute self canonicals and reciprocal cs/en/x-defa
     ]);
     assert.equal(cs.business, route.id === 'contact');
     assert.equal(en.business, route.id === 'contact');
+    assert.equal(cs.website, route.id === 'home');
+    assert.equal(en.website, false);
   }
   const xml = sitemapXml(production);
   assert.equal((xml.match(/<loc>/g) ?? []).length, ROUTES.length * 2);
@@ -495,8 +499,22 @@ test('404, unknown, wrong-language and outside-base paths never inherit a homepa
       assert.equal(meta.canonical, undefined);
       assert.deepEqual(meta.alternates, []);
       assert.equal(meta.business, false);
+      assert.equal(meta.website, false);
     }
   }
+});
+
+test('site name schema states only the visible brand at the production root URL', () => {
+  assert.equal(website(preview), undefined);
+  const site = website(production)!;
+  assert.deepEqual(site, {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Skloservis Brod',
+    url: 'https://www.skloservis-brod.cz/',
+  });
+  const header = readFileSync(new URL('../src/components/Header.astro', import.meta.url), 'utf8');
+  assert.ok(header.includes(`<span class="brand-name">${site.name}</span>`));
 });
 
 test('schema uses validated CMS facts and excludes installation/assumed hours and unsupported claims', () => {

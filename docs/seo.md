@@ -118,6 +118,10 @@ podpora rozšíření Google z těchto zdrojů není doložena. Není slíbená 
   svátky. Viditelný úplný rozvrh s vyhodnocením Europe/Prague zůstává dostupný.
   Jinak se použijí jen potvrzené intervaly; prázdný či předpokládaný den není
   automaticky zapsán jako zavřeno a montážní pátek se nestává návštěvní dobou.
+- Jen produkční česká kořenová úvodní stránka vydává `WebSite` s viditelným názvem
+  `Skloservis Brod` a kořenovou URL. Stejný název používá `og:site_name`; obchodní
+  firma v kontaktech a `LocalBusiness` se nemění. [Google tak umožňuje vyjádřit preferovaný název webu](https://developers.google.com/search/docs/appearance/site-names);
+  zobrazený název ani pořadí to nezaručuje.
 - Osm produkčních detailů v obou jazycích vydává `BreadcrumbList` odpovídající
   viditelné cestě „Produkty → název výrobku“. Názvy výrobků pocházejí z CMS,
   adresy ze stabilní mapy. [Google vyžaduje nejméně dvě položky](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb).

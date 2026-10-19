@@ -149,6 +149,7 @@ const copy = {
   }
   .company-metrics__experience {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
   }
@@ -232,7 +233,8 @@ const copy = {
   }
   @media (max-width: 47.99rem) {
     .company-metrics__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      /* At most two columns; enlarged text gets a full row before figures can overlap. */
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, max(9rem, 45%)), 1fr));
       gap: 1.75rem 1rem;
     }
     .company-metrics__heading {

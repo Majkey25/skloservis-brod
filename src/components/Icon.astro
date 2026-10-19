@@ -33,8 +33,11 @@ const paths = {
   mail: ['M3 5h18v14H3Z', 'M3 6l9 7 9-7'],
   copy: ['M9 9h12v12H9Z', 'M15 9V3H3v12h6'],
   send: 'm3 3 18 9-18 9 4-9-4-9Z M7 12h14',
-  location: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
-  clock: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z M12 6v6l4 2',
+  location: [
+    'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z',
+    'M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+  ],
+  clock: ['M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z', 'M12 6v6l4 2'],
   image: [
     'M3 4.5h18v15H3Z',
     'M17.5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z',
@@ -64,9 +67,11 @@ export type IconName = keyof typeof paths;
 
 interface Props {
   name: IconName;
+  /** Draw the strokes in once when the icon scrolls into view (motion.ts). */
+  reveal?: boolean;
 }
 
-const { name } = Astro.props;
+const { name, reveal = false } = Astro.props;
 const shape = paths[name];
 const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
 ---
@@ -83,9 +88,10 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
   aria-hidden="true"
   focusable="false"
   data-icon={name}
+  data-reveal={reveal ? 'draw' : undefined}
 >
   {parts.map((d) => (
-    <path d={d} />
+    <path d={d} pathLength={reveal ? 1 : undefined} />
   ))}
 </svg>
 
@@ -99,7 +105,8 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
     vertical-align: -0.18em;
   }
 
-  /* Motion answers the control that owns the icon: hover, keyboard focus, open or pressed. */
+  /* Motion answers the control that owns the icon: hover, keyboard focus, a touch press, open or
+     pressed. Each icon moves either its paths or the svg, never both, so effects cannot stack. */
   path {
     transform-box: fill-box;
     transition:
@@ -116,19 +123,27 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
     transform-origin: right center;
   }
 
-  :global(:is(a, button, summary):focus-visible) [data-icon='arrow-right'] path:first-child {
+  :global(:is(a, button, summary):is(:focus-visible, :active))
+    [data-icon='arrow-right']
+    path:first-child {
     transform: scaleX(1.25);
   }
 
-  :global(:is(a, button, summary):focus-visible) [data-icon='arrow-right'] path:last-child {
+  :global(:is(a, button, summary):is(:focus-visible, :active))
+    [data-icon='arrow-right']
+    path:last-child {
     transform: translateX(3px);
   }
 
-  :global(:is(a, button, summary):focus-visible) [data-icon='arrow-left'] path:first-child {
+  :global(:is(a, button, summary):is(:focus-visible, :active))
+    [data-icon='arrow-left']
+    path:first-child {
     transform: scaleX(1.25);
   }
 
-  :global(:is(a, button, summary):focus-visible) [data-icon='arrow-left'] path:last-child {
+  :global(:is(a, button, summary):is(:focus-visible, :active))
+    [data-icon='arrow-left']
+    path:last-child {
     transform: translateX(-3px);
   }
 
@@ -147,10 +162,6 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
 
     :global(:is(a, button, summary):hover) [data-icon='arrow-left'] path:last-child {
       transform: translateX(-3px);
-    }
-
-    :global(button:hover) [data-icon='flip'] {
-      transform: rotate(180deg);
     }
   }
 
@@ -191,32 +202,59 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
     transform: translateY(-5px) rotate(-45deg);
   }
 
-  /* Contact icons answer their control while the icon box stays put: the envelope flap lifts, the
-     copied sheet fans out, the external arrow leaves its box and the paper plane noses up. Strokes
-     keep their width, and every change is a transition, so a quick pass reverses smoothly. */
-  [data-icon='send'] path {
+  /* Control icons answer their control while the icon box stays put: the envelope flap lifts, the
+     copied sheet fans out, the external arrow leaves its box, the paper plane noses up, the handset
+     tilts, the pin hops, the close cross turns and the turn arrows spin. Strokes keep their width,
+     and every change is a transition rather than a ring or loop, so a quick pass reverses smoothly. */
+  [data-icon='send'] path,
+  [data-icon='phone'] path,
+  [data-icon='close'] path {
     transform-origin: center;
   }
 
+  /* Scroll reveals draw the strokes (motion.ts); without JS or motion the full strokes show. */
+  [data-reveal='draw'] path {
+    stroke-dasharray: 1;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    :global(:is(a, button):focus-visible) [data-icon='image'] path:nth-child(2) {
+    :global(:is(a, button):is(:focus-visible, :active)) [data-icon='image'] path:nth-child(2) {
       transform: translateY(-1px);
     }
 
-    :global(:is(a, button):focus-visible) [data-icon='mail'] path:last-child {
+    :global(:is(a, button):is(:focus-visible, :active)) [data-icon='mail'] path:last-child {
       d: path('M3 6l9 3.5 9-3.5');
     }
 
-    :global(:is(a, button):focus-visible) [data-icon='copy'] path:last-child {
+    :global(:is(a, button):is(:focus-visible, :active)) [data-icon='copy'] path:last-child {
       d: path('M13 9V1H1v12h8');
     }
 
-    :global(:is(a, button):focus-visible) [data-icon='external'] path:not(:last-child) {
+    :global(:is(a, button):is(:focus-visible, :active))
+      [data-icon='external']
+      path:not(:last-child) {
       transform: translate(1.5px, -1.5px);
     }
 
-    :global(button:focus-visible) [data-icon='send'] path {
+    :global(:is(a, button):is(:focus-visible, :active)) [data-icon='phone'] path {
+      transform: rotate(-10deg);
+    }
+
+    :global(:is(a, button):is(:focus-visible, :active)) [data-icon='location'] path,
+    :global(:is(a, button):is(:focus-visible, :active)) [data-icon='facebook'] path {
+      transform: translateY(-2px);
+    }
+
+    :global(button:is(:focus-visible, :active)) [data-icon='close'] path {
+      transform: rotate(90deg);
+    }
+
+    :global(button:is(:focus-visible, :active)) [data-icon='send'] path {
       transform: rotate(-12deg);
+    }
+
+    :global(button:is(:focus-visible, :active)) [data-icon='flip'] {
+      transform: rotate(180deg);
     }
   }
 
@@ -237,8 +275,25 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
       transform: translate(1.5px, -1.5px);
     }
 
+    :global(:is(a, button):hover) [data-icon='phone'] path {
+      transform: rotate(-10deg);
+    }
+
+    :global(:is(a, button):hover) [data-icon='location'] path,
+    :global(:is(a, button):hover) [data-icon='facebook'] path {
+      transform: translateY(-2px);
+    }
+
+    :global(button:hover) [data-icon='close'] path {
+      transform: rotate(90deg);
+    }
+
     :global(button:not(:disabled):hover) [data-icon='send'] path {
       transform: rotate(-12deg);
+    }
+
+    :global(button:hover) [data-icon='flip'] {
+      transform: rotate(180deg);
     }
   }
 

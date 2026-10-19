@@ -12,6 +12,8 @@ import {
   localBusiness,
   serviceBreadcrumbs,
   socialPreview,
+  website,
+  SITE_NAME,
   jsonLd,
 } from '../lib/seo.ts';
 import Header from '../components/Header.astro';
@@ -35,6 +37,7 @@ const pageDescription =
 const business = metadata.business
   ? localBusiness(seo, settings, await getContact(), await getHours())
   : undefined;
+const siteName = metadata.website ? website(seo) : undefined;
 const [services, gallery] = await Promise.all([getServices(), getGallery()]);
 const breadcrumbs = serviceBreadcrumbs(
   seo,
@@ -150,13 +153,14 @@ const socialImage = socialPreview(seo, Astro.url.pathname, lang, gallery);
     {metadata.alternates.map((alternate) => (
       <link rel="alternate" hreflang={alternate.lang} href={alternate.href} />
     ))}
+    {siteName && <script type="application/ld+json" is:inline set:html={jsonLd(siteName)} />}
     {business && <script type="application/ld+json" is:inline set:html={jsonLd(business)} />}
     {breadcrumbs && <script type="application/ld+json" is:inline set:html={jsonLd(breadcrumbs)} />}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'cs' ? 'cs_CZ' : 'en_GB'} />
-    <meta property="og:site_name" content={settings.name} />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:image" content={socialImage.src} />
     <meta property="og:image:secure_url" content={socialImage.src} />
     <meta property="og:image:type" content={socialImage.type} />
