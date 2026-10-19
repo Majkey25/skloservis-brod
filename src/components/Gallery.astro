@@ -91,16 +91,6 @@ const categories = [...new Set(displayItems.map((item) => item.category))].map((
   label: categoryName(value),
   count: displayItems.filter((item) => item.category === value).length,
 }));
-// CSS applies bookmarked filters before JS/native lazy loading, including without JS.
-// All pictures remain ordinary static HTML, in their original content order.
-const filterStyles = filterable
-  ? categories
-      .map(
-        ({ value }) =>
-          `[data-gallery-key="${galleryKey}"]:has([data-gallery-filter="${value}"]:target) .gallery-item:not([data-category="${value}"]) { display: none; }`,
-      )
-      .join('\n')
-  : '';
 
 const itemsData = await Promise.all(
   displayItems.map(async (item, index) => {
@@ -142,7 +132,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
   data-gallery-key={filterable ? galleryKey : undefined}
   data-gallery-hero={heroId}
 >
-  {filterStyles && <style is:inline set:html={filterStyles} />}
   <div class="wrap">
     {(compact || heading) && (
       <div class="gallery-header" data-reveal="rise">
@@ -276,7 +265,15 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
             <div class="gallery-dialog__loader" data-loader aria-hidden="true">
               <span class="sr-only">{labels.loading}</span>
             </div>
-            <img class="gallery-dialog__image" data-dialog-image alt="" decoding="async" hidden />
+            <img
+              class="gallery-dialog__image"
+              data-dialog-image
+              src={`${import.meta.env.BASE_URL}placeholder.svg`}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              hidden
+            />
             <div class="gallery-dialog__error" data-dialog-error role="status" hidden>
               <p>{labels.error}</p>
               <a

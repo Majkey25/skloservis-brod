@@ -21,7 +21,6 @@ export async function renderSocialImage(logo: Buffer, photo?: Buffer): Promise<B
   </svg>`);
   const brand = await sharp(logo)
     .resize(photo ? 144 : 184, photo ? 144 : 184, { fit: 'inside', withoutEnlargement: true })
-    .flatten({ background: '#ffffff' })
     .png()
     .toBuffer();
   const layers: OverlayOptions[] = [

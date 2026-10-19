@@ -141,16 +141,16 @@ export function defaultDescription(
   switch (route.id) {
     case 'privacy':
       return lang === 'cs'
-        ? 'Jak Skloservis Brod zpracovává údaje z poptávek, jak je uchovává a jak uplatnit práva k osobním údajům.'
-        : 'How Skloservis Brod processes and retains enquiry information, and how to exercise your personal data rights.';
+        ? 'Jak Skloservis Brod zpracovává a uchovává osobní údaje z poptávek. Informace o formuláři, službě FormSubmit, příjemcích údajů a možnostech uplatnění vašich práv.'
+        : 'How Skloservis Brod processes and retains personal information from enquiries. Read about the form, FormSubmit, data recipients and how to exercise your privacy rights.';
     case 'cookies':
       return lang === 'cs'
-        ? 'Informace o cookies, uložení volby jazyka a motivu v prohlížeči a souhlasu s volitelnou mapou Google.'
-        : 'Information about cookies, saved language and theme preferences, and consent for the optional Google map.';
+        ? 'Cookies a úložiště prohlížeče na webu Skloservis Brod. Jak se ukládá ruční volba jazyka a motivu, jak ji odstranit a kdy se po souhlasu načítá volitelná mapa Google.'
+        : 'Cookies and browser storage on the Skloservis Brod website. How manual language and theme preferences are saved and reset, and when the optional Google map loads after consent.';
     case 'legal':
       return lang === 'cs'
-        ? 'Údaje provozovatele Skloservis Brod, informace o poptávkách, reklamacích a mimosoudním řešení spotřebitelských sporů.'
-        : 'Skloservis Brod company details, enquiries, complaints and consumer alternative dispute resolution information.';
+        ? 'Provozovatel webu SKLOSERVIS-BROD s.r.o., sídlo a fakturační údaje. Informace pro spotřebitele o nezávazných poptávkách, reklamacích a mimosoudním řešení sporů.'
+        : 'SKLOSERVIS-BROD s.r.o. company and billing details. Consumer information about non-binding enquiries, complaints, project terms and alternative dispute resolution.';
     default:
       return homepage;
   }

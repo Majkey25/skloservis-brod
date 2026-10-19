@@ -55,6 +55,16 @@ const breadcrumbs = serviceBreadcrumbs(
 );
 const socialImage = socialPreview(seo, Astro.url.pathname, lang, gallery);
 const searchImage = primaryImage(seo, Astro.url.pathname, lang, gallery);
+// Apply bookmarked gallery filters before image loading, including without JavaScript.
+const galleryFilterStyles =
+  page === 'gallery'
+    ? [...new Set(gallery.map((item) => item.category))]
+        .map(
+          (value) =>
+            `[data-gallery-key="gallery"]:has([data-gallery-filter="${value}"]:target) .gallery-item:not([data-category="${value}"]) { display: none; }`,
+        )
+        .join('\n')
+    : '';
 ---
 
 <!doctype html>
@@ -182,6 +192,16 @@ const searchImage = primaryImage(seo, Astro.url.pathname, lang, gallery);
     <meta name="twitter:description" content={pageDescription} />
     <meta name="twitter:image" content={socialImage.src} />
     <meta name="twitter:image:alt" content={socialImage.alt} />
+    {galleryFilterStyles && <style is:inline set:html={galleryFilterStyles} />}
+    <noscript>
+      <style is:inline>
+        .contact__copy,
+        .contact__actions [data-contact-value],
+        .contact__form {
+          display: none !important;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
     <a class="skip-link" href="#main">

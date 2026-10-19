@@ -923,3 +923,26 @@ test('social rendering produces a real 1200x630 JPEG without enlarging or croppi
   const brand = await sharp(await renderSocialImage(logo)).metadata();
   assert.deepEqual([brand.format, brand.width, brand.height], ['jpeg', 1200, 630]);
 });
+
+test('social artwork composites transparent logo pixels onto the card background', async () => {
+  const { renderSocialImage } = await import('../src/lib/social-image.ts');
+  const logo = readFileSync(new URL('../src/assets/brand/wordpress-logo.png', import.meta.url));
+  const photo = await sharp({
+    create: { width: 33, height: 55, channels: 3, background: '#ff0000' },
+  })
+    .png()
+    .toBuffer();
+  for (const image of [undefined, photo]) {
+    const result = await renderSocialImage(logo, image);
+    const left = image ? 48 : 120;
+    const top = image ? 56 : 223;
+    const pixel = async (x: number) =>
+      sharp(result)
+        .extract({ left: x, top: top + 2, width: 1, height: 1 })
+        .removeAlpha()
+        .raw()
+        .toBuffer();
+    const [outside, corner] = await Promise.all([pixel(left - 4), pixel(left + 2)]);
+    assert.ok(corner.every((channel, index) => Math.abs(channel - outside[index]!) < 15));
+  }
+});
