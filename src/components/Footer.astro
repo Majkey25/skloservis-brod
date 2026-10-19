@@ -50,6 +50,13 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       <p>
         {settings.name} · IČO {contact.company_id}
       </p>
+      <p class="footer-credit">
+        made by{' '}
+        <a class="footer-credit__name" href="https://majkey25.github.io/init/" data-scramble>
+          <span class="footer-credit__text">Majkey25</span>
+          <span class="footer-credit__code" aria-hidden="true"></span>
+        </a>
+      </p>
       <button type="button" class="footer-theme-system" data-theme-system hidden>
         {lang === 'cs' ? 'Použít nastavení zařízení' : 'Use device theme'}
       </button>
@@ -64,18 +71,14 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       </a>
     </nav>
   </div>
-  <p class="footer-credit">
-    made by{' '}
-    <a class="footer-credit__name" href="https://majkey25.github.io/init/" data-scramble>
-      <span class="footer-credit__text">Majkey25</span>
-      <span class="footer-credit__code" aria-hidden="true"></span>
-    </a>
-  </p>
 </footer>
 <script>
-  // Hovering or focusing the author name runs a short code-like scramble that resolves letter by
-  // letter. The real name stays in the link for assistive technology; only an overlay changes.
-  const glyphs = '0123456789ABCDEF#$%&*+=?<>/|{}[]~^_:;';
+  // Pointing at or focusing the author name decodes it like a hash. Each real letter gets a cell
+  // of its exact width that cycles through code glyphs until a scan line passes and locks it.
+  // A skew and shake decay to nothing, so the final frame matches the label exactly. The real
+  // name stays in the link, so its accessible text, width and hit area never change.
+  const glyphs = '0123456789abcdef#$%&*+=?<>/|{}[]~^_:;';
+  const duration = 1200;
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
   const running = new Map<HTMLElement, number>();
 
@@ -83,36 +86,53 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
     cancelAnimationFrame(running.get(link) ?? 0);
     running.delete(link);
     link.removeAttribute('data-scrambling');
-    const code = link.querySelector('.footer-credit__code');
-    if (code) {
-      code.textContent = '';
-      code.removeAttribute('data-text');
-    }
+    const code = link.querySelector<HTMLElement>('.footer-credit__code');
+    code?.replaceChildren();
+    code?.removeAttribute('style');
   }
 
   function scramble(link: HTMLElement) {
-    const name = link.querySelector('.footer-credit__text')?.textContent ?? '';
-    const code = link.querySelector('.footer-credit__code');
-    if (calm.matches || running.has(link) || !name || !code) return;
+    const label = link.querySelector('.footer-credit__text')?.firstChild;
+    const code = link.querySelector<HTMLElement>('.footer-credit__code');
+    if (calm.matches || running.has(link) || !(label instanceof Text) || !code) return;
+    const range = document.createRange();
+    let width = 0;
+    const cells = Array.from(label.data, (letter, index) => {
+      range.setStart(label, index);
+      range.setEnd(label, index + 1);
+      const cell = document.createElement('span');
+      const size = range.getBoundingClientRect().width;
+      cell.style.width = `${size}px`;
+      code.append(cell);
+      // Each letter locks just after the scan line passes its centre.
+      const at = width + size * (0.5 + Math.random() * 0.4);
+      width += size;
+      return { cell, letter, at };
+    });
     link.setAttribute('data-scrambling', '');
     const started = performance.now();
     let drawn = 0;
     const tick = (now: number) => {
-      const progress = (now - started) / 900;
-      // Dense noise at roughly 40 updates a second; letters lock in from left to right.
-      if (now - drawn > 24 || progress >= 1) {
+      const progress = Math.min((now - started) / duration, 1);
+      // The scan crosses the name in 12–60% of the run, so the last lock flash ends in time.
+      const scan = Math.min(Math.max((progress - 0.12) / 0.48, 0), 1) * width;
+      // About 30 glyph changes a second keeps the noise readable as code, not as flicker.
+      if (now - drawn > 32 || progress === 1) {
         drawn = now;
-        const text = [...name]
-          .map((letter, index) =>
-            progress >= (index + 1.5) / (name.length + 1)
-              ? letter
-              : glyphs[Math.floor(Math.random() * glyphs.length)],
-          )
-          .join('');
-        code.textContent = text;
-        // The glitch layers repeat the same frame with sliced offsets.
-        code.setAttribute('data-text', text);
+        for (const item of cells) {
+          if (item.cell.hasAttribute('data-locked')) continue;
+          if (scan >= item.at) {
+            item.cell.setAttribute('data-locked', '');
+            item.cell.textContent = item.letter;
+          } else item.cell.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+        }
       }
+      const decay = (1 - progress) ** 2;
+      const shake = (1.5 * Math.sin(now / 23) * decay).toFixed(2);
+      const skew = (9 * Math.sin(now / 41) * decay).toFixed(2);
+      code.style.transform = `translateX(${shake}px) skewX(${skew}deg)`;
+      code.style.setProperty('--scan', `${scan.toFixed(1)}px`);
+      code.style.setProperty('--fade', (1 - progress ** 4).toFixed(3));
       if (progress < 1) running.set(link, requestAnimationFrame(tick));
       else stop(link);
     };
@@ -217,113 +237,64 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
   .footer-bottom a:hover {
     text-decoration: underline;
   }
-  .footer-credit {
+  .footer-legal .footer-credit {
     margin: 0;
-    padding-bottom: 1.25rem;
-    color: var(--muted);
-    font-size: var(--step--1);
-    text-align: center;
   }
   .footer-credit__name {
     position: relative;
     display: inline-block;
+    /* A 44px tall target that adds no height to the compact bar. */
+    margin-block: -0.75rem;
     padding-block: 0.75rem;
     color: var(--accent);
     font-weight: 650;
-    text-decoration: none;
   }
-  .footer-credit__name:hover,
   .footer-credit__name:focus-visible {
     text-decoration: underline;
     text-underline-offset: 0.3em;
   }
-  /* The overlay sits over the real name, so scrambling never changes the line's layout. */
+  /* The overlay sits exactly over the real name, so decoding never changes layout or width. */
   .footer-credit__code {
     position: absolute;
     top: 0.75rem;
-    left: 50%;
-    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
-    letter-spacing: 0.02em;
+    left: 0;
     white-space: nowrap;
     pointer-events: none;
-    translate: -50% 0;
+  }
+  .footer-credit__code > :global(span) {
+    display: inline-block;
+    text-align: center;
+  }
+  .footer-credit__code > :global(span:not([data-locked])) {
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    text-shadow:
+      1.5px 0 color-mix(in srgb, var(--accent) 55%, transparent),
+      -1.5px 0 color-mix(in srgb, var(--text) 35%, transparent);
+  }
+  .footer-credit__code > :global(span[data-locked]) {
+    animation: footer-credit-lock 380ms var(--ease) both;
+  }
+  /* The scan line that locks each letter as it passes, fading out at the end. */
+  .footer-credit__code::after {
+    position: absolute;
+    top: 0.15em;
+    bottom: 0.15em;
+    left: -1px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    content: '';
+    opacity: var(--fade, 0);
+    translate: var(--scan, 0) 0;
   }
   .footer-credit__name[data-scrambling] .footer-credit__text {
     color: transparent;
   }
-  .footer-credit__name[data-scrambling] .footer-credit__code {
-    text-shadow:
-      2px 0 color-mix(in srgb, var(--accent) 60%, transparent),
-      -2px 0 color-mix(in srgb, var(--text) 40%, transparent);
-    animation: footer-credit-glitch 900ms steps(10) both;
-  }
-  /* Two copies of the current frame, cut into shifting bands, give the distortion. */
-  .footer-credit__name[data-scrambling] .footer-credit__code::before,
-  .footer-credit__name[data-scrambling] .footer-credit__code::after {
-    position: absolute;
-    inset: 0;
-    content: attr(data-text);
-    pointer-events: none;
-  }
-  .footer-credit__name[data-scrambling] .footer-credit__code::before {
-    color: var(--accent);
-    animation: footer-credit-slice-a 900ms steps(9) both;
-  }
-  .footer-credit__name[data-scrambling] .footer-credit__code::after {
-    color: color-mix(in srgb, var(--text) 70%, var(--accent));
-    animation: footer-credit-slice-b 900ms steps(7) both;
-  }
-  @keyframes footer-credit-slice-a {
-    0% {
-      clip-path: inset(10% 0 62% 0);
-      translate: -4px 0;
-    }
-    30% {
-      clip-path: inset(55% 0 20% 0);
-      translate: 3px 0;
-    }
-    60% {
-      clip-path: inset(30% 0 45% 0);
-      translate: -2px 0;
-    }
-    100% {
-      clip-path: inset(50% 0 50% 0);
-      translate: 0 0;
-    }
-  }
-  @keyframes footer-credit-slice-b {
-    0% {
-      clip-path: inset(68% 0 6% 0);
-      translate: 4px 0;
-    }
-    35% {
-      clip-path: inset(18% 0 60% 0);
-      translate: -3px 0;
-    }
-    70% {
-      clip-path: inset(40% 0 38% 0);
-      translate: 2px 0;
-    }
-    100% {
-      clip-path: inset(50% 0 50% 0);
-      translate: 0 0;
-    }
-  }
-  @keyframes footer-credit-glitch {
-    0% {
-      transform: skewX(-12deg);
-    }
-    25% {
-      transform: skewX(8deg);
-    }
-    50% {
-      transform: skewX(-5deg);
-    }
-    75% {
-      transform: skewX(2deg);
-    }
-    100% {
-      transform: none;
+  @keyframes footer-credit-lock {
+    from {
+      color: var(--text);
+      text-shadow: 0 0 10px var(--accent);
     }
   }
   @media (min-width: 48rem) {
