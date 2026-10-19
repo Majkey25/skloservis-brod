@@ -106,11 +106,10 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
         fetchpriority="high"
         decoding="async"
       />
-      {/* Glass slats lift off the already painted photo, so the LCP image itself never animates. */}
-      <span class="home-hero__shutters" aria-hidden="true">
-        {[0, 1, 2, 3].map((index) => (
-          <span style={`--i: ${index}`} />
-        ))}
+      {/* Two frosted sliding doors part over the already painted photo, so LCP is not delayed. */}
+      <span class="home-hero__doors" aria-hidden="true">
+        <span />
+        <span />
       </span>
     </figure>
   )}
@@ -259,35 +258,63 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
     display: inline-block;
   }
 
-  .home-hero__shutters {
+  .home-hero__doors {
     display: none;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    :global(html[data-entry]) .home-hero__shutters {
+    :global(html[data-entry]) .home-hero__doors {
       position: absolute;
       inset: 0;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: 1fr 1fr;
       pointer-events: none;
     }
 
-    .home-hero__shutters > span {
-      background: var(--bg);
-      box-shadow:
-        inset 1px 0 var(--glass-edge),
-        inset -1px 0 color-mix(in srgb, var(--accent) 22%, transparent);
-      transform: scaleY(0);
-      transform-origin: top center;
+    .home-hero__doors > span {
+      position: relative;
+      background: color-mix(in srgb, var(--bg) 84%, transparent);
+      box-shadow: inset 0 0 0 1px var(--glass-edge);
     }
 
-    :global(html[data-entry='pending']) .home-hero__shutters > span {
-      transform: none;
+    /* A slim handle beside the meeting edge of each door. */
+    .home-hero__doors > span::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 3px;
+      height: clamp(3rem, 18%, 6rem);
+      border-radius: 2px;
+      background: color-mix(in srgb, var(--accent) 55%, transparent);
+      translate: 0 -50%;
     }
 
-    :global(html[data-entry='play']) .home-hero__shutters > span {
-      animation: home-hero-shutter 1050ms cubic-bezier(0.77, 0, 0.18, 1) both;
-      animation-delay: calc(120ms + var(--i) * 90ms);
+    .home-hero__doors > span:first-child {
+      border-right: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+
+    .home-hero__doors > span:first-child::after {
+      right: 1.1rem;
+    }
+
+    .home-hero__doors > span:last-child::after {
+      left: 1.1rem;
+    }
+
+    :global(html[data-entry='play']) .home-hero__doors > span {
+      animation: home-hero-door 1150ms cubic-bezier(0.7, 0, 0.2, 1) 160ms both;
+    }
+
+    :global(html[data-entry='play']) .home-hero__doors > span:last-child {
+      animation-name: home-hero-door-right;
+    }
+
+    :global(html[data-entry='pending']) .home-hero__media :global(img) {
+      transform: scale(1.12);
+    }
+
+    :global(html[data-entry='play']) .home-hero__media :global(img) {
+      animation: home-hero-settle 1700ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both;
     }
 
     :global(html[data-entry='pending']) .home-hero__word > span {
@@ -322,12 +349,21 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
     }
   }
 
-  @keyframes home-hero-shutter {
-    from {
-      transform: none;
-    }
+  @keyframes home-hero-door {
     to {
-      transform: scaleY(0);
+      transform: translateX(-101%);
+    }
+  }
+
+  @keyframes home-hero-door-right {
+    to {
+      transform: translateX(101%);
+    }
+  }
+
+  @keyframes home-hero-settle {
+    from {
+      transform: scale(1.12);
     }
   }
 

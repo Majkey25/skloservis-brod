@@ -188,12 +188,10 @@ summary:focus-visible {
 .muted {
   color: var(--muted);
 }
-/* Actions fill with a deeper tone that rises from the bottom edge, inside a soft accent halo.
-   Only colour, fill and shadow change, so the hit area never moves under the pointer. */
+/* Actions grow slightly with a springy settle, deepen in colour and gain a soft accent halo.
+   The box only ever grows under a hovering pointer and never shrinks on press, so an edge
+   click cannot slip off the button. */
 .button {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -207,64 +205,53 @@ summary:focus-visible {
   font-weight: 600;
   text-decoration: none;
   transition:
-    border-color var(--dur-fast) var(--ease),
-    box-shadow 320ms var(--ease),
-    color 240ms var(--ease);
-}
-.button::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: var(--accent-hover);
-  content: '';
-  transform: scaleY(0);
-  transform-origin: bottom center;
-  transition: transform 380ms var(--ease);
+    background-color 240ms var(--ease),
+    border-color 240ms var(--ease),
+    box-shadow 360ms var(--ease),
+    color 240ms var(--ease),
+    scale 460ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .button svg {
-  transition:
-    translate 320ms var(--ease),
-    scale 320ms var(--ease);
+  transition: translate 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .button--secondary {
   background-color: transparent;
   color: var(--accent);
 }
-.button--secondary::before {
-  background: var(--accent);
-}
 .button:focus-visible {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-.button:focus-visible::before,
-.button:active:not(:disabled)::before {
-  transform: scaleY(1);
-}
-.button--secondary:focus-visible,
-.button--secondary:active:not(:disabled) {
-  color: var(--on-accent);
+  scale: 1.04;
 }
 .button:active:not(:disabled) {
-  box-shadow: inset 0 2px 0 rgb(0 0 0 / 0.14);
+  background-color: color-mix(in srgb, var(--accent-hover) 85%, var(--text));
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.18);
+  transition-duration: 90ms;
+}
+.button--secondary:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 @media (hover: hover) and (pointer: fine) {
-  .button:hover:not(:disabled)::before {
-    transform: scaleY(1);
-  }
   .button:hover:not(:disabled) {
+    background-color: var(--accent-hover);
     box-shadow:
-      0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent),
-      0 14px 26px -16px var(--accent);
+      0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent),
+      0 16px 30px -16px var(--accent);
+    scale: 1.045;
   }
   .button--secondary:hover:not(:disabled) {
-    color: var(--on-accent);
+    border-color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
   }
   .button:hover:not(:disabled) svg {
-    translate: 0 -1px;
-    scale: 1.12;
+    translate: 3px 0;
   }
   .button:active:not(:disabled) {
-    box-shadow: inset 0 2px 0 rgb(0 0 0 / 0.14);
+    background-color: color-mix(in srgb, var(--accent-hover) 85%, var(--text));
+    box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.18);
+  }
+  .button--secondary:active:not(:disabled) {
+    background-color: color-mix(in srgb, var(--accent) 18%, transparent);
   }
 }
 .text-link {
@@ -450,6 +437,9 @@ html[data-preference-transition='theme']::view-transition-new(root) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .button:is(:hover, :focus-visible):not(:disabled) {
+    scale: none;
   }
   /* The universal selector does not reach this pseudo-element, so opening stays instant here. */
   .disclosure::details-content {
