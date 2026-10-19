@@ -92,3 +92,45 @@ test('network failures and aborted or timed-out requests reject without retrying
   await assert.rejects(sendEnquiry(endpoint, enquiry, new AbortController().signal), TypeError);
   assert.equal(network.mock.callCount(), 1);
 });
+
+test('submission works without the newer AbortSignal static methods', async (t) => {
+  const any = Object.getOwnPropertyDescriptor(AbortSignal, 'any');
+  const timeout = Object.getOwnPropertyDescriptor(AbortSignal, 'timeout');
+  assert.ok(any && timeout);
+  Object.defineProperty(AbortSignal, 'any', { ...any, value: undefined });
+  Object.defineProperty(AbortSignal, 'timeout', { ...timeout, value: undefined });
+  t.after(() => {
+    Object.defineProperty(AbortSignal, 'any', any);
+    Object.defineProperty(AbortSignal, 'timeout', timeout);
+  });
+  assert.equal(AbortSignal.any, undefined);
+  assert.equal(AbortSignal.timeout, undefined);
+  const fetch = t.mock.method(globalThis, 'fetch', async () => Response.json({ success: true }));
+  await sendEnquiry(endpoint, enquiry, new AbortController().signal);
+  assert.equal(fetch.mock.callCount(), 1);
+});
+
+test('response deadline is one minute and completed requests release their timer', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const signals: AbortSignal[] = [];
+  t.mock.method(globalThis, 'fetch', async (_url: RequestInfo | URL, options?: RequestInit) => {
+    const signal = options?.signal;
+    assert.ok(signal);
+    signals.push(signal);
+    if (signals.length === 1) return Response.json({ success: true });
+    return new Promise<Response>((_resolve, reject) => {
+      signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+    });
+  });
+  await sendEnquiry(endpoint, enquiry, new AbortController().signal);
+  t.mock.timers.tick(60_000);
+  assert.equal(signals[0].aborted, false);
+
+  const pending = sendEnquiry(endpoint, enquiry, new AbortController().signal);
+  const rejected = assert.rejects(pending, { name: 'TimeoutError' });
+  t.mock.timers.tick(59_999);
+  assert.equal(signals[1].aborted, false);
+  t.mock.timers.tick(1);
+  await rejected;
+  assert.equal(signals.length, 2);
+});

@@ -100,7 +100,7 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
         src={hero.image}
         alt={hero[`alt_${lang}`]}
         formats={['avif', 'webp']}
-        widths={[400, 720, 1000, hero.image.width].filter(
+        widths={[400, 720, 800, 1000, hero.image.width].filter(
           (width, index, all) => width <= hero.image.width && all.indexOf(width) === index,
         )}
         sizes="(min-width: 48rem) 50vw, 100vw"

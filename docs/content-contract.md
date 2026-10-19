@@ -188,6 +188,9 @@ languages submit the Czech subject “SKLOSERVIS-BROD: Nezávazná poptávka” 
 names `Jméno`, `email`, `Zpráva`; the standard `email` field preserves the provider's
 reply-to behavior. Interface labels stay localized. FormSubmit's own system text
 is outside this site's translation controls; no undocumented language flag is sent.
+The owner requested a one-minute response deadline on 2026-10-19. Requests retain
+navigation cancellation, never retry automatically and require explicit relay
+acceptance. A missing acknowledgment does not prove whether an email arrived.
 
 The owner confirmed on 2026-10-19 that Monday–Thursday visiting hours are
 08:00–11:30 and 12:30–15:00. The owner subsequently removed duplicate lunch notes;

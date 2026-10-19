@@ -158,11 +158,11 @@ const formatDate = (date: string) =>
         : row.slots.length
           ? current.isOpen
             ? cs
-              ? 'Právě je čas pro návštěvu podle rozpisu.'
-              : 'Currently within listed visiting hours.'
+              ? 'Právě je otevřeno.'
+              : 'We are open now.'
             : cs
-              ? 'Právě je mimo uvedené návštěvní hodiny.'
-              : 'Currently outside listed visiting hours.'
+              ? 'Právě je zavřeno.'
+              : 'We are closed now.'
           : note
             ? ''
             : cs
