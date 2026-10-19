@@ -20,6 +20,9 @@ const service = services.find((item) => item.slug === slug);
 if (!service) throw new Error(`Missing validated service: ${slug}`);
 const photos = gallery.filter((item) => item.category === slug);
 const hero = photos[0];
+// Match the contained photo, bounded by half the 1240px wrapper on desktop.
+const heroWidthRatio = hero ? Math.min(1, (hero.image.width / hero.image.height) * (3 / 4)) : 1;
+const heroDesktopSize = heroWidthRatio < 1 ? `${(620 * heroWidthRatio).toFixed(2)}px` : '37rem';
 const heroId = `service-photo-${slug}`;
 const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
 const labels = {
@@ -175,7 +178,7 @@ const related = services.filter((item) => item.slug !== slug);
               widths={[360, 600, 900, Math.min(1200, hero.image.width)].filter(
                 (width, index, all) => width <= hero.image.width && all.indexOf(width) === index,
               )}
-              sizes="(min-width: 70rem) 37rem, (min-width: 48rem) 46vw, 100vw"
+              sizes={`(min-width: 70rem) ${heroDesktopSize}, (min-width: 48rem) ${(46 * heroWidthRatio).toFixed(2)}vw, ${(100 * heroWidthRatio).toFixed(2)}vw`}
               loading="eager"
               fetchpriority="high"
               decoding="async"
