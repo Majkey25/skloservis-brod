@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: Publish the verified preview to GitHub Pages (main only)
+        description: Publish the verified artifact to GitHub Pages (main only)
         type: boolean
         default: false
 
@@ -26,6 +26,8 @@ jobs:
     name: Verify and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      target: ${{ steps.target.outputs.target }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -36,13 +38,26 @@ jobs:
       - run: npm run format:check
       - run: npm run check
       - run: npm test
+      # Preview unless this is main and the repository variable SITE_DEPLOY_TARGET is production.
+      - id: target
+        name: Select Pages target
+        run: node scripts/pages-target.ts
+        env:
+          SITE_DEPLOY_TARGET: ${{ vars.SITE_DEPLOY_TARGET }}
       - run: npm run build
+        env:
+          SITE_BUILD_TARGET: ${{ steps.target.outputs.target }}
+          SITE_DEPLOY_TARGET: ${{ vars.SITE_DEPLOY_TARGET }}
+      - name: Check the artifact's indexing state
+        run: node scripts/check-artifact.ts
+        env:
+          SITE_BUILD_TARGET: ${{ steps.target.outputs.target }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: dist
+          path: ${{ steps.target.outputs.out }}
 
   deploy:
-    name: Publish preview
+    name: Publish ${{ needs.verify.outputs.target }}
     if: >-
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish))

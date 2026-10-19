@@ -13,7 +13,96 @@ export function deployment(target: string = 'preview') {
     target,
     site: target === 'production' ? PRODUCTION_ORIGIN : 'https://majkey25.github.io',
     base: target === 'production' ? '/' : '/skloservis-brod/',
+    outDir: target === 'production' ? '.reference/build-production' : 'dist',
   } as const;
+}
+
+/**
+ * The Pages target of one workflow run. The repository variable SITE_DEPLOY_TARGET (unset means
+ * preview) applies only to pushes and manual runs on main; pull requests and other branches always
+ * build the noindex preview. Any other value fails, so a typo can never publish by accident.
+ */
+export function workflowTarget(event: string, ref: string, configured = ''): BuildTarget {
+  const value = configured || 'preview';
+  if (value !== 'preview' && value !== 'production') {
+    throw new TypeError(`SITE_DEPLOY_TARGET must be preview or production, not "${configured}"`);
+  }
+  const main = ref === 'refs/heads/main' && (event === 'push' || event === 'workflow_dispatch');
+  return main ? value : 'preview';
+}
+
+/** One attribute value of an HTML tag, double, single or unquoted. */
+function attribute(tag: string, name: string): string | undefined {
+  const match = new RegExp(
+    String.raw`\s${name}\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))`,
+    'i',
+  ).exec(tag);
+  return match ? (match[1] ?? match[2] ?? match[3]) : undefined;
+}
+
+/** True when any robots meta tag carries noindex or none, in any order, case or quoting. */
+function blocksIndexing(html: string): boolean {
+  return [...html.matchAll(/<meta\b[^>]*>/gi)].some(
+    ([tag]) =>
+      attribute(tag, 'name')?.trim().toLowerCase() === 'robots' &&
+      (attribute(tag, 'content') ?? '')
+        .split(',')
+        .some((token) => ['noindex', 'none'].includes(token.trim().toLowerCase())),
+  );
+}
+
+/** Problems that must stop an artifact from being published as the selected target. */
+export function artifactProblems(
+  target: BuildTarget,
+  pages: readonly { path: string; html: string }[],
+  robots: string,
+  sitemap: string,
+): string[] {
+  const problems: string[] = [];
+  // Each route's built file, e.g. '/kontakt/' -> 'kontakt/index.html', and its own canonical.
+  const canonicals = new Map(
+    ROUTES.flatMap(({ cs, en }) => [cs, en]).map((path) => [
+      `${path.slice(1)}index.html`,
+      new URL(path, PRODUCTION_ORIGIN).href,
+    ]),
+  );
+  const expected = new Set([...canonicals.keys(), '404.html']);
+  const found = new Set(pages.map(({ path }) => path));
+  for (const path of expected) if (!found.has(path)) problems.push(`${path}: page is missing`);
+  for (const path of found) if (!expected.has(path)) problems.push(`${path}: unexpected page`);
+  for (const { path, html } of pages) {
+    const noindex = blocksIndexing(html);
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    if (target === 'preview') {
+      if (!noindex) problems.push(`${path}: preview page is missing noindex`);
+      if (canonical) problems.push(`${path}: preview page must not declare a canonical URL`);
+      continue;
+    }
+    const own = canonicals.get(path);
+    if (!own) {
+      if (!noindex) problems.push(`${path}: a page without a route must stay noindex`);
+    } else {
+      if (noindex) problems.push(`${path}: production page is marked noindex`);
+      if (canonical !== own) problems.push(`${path}: production canonical must be ${own}`);
+    }
+    if (
+      /["'(]\/skloservis-brod\//.test(html) ||
+      html.includes('majkey25.github.io/skloservis-brod')
+    ) {
+      problems.push(`${path}: production page still points at the preview path or host`);
+    }
+  }
+  const sitemapLine = `Sitemap: ${PRODUCTION_ORIGIN}/sitemap.xml`;
+  if (target === 'production') {
+    if (!robots.includes(sitemapLine)) problems.push(`robots.txt must list ${sitemapLine}`);
+    const urls = sitemap.match(/<loc>/g)?.length ?? 0;
+    if (urls !== ROUTES.length * 2) {
+      problems.push(`sitemap.xml must list ${ROUTES.length * 2} pages, found ${urls}`);
+    }
+  } else if (robots.includes('Sitemap:')) {
+    problems.push('Preview robots.txt must not advertise a sitemap');
+  }
+  return problems;
 }
 
 /** Fail closed on host/base overrides rather than silently publish conflicting SEO claims. */
@@ -131,9 +220,54 @@ export function robotsText(context: SeoContext): string {
   return `User-agent: *\nAllow: /\n${context.target === 'production' ? `\nSitemap: ${context.site}/sitemap.xml\n` : ''}`;
 }
 
-export function sitemapXml(context: SeoContext): string {
-  const urls = context.target === 'production' ? ROUTES.flatMap(({ cs, en }) => [cs, en]) : [];
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((path) => `<url><loc>${new URL(path, context.site).href}</loc></url>`).join('')}</urlset>\n`;
+function xmlText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/** Use the original image links already rendered by Gallery and ServiceDetail. */
+export function sitemapXml(
+  context: SeoContext,
+  gallery: readonly Pick<GalleryItem, 'category' | 'image'>[] = [],
+): string {
+  const urls =
+    context.target === 'production'
+      ? ROUTES.flatMap(({ id, cs, en }) => {
+          const images = [
+            ...new Set(
+              gallery
+                .filter((photo) => id === 'gallery' || photo.category === id)
+                .map(({ image }) => {
+                  const url = new URL(image.src, context.site);
+                  if (
+                    url.origin !== context.site ||
+                    !url.pathname.startsWith('/_astro/') ||
+                    url.username ||
+                    url.password ||
+                    url.search ||
+                    url.hash
+                  ) {
+                    throw new TypeError('Sitemap images must use built local /_astro/ URLs');
+                  }
+                  return url.href;
+                }),
+            ),
+          ];
+          if (images.length > 1000) throw new RangeError('Sitemap allows 1000 images per page');
+          const imageTags = images
+            .map((url) => `<image:image><image:loc>${xmlText(url)}</image:loc></image:image>`)
+            .join('');
+          return [cs, en].map(
+            (path) =>
+              `<url><loc>${xmlText(new URL(path, context.site).href)}</loc>${imageTags}</url>`,
+          );
+        })
+      : [];
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${urls.join('')}</urlset>\n`;
 }
 
 const SCHEMA_DAYS = {
@@ -150,7 +284,7 @@ const SCHEMA_DAYS = {
 export function localBusiness(
   context: SeoContext,
   settings: Pick<Settings, 'name' | 'contact_email'>,
-  contact: Pick<Contact, 'phone' | 'address' | 'company_id'>,
+  contact: Pick<Contact, 'phone' | 'address' | 'company_id' | 'facebook_url'>,
   hours: Hours,
 ) {
   if (context.target !== 'production') return undefined;
@@ -178,6 +312,7 @@ export function localBusiness(
     telephone: contact.phone,
     email: settings.contact_email,
     identifier: contact.company_id,
+    ...(contact.facebook_url ? { sameAs: [contact.facebook_url] } : {}),
     address: {
       '@type': 'PostalAddress',
       streetAddress: contact.address.street,

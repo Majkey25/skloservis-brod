@@ -9,7 +9,7 @@ Pro náhled máme repozitář, statický Astro web, české a anglické adresy, 
 Před skutečným přechodem ještě potřebujeme:
 
 - Ověřený přístup správce k doméně a aktivní DNS zóně. Ten nebyl testován. Administrátorský přístup k repozitáři na GitHubu byl pouze čtením potvrzen; není to přístup k DNS.
-- Pro požadovaný GitHub Pages ověřit vhodnost podle podmínek služby, připravit produkční workflow, vlastní doménu, HTTPS, skutečné 404 a řešení starých aliasů. Přístup SFTP k nynějšímu hostingu není potřeba k publikování na Pages, může však být potřeba pro zálohu a návrat WordPressu.
+- Pro požadovaný GitHub Pages ověřit vhodnost podle podmínek služby, dokončit ověření připraveného produkčního režimu workflow, vlastní doménu, HTTPS, skutečné 404 a řešení starých aliasů. Přístup SFTP k nynějšímu hostingu není potřeba k publikování na Pages, může však být potřeba pro zálohu a návrat WordPressu.
 - Zálohu souborů a databáze WordPressu, kompletní export DNS a ověřený způsob návratu. Při tomto běhu se záloha ani obnova produkce neprovádí.
 - Ověřit přístupy a nasazování pro vybraný produkční cíl. Na současném náhledu byl 18. října 2026 úspěšně ověřen celý průchod Pages CMS: uložení → commit → zelené CI → zveřejněný český i anglický text galerie. [Ověřený běh](https://github.com/Majkey25/skloservis-brod/actions/runs/39081477798) se týká GitHub Pages, nikoli dosud nenastaveného produkčního hostingu.
 - Před přechodem na jiný host znovu ověřit funkčnost formuláře. FormSubmit používá potvrzenou schránku `skloservis.brod@gmail.com`; majitel potvrdil aktivaci a 18. října 2026 také přijetí jediného povoleného testu. Klient při tomto pokusu nedostal do 15 sekund odpověď relaye, přesto zpráva dorazila. Další test vyžaduje nové povolení. Potvrzení relé ani `mailto:` samy neprokazují doručení. Prověřit také podmínky poskytovatele popsané v právních poznámkách.
@@ -22,6 +22,15 @@ Před skutečným přechodem ještě potřebujeme:
 Produkci publikovat na samostatném ověřeném cíli, případně na současném hostingu, pokud podporuje uvedené požadavky. Astro vytvoří HTML, CSS, JavaScript a obrázky; na serveru nepotřebuje běžící Node.js ani „Astro backend“. Náhled na adrese Majkey25 tak může dál zůstat nezávislý a s `noindex`.
 
 ### 1. Připravit přístupy, zálohu a návrat
+
+Produkční návrat na GitHub Pages musí zachovat produkční cíl a vlastní doménu.
+Při vadném novém vydání se znovu publikuje ověřený produkční commit nebo jeho
+ověřený artefakt. Přepnutí `SITE_DEPLOY_TARGET` na `preview` či smazání proměnné
+není návrat produkce: vytvořilo by `noindex` a prefix `/skloservis-brod/` na vlastní
+doméně. Pokud je nutný návrat na původní WordPress, obnoví se předem zaznamenané
+webové DNS a související nastavení Pages. Poštovní záznamy zůstávají beze změny.
+Před přechodem musí být zapsané konkrétní funkční SHA, artefakt, DNS a ověřený
+postup obnovy; samotná existence dokumentu není ověřená záloha.
 
 Správce hostingu nejprve zjistí skutečný dokumentový kořen a způsob přepnutí webu. Připraví oddělené místo pro novou verzi a zálohu WordPressu včetně databáze. Stávající instalaci nemaže ani nepřepisuje. Ověří obnovu mimo živý web a zaznamená přesný postup návratu, odpovědnou osobu a poslední funkční verzi.
 
@@ -60,7 +69,31 @@ SITE_BUILD_TARGET=production npm run preview -- --host 127.0.0.1 --port 4322
 
 Produkční výstup je v ignorované `.reference/build-production/`, adresa je `https://www.skloservis-brod.cz` a základní cesta `/`. Do cílového webového kořene patří **obsah tohoto výstupu**, nikoli zdrojové soubory, `.git`, `node_modules`, přístupy nebo celá `.reference/`.
 
-Současný GitHub Actions workflow produkční režim úmyslně odmítá. Pozdější automatické nasazování na produkční hosting potřebuje samostatně schválenou úpravu workflow, oddělený cíl a zabezpečené přihlašovací údaje. Nenastavovat globální produkční proměnnou v repozitáři a neměnit dnešní Pages job na produkční.
+Připravený GitHub Actions workflow standardně sestavuje náhled. Produkční režim povoluje pouze pro push nebo ruční běh na `main`, pokud je repozitářová proměnná `SITE_DEPLOY_TARGET=production`. Pull requesty vždy sestavují náhled. Před nahráním kontroluje artefakt vybraného cíle. Aktivace produkční proměnné je součástí samostatně povoleného přechodu domény; před tímto okamžikem ji nenastavovat. Nový režim musí být před přechodem také publikovaný a ověřený vzdáleným CI, nestačí lokální zdroj.
+
+Volbou je repozitářová proměnná Actions `SITE_DEPLOY_TARGET`. Nyní není nastavená, takže web zůstává náhledem:
+
+| `SITE_DEPLOY_TARGET`            | Push nebo ruční běh na `main`                                                   | Pull request, jiná větev |
+| ------------------------------- | ------------------------------------------------------------------------------- | ------------------------ |
+| nenastavená, prázdná, `preview` | náhled s `noindex` z `dist/`                                                    | náhled, nepublikuje se   |
+| `production`                    | `https://www.skloservis-brod.cz` s kořenem `/` z `.reference/build-production/` | náhled, nepublikuje se   |
+| jiná hodnota                    | běh selže před sestavením                                                       | běh selže                |
+
+Ruční běh publikuje jen s volbou `publish`. Název publikačního jobu ukazuje cíl, `Publish preview` nebo `Publish production`. Nahrává se jen obsah vybraného výstupu, ne zbytek `.reference/`. Aktivace v povoleném okně přechodu:
+
+```sh
+gh variable set SITE_DEPLOY_TARGET --body production -R Majkey25/skloservis-brod
+gh workflow run site.yml -R Majkey25/skloservis-brod --ref main -f publish=true
+```
+
+Dokud není připojená vlastní doména, návrat k náhledu je:
+
+```sh
+gh variable delete SITE_DEPLOY_TARGET -R Majkey25/skloservis-brod
+gh workflow run site.yml -R Majkey25/skloservis-brod --ref main -f publish=true
+```
+
+Po připojení domény platí návrat z kroku 1. Proměnná zůstává `production` a znovu se spustí poslední ověřený produkční běh: `gh run rerun <ID běhu> -R Majkey25/skloservis-brod`. GitHub při opakování použije stejný commit a ref, a to [nejvýše 30 dní po původním běhu](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs). Jinak vadnou změnu vrátí nový commit na `main`.
 
 ### 4. Ověřit artefakt před přepnutím
 
@@ -100,7 +133,7 @@ Majitel tuto variantu požaduje, dosud není nastavená ani provedená. Dne 18. 
 - **Správa domény a DNS:** kdo má přístup k aktivní DNS zóně a u jakého poskytovatele. Veřejné NS `ns.grdns.cz` a `ns.grdns.it` samy neprokazují registrátora ani oprávnění. Správce musí umět přidat ověřovací TXT a později upravit webové A/CNAME, případně konfliktní AAAA a CAA. Nezveřejňovat přístupová hesla.
 - **Úplný export DNS:** všechny webové i poštovní záznamy včetně SPF, DKIM a DMARC. Současné MX směřují na `mx1.savana.cz` a `mx2.savana.cz`; přesun webu nevyžaduje jejich změnu ani rušení poštovní služby.
 - **Záloha a návrat:** soubory a databáze WordPressu, původní DNS a ověřená obnova. Není potřeba WordPress nejprve smazat. Starý server musí zůstat dostupný pro případ návratu.
-- **GitHub:** administrátorský přístup k `Majkey25/skloservis-brod` byl přes API potvrzen. To neověřuje přístup k doméně. Budoucí produkční workflow je nutné připravit a samostatně schválit; současný job záměrně publikuje jen náhled a produkční cíl odmítá.
+- **GitHub:** administrátorský přístup k `Majkey25/skloservis-brod` byl přes API potvrzen. To neověřuje přístup k doméně. Připravený workflow má výslovnou produkční volbu popsanou výše; výchozí náhled není neobejitelný zákaz produkce. Před aktivací je nutné ověřit publikovaný commit, vzdálené CI a samostatné povolení přechodu.
 - **Vyhledávače:** přístup ke stávajícím Search Console a Seznam Webmaster, export nejnavštěvovanějších stránek a odkazů, zachování existujícího ověření. Nevytvářet duplicitní firemní profily.
 - **Staré adresy:** porovnat 14 současných cest ze sitemap s historickými adresami, `?page_id=…`, starými sitemap a `/wp-content/uploads/…`. Některé existující odkazy vedou přímo na `/galerie/`. Zachovat významné adresy médií nebo předem rozhodnout o jejich náhradě. Nepublikovat vyřazené osobní či portrétní fotografie jen kvůli zachování staré adresy.
 
@@ -110,13 +143,13 @@ Připojení vlastní domény ke **stejnému** Pages webu by změnilo také chov�
 
 Po samostatném schválení této varianty:
 
-1. Připravit oddělené produkční publikování a ověřený artefakt. Dnešní workflow je pouze pro náhled.
+1. Ověřit produkční režim připraveného workflow a konkrétní artefakt. Výchozí cíl zůstává náhled, produkce vyžaduje výslovnou proměnnou a povolený běh na `main`.
 2. V nastavení účtu Majkey25 → Pages ověřit doménu pomocí GitHubem vygenerovaného TXT. Hodnotu nevymýšlet; TXT ponechat. Viz [ověření domény](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages).
 3. Před směrováním DNS nastavit u cílového repozitáře Settings → Pages → Custom domain na `www.skloservis-brod.cz`.
 4. `www` CNAME nasměrovat přímo na `Majkey25.github.io`, bez jména repozitáře. Pro hlavní doménu současný oficiální návod uvádí čtyři A záznamy `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`, případně podporované ALIAS/ANAME. Před akcí hodnoty znovu ověřit. Odstranit pouze konfliktní webové záznamy a zkontrolovat případné AAAA. Nepoužívat wildcard. Poštovní záznamy zachovat.
 5. Po úspěšné DNS a certifikátové kontrole zapnout Enforce HTTPS, otestovat apex → `www` a všechny cesty. U Actions publikování se soubor CNAME nepoužívá jako nastavení domény.
 
-6. V předem schváleném okamžiku publikovat ověřený produkční artefakt s kořenem `/`, indexovatelnými známými stránkami a canonical na `https://www.skloservis-brod.cz`. Dnešní náhledový artefakt má prefix repozitáře a `noindex`, proto jej nelze pouze připojit k nové doméně. Připravit automatické produkční nasazování obsahových CMS commitů se stejnými kontrolami; neobcházet validaci.
+6. V předem schváleném okamžiku publikovat ověřený produkční artefakt s kořenem `/`, indexovatelnými známými stránkami a canonical na `https://www.skloservis-brod.cz`. Dnešní náhledový artefakt má prefix repozitáře a `noindex`, proto jej nelze pouze připojit k nové doméně. Publikuje se nastavením `SITE_DEPLOY_TARGET=production` a ručním během popsaným výše. Každý další push na `main`, včetně CMS commitů, pak publikuje produkci se stejnými kontrolami.
 7. Po přechodu ověřit HTTPS, hlavní doménu i `www`, všechna historická URL, skutečné 404, média, metadata, sitemap, kontakty a CMS nasazování. Odeslat skutečnou produkční sitemap přes stávající účty vyhledávačů, sledovat chyby a návštěvnost a ponechat připravený návrat. Nový skutečný testovací e-mail vyžaduje další výslovné povolení.
 
 Přesné DNS hodnoty a pořadí znovu ověřit v [aktuálním návodu GitHubu](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site). Tento dokument nic nenastavuje a neopravňuje provést přepnutí nyní.

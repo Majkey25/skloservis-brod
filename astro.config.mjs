@@ -1,11 +1,21 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import { deployment, seoContext } from './src/lib/seo.ts';
+import { deployment, seoContext, workflowTarget } from './src/lib/seo.ts';
 
 const target = deployment(process.env.SITE_BUILD_TARGET);
-if (target.target === 'production' && process.env.GITHUB_ACTIONS === 'true') {
+// In Actions a production build also needs the run itself to qualify: main, push or manual run,
+// and the repository variable SITE_DEPLOY_TARGET=production. Pull requests always fail here.
+if (
+  target.target === 'production' &&
+  process.env.GITHUB_ACTIONS === 'true' &&
+  workflowTarget(
+    process.env.GITHUB_EVENT_NAME ?? '',
+    process.env.GITHUB_REF ?? '',
+    process.env.SITE_DEPLOY_TARGET,
+  ) !== 'production'
+) {
   throw new Error(
-    'GitHub Actions publishes previews only; production builds are local preparation',
+    'GitHub Actions builds production only on main with SITE_DEPLOY_TARGET=production',
   );
 }
 
@@ -13,7 +23,7 @@ export default defineConfig({
   site: target.site,
   base: target.base,
   output: 'static',
-  outDir: target.target === 'production' ? './.reference/build-production/' : './dist/',
+  outDir: `./${target.outDir}/`,
   trailingSlash: 'always',
   compressHTML: true,
   build: { inlineStylesheets: 'always' },
