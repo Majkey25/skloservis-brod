@@ -1,5 +1,5 @@
 import { PRODUCTION_ORIGIN, ROUTES, SERVICE_ROUTES, pageUrl, type Language } from './urls.ts';
-import type { Contact, GalleryItem, Service, Settings } from '../content.ts';
+import type { About, Contact, GalleryItem, Service, Settings } from '../content.ts';
 import type { Hours } from './schedule.ts';
 
 export type BuildTarget = 'preview' | 'production';
@@ -169,7 +169,7 @@ export function pageSeo(context: SeoContext, pathname: string, lang: Language) {
           { lang: 'x-default', href: new URL(route.cs, context.site).href },
         ]
       : [],
-    business: indexable && route.id === 'contact',
+    business: indexable && (route.id === 'home' || route.id === 'contact'),
     website: indexable && route.id === 'home' && lang === 'cs',
   };
 }
@@ -275,6 +275,33 @@ export function socialPreview(
   };
 }
 
+/** Prefer a real, visible photograph for search; keep branded social artwork separate. */
+export function primaryImage(
+  context: SeoContext,
+  pathname: string,
+  lang: Language,
+  gallery: Parameters<typeof socialPhoto>[3],
+) {
+  const route = pageRoute(context, pathname, lang);
+  if (
+    context.target !== 'production' ||
+    !route ||
+    (route.id !== 'gallery' && !Object.hasOwn(SERVICE_ROUTES, route.id))
+  )
+    return undefined;
+  const photo = socialPhoto(context, pathname, lang, gallery);
+  if (!photo) return undefined;
+  const image = new URL(photo.image.src, context.site);
+  if (image.origin !== context.site || !image.pathname.startsWith('/_astro/'))
+    throw new TypeError('Search images must use built local /_astro/ URLs');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    url: new URL(route[lang], context.site).href,
+    primaryImageOfPage: image.href,
+  };
+}
+
 export function robotsText(context: SeoContext): string {
   return `User-agent: *\nAllow: /\n${context.target === 'production' ? `\nSitemap: ${context.site}/sitemap.xml\n` : ''}`;
 }
@@ -345,6 +372,8 @@ export function localBusiness(
   settings: Pick<Settings, 'name' | 'contact_email'>,
   contact: Pick<Contact, 'phone' | 'address' | 'company_id' | 'facebook_url'>,
   hours: Hours,
+  profiles?: Pick<About, 'reputation' | 'google_reputation'>,
+  logo?: string,
 ) {
   if (context.target !== 'production') return undefined;
   // Dated exceptions and movable holidays cannot be represented as year-round weekly hours.
@@ -362,6 +391,11 @@ export function localBusiness(
               closes: slot.closes,
             })),
           );
+  const sameAs = [
+    contact.facebook_url,
+    profiles?.reputation?.url,
+    profiles?.google_reputation?.url,
+  ].filter((url): url is string => !!url);
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
@@ -371,7 +405,8 @@ export function localBusiness(
     telephone: contact.phone,
     email: settings.contact_email,
     identifier: contact.company_id,
-    ...(contact.facebook_url ? { sameAs: [contact.facebook_url] } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+    ...(logo ? { logo: new URL(logo, context.site).href } : {}),
     address: {
       '@type': 'PostalAddress',
       streetAddress: contact.address.street,
@@ -389,6 +424,7 @@ export function jsonLd(
     | ReturnType<typeof localBusiness>
     | ReturnType<typeof serviceBreadcrumbs>
     | ReturnType<typeof website>
+    | ReturnType<typeof primaryImage>
   >,
 ): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');

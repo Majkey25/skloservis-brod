@@ -190,14 +190,17 @@ function initializeMotion() {
     { rootMargin: '0px 0px -6% 0px' },
   );
 
-  const elements = document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR);
-  for (const element of Array.from(elements).slice(0, 80)) {
-    // Leave the initial viewport and restored scroll position fully visible.
-    if (revealed.has(element)) continue;
-    if (element.getBoundingClientRect().top < window.innerHeight) {
+  // Read all positions before paused animations change styles and invalidate the next read.
+  const elements = Array.from(document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR))
+    .slice(0, 80)
+    .filter((element) => {
+      // Leave the initial viewport and restored scroll position fully visible.
+      if (revealed.has(element)) return false;
+      if (element.getBoundingClientRect().top >= window.innerHeight) return true;
       revealed.add(element);
-      continue;
-    }
+      return false;
+    });
+  for (const element of elements) {
     const reveal = prepare(element);
     if (!reveal) continue;
     prepared.set(element, reveal);

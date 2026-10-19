@@ -398,8 +398,8 @@ test('production pairs have absolute self canonicals and reciprocal cs/en/x-defa
       { lang: 'en', href: en.canonical },
       { lang: 'x-default', href: cs.canonical },
     ]);
-    assert.equal(cs.business, route.id === 'contact');
-    assert.equal(en.business, route.id === 'contact');
+    assert.equal(cs.business, route.id === 'home' || route.id === 'contact');
+    assert.equal(en.business, route.id === 'home' || route.id === 'contact');
     assert.equal(cs.website, route.id === 'home');
     assert.equal(en.website, false);
   }
@@ -610,6 +610,33 @@ test('holiday closures never become year-round opening claims in business schema
   );
 });
 
+test('business identity reuses visible validated profiles and logo without publishing ratings', () => {
+  const schema = schemas.about.pick({ reputation: true, google_reputation: true });
+  const profiles = schema.parse({
+    reputation: {
+      source: 'Firmy.cz',
+      url: 'https://www.firmy.cz/detail/13749142-example.html',
+      rating: 5,
+      count: 4,
+      verified_on: '2030-01-01',
+    },
+    google_reputation: {
+      url: 'https://www.google.com/maps?cid=123456',
+      rating: 4.5,
+      count: 20,
+      verified_on: '2030-01-01',
+    },
+  });
+  const logo = '/_astro/logo.png';
+  const business = localBusiness(production, settings, contact, hours, profiles, logo)!;
+  assert.deepEqual(business.sameAs, [profiles.reputation!.url, profiles.google_reputation!.url]);
+  assert.equal(business.logo, `${production.site}${logo}`);
+  assert.doesNotMatch(jsonLd(business), /aggregateRating|review|verified_on|count/);
+  const cleared = schema.parse({ reputation: {}, google_reputation: {} });
+  assert.equal(localBusiness(production, settings, contact, hours, cleared)?.sameAs, undefined);
+  assert.equal(localBusiness(preview, settings, contact, hours, profiles, logo), undefined);
+});
+
 test('legal pages and unknown URLs describe their own content instead of the homepage', () => {
   assert.equal(typeof seo.defaultDescription, 'function');
   for (const context of [preview, production]) {
@@ -751,6 +778,52 @@ test('social photographs belong to the actual localized page and never substitut
   assert.equal(seo.socialPhoto(preview, '/sklenene-dvere/', 'cs', gallery), undefined);
   assert.equal(seo.socialPhoto(production, '/en/glass-doors/', 'cs', gallery), undefined);
   assert.equal(seo.socialPhoto(production, '/kontakt/', 'cs', gallery), undefined);
+});
+
+test('search image metadata uses only visible product/gallery photos on indexable language URLs', () => {
+  assert.equal(typeof seo.primaryImage, 'function');
+  const photo = {
+    category: 'sklenene-dvere' as const,
+    image: { src: '/_astro/doors.jpg', width: 1200, height: 800, format: 'jpg' as const },
+    alt_cs: 'Skleněné dveře',
+    alt_en: 'Glass doors',
+  };
+  for (const [lang, paths] of [
+    ['cs', ['/sklenene-dvere/', '/galerie/']],
+    ['en', ['/en/glass-doors/', '/en/gallery/']],
+  ] as const) {
+    for (const path of paths) {
+      assert.deepEqual(seo.primaryImage(production, path, lang, [photo]), {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        url: `${production.site}${path}`,
+        primaryImageOfPage: `${production.site}/_astro/doors.jpg`,
+      });
+      assert.equal(seo.primaryImage(production, path, lang, []), undefined);
+      assert.equal(seo.primaryImage(preview, `/skloservis-brod${path}`, lang, [photo]), undefined);
+    }
+  }
+  for (const path of [
+    '/',
+    '/produkty/',
+    '/sluzby/',
+    '/kontakt/',
+    '/ochrana-osobnich-udaju/',
+    '/404.html',
+    '/unknown/',
+    '/en/glass-doors/',
+    '/sklenene-zabradli/',
+    '/sklenene-nahrobni-desky/',
+  ]) {
+    assert.equal(seo.primaryImage(production, path, 'cs', [photo]), undefined);
+  }
+  assert.throws(
+    () =>
+      seo.primaryImage(production, '/sklenene-dvere/', 'cs', [
+        { ...photo, image: { ...photo.image, src: 'https://example.com/doors.jpg' } },
+      ]),
+    /built local/,
+  );
 });
 
 test('branded social previews share a JPEG across languages and respect the deployment base', () => {

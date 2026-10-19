@@ -25,7 +25,6 @@ const labels = {
     enquiry: 'Nezávazná poptávka',
     gallery: 'Prohlédnout realizace',
     groups: 'Co pro vás vyrobíme',
-    offer: 'Zobrazit nabídku',
     steps: ['Návrh', 'Zaměření', 'Výroba', 'Montáž'],
   },
   en: {
@@ -33,7 +32,6 @@ const labels = {
     enquiry: 'Project enquiry',
     gallery: 'View our work',
     groups: 'What we make for you',
-    offer: 'See the offer',
     steps: ['Planning', 'Measuring', 'Manufacture', 'Installation'],
   },
 }[lang];
@@ -84,9 +82,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
           <h3>{group[`title_${lang}`]}</h3>
           <p class="services-group__summary">{group[`summary_${lang}`]}</p>
           <p>{group[`text_${lang}`]}</p>
-          <a class="text-link services-group__link" href={url(group.link)}>
-            {labels.offer} <Icon name="arrow-right" />
-          </a>
+          {group.link !== 'services' && (
+            <a class="text-link services-group__link" href={url(group.link)}>
+              {services.find((service) => service.slug === group.link)?.[`title_${lang}`]}
+              <Icon name="arrow-right" />
+            </a>
+          )}
         </article>
       ))}
     </div>

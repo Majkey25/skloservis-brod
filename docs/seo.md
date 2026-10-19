@@ -3,7 +3,7 @@
 Web od 19. října 2026 běží na GitHub Pages na vlastní doméně
 `https://www.skloservis-brod.cz/` s vynuceným HTTPS. Produkční nasazení prošlo kontrolami
 artefaktu a živých adres; samotné nasazení není dokladem indexace ani pořadí ve vyhledávání.
-Níže uvedené zdroje byly zkontrolovány 18. října 2026. Postup produkčního sestavení
+Níže uvedené zdroje byly zkontrolovány 18.–19. října 2026. Postup produkčního sestavení
 a obnovy popisuje [dokumentace nasazení](nasazeni.md).
 
 ## Adresy, obsah a indexace
@@ -81,6 +81,14 @@ Viditelné obrázky nadále používají lokální responzivní varianty, rozmě
 alternativní texty. Text má popisovat fotografii, ne opakovat klíčová slova nebo
 neověřené místo realizace; viz [doporučení Google pro obrázky](https://developers.google.com/search/docs/appearance/google-images).
 
+Produkční galerie a detaily výrobků s fotografiemi navíc vydávají `WebPage`
+s `primaryImageOfPage`: původní fotografii viditelnou v galerii dané stránky,
+bez přidaného loga či textu. Výběr používá tutéž ověřenou kategorii a přednostní
+snímek jako sociální kompozice, kterou nemění. Bez fotografie, v náhledu,
+na neznámé nebo jazykově nesouladné adrese se značení nevydává. Jde o
+[Googlem podporovanou preferenci obrázku](https://developers.google.com/search/docs/appearance/google-images#preferred-image),
+nikoli příslib jeho zobrazení nebo lepší pozice.
+
 Produkční sitemap přidává `image:image` a `image:loc` podle
 [dokumentace Google](https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps).
 Obě jazykové galerie uvádějí všechny fotografie, nyní 139. Produktové stránky uvádějí
@@ -131,6 +139,16 @@ podpora rozšíření Google z těchto zdrojů není doložena. Není slíbená 
 
 ## Jazyk a ověření
 
+Odkazy ze skupin služeb používají názvy cílových stránek z CMS; odkaz na stránku
+služeb na ní samotné se neopakuje. Popisný text pomáhá návštěvníkovi i robotovi
+[rozpoznat cíl odkazu](https://developers.google.com/search/docs/crawling-indexing/links-crawlable).
+
+Astro používá `build.inlineStylesheets: 'auto'`: větší styly vydá jako místní
+soubory, které může prohlížeč znovu použít mezi stránkami. Malé styly ponechá v HTML;
+viz [konfigurace Astro](https://docs.astro.build/en/reference/configuration-reference/#buildinlinestylesheets).
+Nejde o odložené načítání stylů. Před nasazením změny se porovnává první zobrazení,
+přenos při procházení a výsledný vzhled; laboratorní skóre není měřením pořadí.
+
 Ruční volba jazyka a motivu i výchozí nastavení zařízení zůstávají beze změny.
 Pouze náhled může při čerstvé návštěvě české homepage bez parametrů, fragmentu
 a interního referreru přejít podle jazyka zařízení či uložené angličtiny na `/en/`.
@@ -143,6 +161,10 @@ skutečný úvodní skript pro oba cíle, zařízení, uložené volby a zakáza
 produkční nasazení vyžaduje také kontrolu výsledného HTML a prohlížeče.
 
 ## Užitečné podrobnosti výrobků
+
+Český titul homepage uvádí obor, město, sklo na míru a značku. Změna doplňuje
+skutečnou nabídku, nesleduje pevný počet znaků. Vyhledávač může titulek přepsat;
+[Google doporučuje výstižný text bez zbytečného opakování](https://developers.google.com/search/docs/appearance/title-link).
 
 Krátké shrnutí výrobku doplňují volitelné dvojjazyčné oddíly `details` v CMS.
 Obsahují doložené možnosti skel, kování a uchycení převzaté z původních firemních
@@ -175,3 +197,43 @@ podmínkou samotné indexace, ale místní test je nenahrazuje. Správa Google B
 Firmy.cz, sjednocení jejich kontaktů a provozních hodin i měření hledaných dotazů
 zůstávají samostatné úkoly s přístupem k účtům. Účty ani profily tato změna neupravuje.
 Bez měření po nasazení nelze tvrdit růst návštěvnosti nebo lepší pořadí.
+
+## AI vyhledávání a GEO
+
+Google popisuje query fan-out jako souběžné hledání souvisejících dotazů. Základem
+zůstává dostupné, indexovatelné a užitečné HTML. Parametry výrobku proto patří
+k danému výrobku a správnému nadpisu; nevytváříme hromadné stránky pro domnělé
+dotazy. Strukturovaná firemní identita na úvodu a kontaktu používá stejné `@id`,
+ověřené veřejné profily a skutečné logo. Nepřidáváme vlastní hodnocení do schema.
+
+`/llms.txt` je volitelný dvojjazyčný rozcestník generovaný ze stejného ověřeného
+obsahu a adres. Náhled používá vlastní základní cestu a výslovně uvádí svůj stav.
+Neobsahuje skryté pokyny pro modely. Google tento soubor k vyhledávání nevyužívá;
+nenahrazuje robots, sitemap ani obsah a jeho vliv na jiné služby není změřený.
+Viz [aktuální průvodce Google pro AI vyhledávání](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide).
+
+Přístupnost odkazů, formuláře, filtrů a čitelný text pomáhají návštěvníkům i
+prohlížečovým agentům. Výsledek ověřujeme v prohlížeči; nevydáváme syntetické
+odpovědi modelů za skutečné citace ve vyhledávání.
+
+## Doporučení automatických auditů
+
+Kontrola musí odlišit chybějící funkci od volitelného marketingového nástroje.
+Dekorativní logo vedle názvu, pozadí a prázdný obrázek zavřeného prohlížeče mají
+záměrně prázdné `alt`; obsahové fotografie mají věcný přeložený popis. Skryté
+oznámení není aktivní nadpis stránky. Viditelná hierarchie zachovává jeden H1
+a oddíly H2/H3. Samotný počet slov není měřítkem užitečnosti.
+
+Větší styly jsou místní opakovaně použitelné soubory. U inline SVG, kritického
+bootstrapu a animovaných hodnot není odstranění každého inline zápisu cílem.
+Cache-Control určuje GitHub Pages; fiktivní `.htaccess` ani `_headers` by jej
+nezměnily. Měření a Meta Pixel nejsou podmínkou pořadí; na tomto webu se nepoužívají.
+Veřejný e-mail zůstává dostupným kontaktem; obrázek místo něj
+by zhoršil kopírování a přístupnost bez prokázaného bezpečnostního přínosu.
+
+Zpětné odkazy získává firma skutečnými realizacemi, vlastními aktuálními profily
+a relevantními zmínkami. Nezakládáme prázdné profily, nepřidáváme placené či
+automatické odkazy a nevydáváme počty z cizího auditu za ověřený úplný inventář.
+Zachování HTTP/HTTPS, apex/www a historických cílových URL je součástí kontroly
+nasazení. Oprava poštovních SPF/DMARC patří k ověřené konfiguraci odesílatelů;
+nelze ji odvodit z webhostingu ani z kontaktní adresy Gmail.

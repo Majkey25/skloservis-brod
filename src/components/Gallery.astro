@@ -223,7 +223,7 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
                         ),
                       ),
                     ]}
-                    sizes={sizes}
+                    sizes={`auto, ${sizes}`}
                     loading="lazy"
                     decoding="async"
                   />

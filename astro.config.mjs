@@ -26,7 +26,7 @@ export default defineConfig({
   outDir: `./${target.outDir}/`,
   trailingSlash: 'always',
   compressHTML: true,
-  build: { inlineStylesheets: 'always' },
+  build: { inlineStylesheets: 'auto' },
   vite: {
     define: { 'import.meta.env.SITE_BUILD_TARGET': JSON.stringify(target.target) },
   },

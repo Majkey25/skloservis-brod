@@ -3,7 +3,14 @@ import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import favicon from '../assets/brand/favicon.png';
 import logo from '../assets/brand/wordpress-logo.png';
-import { getSettings, getContact, getHours, getServices, getGallery } from '../content.ts';
+import {
+  getSettings,
+  getContact,
+  getHours,
+  getServices,
+  getGallery,
+  getAbout,
+} from '../content.ts';
 import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
 import {
   seoContext,
@@ -12,6 +19,7 @@ import {
   localBusiness,
   serviceBreadcrumbs,
   socialPreview,
+  primaryImage,
   website,
   SITE_NAME,
   jsonLd,
@@ -35,7 +43,7 @@ const pageDescription =
   description ??
   defaultDescription(seo, Astro.url.pathname, lang, settings[`seo_description_${lang}`]);
 const business = metadata.business
-  ? localBusiness(seo, settings, await getContact(), await getHours())
+  ? localBusiness(seo, settings, await getContact(), await getHours(), await getAbout(), logo.src)
   : undefined;
 const siteName = metadata.website ? website(seo) : undefined;
 const [services, gallery] = await Promise.all([getServices(), getGallery()]);
@@ -46,6 +54,7 @@ const breadcrumbs = serviceBreadcrumbs(
   services.find((service) => service.slug === page),
 );
 const socialImage = socialPreview(seo, Astro.url.pathname, lang, gallery);
+const searchImage = primaryImage(seo, Astro.url.pathname, lang, gallery);
 ---
 
 <!doctype html>
@@ -156,6 +165,7 @@ const socialImage = socialPreview(seo, Astro.url.pathname, lang, gallery);
     {siteName && <script type="application/ld+json" is:inline set:html={jsonLd(siteName)} />}
     {business && <script type="application/ld+json" is:inline set:html={jsonLd(business)} />}
     {breadcrumbs && <script type="application/ld+json" is:inline set:html={jsonLd(breadcrumbs)} />}
+    {searchImage && <script type="application/ld+json" is:inline set:html={jsonLd(searchImage)} />}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:type" content="website" />
