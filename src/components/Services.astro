@@ -58,10 +58,10 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
           src={photo.image}
           alt={photo[`alt_${lang}`]}
           formats={['avif', 'webp']}
-          widths={[360, 600, 900, Math.min(1200, photo.image.width)].filter(
+          widths={[360, 600, 720, 800, 900, Math.min(1200, photo.image.width)].filter(
             (width, index, all) => width <= photo.image.width && all.indexOf(width) === index,
           )}
-          sizes="(min-width: 70rem) 32rem, (min-width: 48rem) 42vw, 100vw"
+          sizes="(min-width: 70rem) 558px, (min-width: 48rem) 42vw, 100vw"
           loading="eager"
           fetchpriority="high"
           decoding="async"

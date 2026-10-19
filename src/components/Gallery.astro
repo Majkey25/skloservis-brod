@@ -203,7 +203,8 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
                   <Picture
                     src={item.image}
                     alt={altText}
-                    formats={['avif', 'webp']}
+                    formats={['avif']}
+                    fallbackFormat="webp"
                     width={Math.min(960, item.image.width)}
                     widths={[
                       ...new Set(
