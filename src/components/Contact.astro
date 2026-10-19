@@ -128,10 +128,8 @@ const enquiryTexts = JSON.stringify({
           </a>
           <a class="text-link contact__email" href={`mailto:${settings.contact_email}`}>
             <Icon name="mail" />
-            <span>
-              {emailName}@<wbr />
-              {emailDomain}
-            </span>
+            <!-- prettier-ignore -->
+            <span>{emailName}@<wbr />{emailDomain}</span>
           </a>
         </div>
         {/* Copy buttons are laid out from the first paint, so enhancing them never shifts the page. */}
