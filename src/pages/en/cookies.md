@@ -35,4 +35,4 @@ Submitting the form sends its content and technical request information to FormS
 
 ## Questions
 
-Email [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com). See the [privacy notice](../privacy/) and [company information](../legal/) for further details.
+Use our [contact form or Write an email button](../contact/#contact-methods). See the [privacy notice](../privacy/) and [company information](../legal/) for further details.

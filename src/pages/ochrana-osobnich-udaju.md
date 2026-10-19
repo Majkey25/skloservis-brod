@@ -11,13 +11,13 @@ Aktualizováno 18. října 2026.
 
 Správcem údajů při vyřizování poptávek a zakázek je **SKLOSERVIS-BROD s.r.o.**, IČO **02596491**, se sídlem **č.p. 314, 760 01 Březnice, Česká republika**. Provozovna je na adrese Prakšická 281, 688 01 Uherský Brod.
 
-S dotazy k soukromí a žádostmi o uplatnění práv se obraťte na [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) nebo na [+420 608 031 206](tel:+420608031206). Ve firmě má ke kontaktní schránce přístup pouze majitel.
+S dotazy k soukromí a žádostmi o uplatnění práv použijte [tlačítka Napsat e-mail, Zavolat nebo kontaktní formulář](../kontakt/#contact-methods). Ve firmě má ke kontaktní schránce přístup pouze majitel.
 
 ## Návštěva webu
 
 Web slouží k představení výrobků a služeb. Nemá vlastní databázi poptávek, uživatelské účty, internetový obchod ani vlastní reklamní a analytické měření.
 
-Kontaktní formulář po vašem odeslání předá jméno, e-mail a zprávu službě **FormSubmit**, která zajišťuje předání do schránky `skloservis.brod@gmail.com`. FormSubmit obdrží také technické údaje požadavku, například IP adresu. Údaje z formuláře neukládáme do místního úložiště prohlížeče. Potvrzení formuláře znamená přijetí službou, nikoli ověření doručení do schránky. Tlačítko „Napsat e-mail“ na úvodní stránce vede na stránku Kontakt. Tam tlačítko „Napsat e-mail“ a odkaz na e-mailovou adresu používají `mailto:`: otevřou vaši poštovní aplikaci s připraveným adresátem, zprávu samy neodešlou.
+Kontaktní formulář po vašem odeslání předá jméno, e-mail a zprávu službě **FormSubmit**, která zajišťuje předání do firemní schránky Gmail. FormSubmit obdrží také technické údaje požadavku, například IP adresu. Údaje z formuláře neukládáme do místního úložiště prohlížeče. Potvrzení formuláře znamená přijetí službou, nikoli ověření doručení do schránky. Tlačítko „Napsat e-mail“ na úvodní stránce vede na stránku Kontakt. Tam tlačítko „Napsat e-mail“ otevře vaši poštovní aplikaci s připraveným adresátem; zprávu samo neodešle. Kontaktní údaje se v prohlížeči zpřístupní až při použití kontaktního tlačítka, aby nebyly přímo v HTML stránky. Nejde o ochranu před veškerým automatickým sběrem.
 
 Při načtení stránek zpracovává GitHub Pages technické údaje požadavku, například IP adresu a údaje o spojení, mimo jiné pro zabezpečení služby. To není ukládání poptávky do firemní databáze. Další informace uvádí [prohlášení GitHubu o soukromí](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
@@ -41,7 +41,7 @@ Poptávky se z tohoto webu neukládají do samostatné databáze. E-mailová kom
 
 Uchování a odstranění podkladů zajišťuje majitel; kód webu nemaže zprávy v Gmailu ani papírové dokumenty.
 
-**Běžnou vyřízenou poptávku a související podklady uchováváme ještě jeden měsíc od jejího vyřízení pro zpětné dohledání.** Zákazník může na [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) požádat o delší uchování pro konkrétní pokračování jednání. Účel a další dobu uchování s ním dohodneme individuálně.
+**Běžnou vyřízenou poptávku a související podklady uchováváme ještě jeden měsíc od jejího vyřízení pro zpětné dohledání.** Zákazník může [e-mailem](../kontakt/#contact-methods) požádat o delší uchování pro konkrétní pokračování jednání. Účel a další dobu uchování s ním dohodneme individuálně.
 
 Na stejný e-mail můžete kdykoli poslat žádost o odstranění osobních údajů, včetně e-mailů, elektronických souborů a papírových podkladů. Výmaz se posuzuje podle podmínek GDPR. Nevztahuje se na údaje, které musíme dále uchovávat kvůli zákonné povinnosti nebo oprávněné ochraně konkrétních právních nároků.
 

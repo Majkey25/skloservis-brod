@@ -5,6 +5,7 @@ import { getContact, getServices } from '../content.ts';
 import { pageUrl, type Language, type PageId } from '../lib/urls.ts';
 import Icon from './Icon.astro';
 import ProductIcon from './ProductIcon.astro';
+import ContactLink from './ContactLink.astro';
 interface Props {
   lang: Language;
   page: PageId;
@@ -12,7 +13,6 @@ interface Props {
 const { lang, page } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const [contact, services] = await Promise.all([getContact(), getServices()]);
-const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
 const nav = [
   ['services', lang === 'cs' ? 'Služby' : 'Services'],
   ['gallery', lang === 'cs' ? 'Galerie' : 'Gallery'],
@@ -74,10 +74,10 @@ const products = {
       ))}
     </nav>
     <div class="tools">
-      <a class="header-phone" href={`tel:${contact.phone}`}>
+      <ContactLink class="header-phone" value={contact.phone} kind="phone" lang={lang}>
         <Icon name="phone" />
-        {phone}
-      </a>
+        {lang === 'cs' ? 'Zavolat' : 'Call us'}
+      </ContactLink>
       <nav class="language-nav" aria-label={lang === 'cs' ? 'Jazyk' : 'Language'}>
         {(['cs', 'en'] as const).map((language) =>
           language === lang ? (
@@ -176,10 +176,16 @@ const products = {
               {label}
             </a>
           ))}
-          <a class="mobile-link" href={`tel:${contact.phone}`} style={`--i: ${nav.length + 1}`}>
+          <ContactLink
+            class="mobile-link"
+            value={contact.phone}
+            kind="phone"
+            lang={lang}
+            style={`--i: ${nav.length + 1}`}
+          >
             <Icon name="phone" />
-            {phone}
-          </a>
+            {lang === 'cs' ? 'Zavolat' : 'Call us'}
+          </ContactLink>
           <a
             class="button mobile-enquiry"
             href={pageUrl('contact', lang, base)}

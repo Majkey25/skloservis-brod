@@ -15,8 +15,7 @@ Aktualizováno 17. října 2026.
 - IČO: 02596491. DIČ: CZ02596491.
 - Zápis v obchodním rejstříku: Krajský soud v Brně, oddíl C, vložka 81823.
 - Provozovna: Prakšická 281, 688 01 Uherský Brod.
-- Telefon: [+420 608 031 206](tel:+420608031206).
-- E-mail: [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com).
+- Telefon a e-mail: [kontaktní tlačítka a formulář](../kontakt/#contact-methods).
 
 Sídlo a provozovna jsou odlišné adresy. Před návštěvou provozovny ověřte otevírací dobu. Údaje o sídle a zápisu byly ověřeny ve [veřejném systému ARES](https://ares.gov.cz/ekonomicke-subjekty/res/02596491).
 

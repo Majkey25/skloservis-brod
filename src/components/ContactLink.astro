@@ -1,0 +1,84 @@
+---
+import { encodeContact, type ContactKind } from '../lib/contact';
+import { pageUrl, type Language } from '../lib/urls';
+
+interface Props {
+  value: string;
+  kind: ContactKind;
+  lang: Language;
+  copy?: boolean;
+  class?: string;
+  style?: string;
+}
+
+const { value, kind, lang, copy = false, ...attributes } = Astro.props;
+const Tag = copy ? 'button' : 'a';
+---
+
+<Tag
+  {...attributes}
+  type={copy ? 'button' : undefined}
+  href={copy ? undefined : `${pageUrl('contact', lang, import.meta.env.BASE_URL)}#contact-methods`}
+  data-astro-reload
+  data-contact-value={encodeContact(value)}
+  data-contact-kind={kind}
+  data-contact-copy={copy ? '' : undefined}
+>
+  <slot />
+</Tag>
+
+<script>
+  import { contactUri, decodeContact } from '../lib/contact';
+
+  // One delegated listener also handles links arriving through client navigation.
+  document.addEventListener('click', async (event) => {
+    if (!event.isTrusted || event.defaultPrevented || !(event.target instanceof Element)) return;
+    const control = event.target.closest<HTMLAnchorElement | HTMLButtonElement>(
+      '[data-contact-value]',
+    );
+    if (!control) return;
+    if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const kind = control.dataset.contactKind;
+    if (kind !== 'phone' && kind !== 'email') return;
+    let value: string;
+    try {
+      value = decodeContact(control.dataset.contactValue ?? '', kind);
+    } catch {
+      return;
+    }
+    if (control instanceof HTMLAnchorElement) {
+      const fallback = control.href;
+      control.href = contactUri(value, kind);
+      setTimeout(() => (control.href = fallback), 0);
+      return;
+    }
+    event.preventDefault();
+    const status = document.querySelector<HTMLElement>('[data-copy-status]');
+    const fallback = document.querySelector<HTMLInputElement>('[data-copy-fallback]');
+    if (!status || !fallback) return;
+    fallback.hidden = true;
+    fallback.value = '';
+    const cs = document.documentElement.lang === 'cs';
+    try {
+      await navigator.clipboard.writeText(value);
+      if (status.isConnected)
+        status.textContent = cs
+          ? kind === 'phone'
+            ? 'Telefonní číslo zkopírováno.'
+            : 'E-mailová adresa zkopírována.'
+          : kind === 'phone'
+            ? 'Phone number copied.'
+            : 'Email address copied.';
+    } catch {
+      if (status.isConnected && fallback.isConnected) {
+        status.textContent = cs
+          ? 'Zkopírujte označený údaj ručně.'
+          : 'Copy the selected value manually.';
+        fallback.value = value;
+        fallback.hidden = false;
+        fallback.focus({ preventScroll: true });
+        fallback.select();
+      }
+    }
+  });
+</script>

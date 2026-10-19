@@ -25,7 +25,7 @@ Production address: [www.skloservis-brod.cz](https://www.skloservis-brod.cz/). T
 - Build-time content validation and focused tests for dates, schedules and invalid content.
 - GitHub Actions checks for formatting, TypeScript, tests and the static build, followed by Pages publication for successful pushes to `main`.
 
-CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip require an authorized account. Enquiries can be submitted directly through FormSubmit to `skloservis.brod@gmail.com`, with validation, a sending state, timeout handling and preserved input on failure. Without JavaScript the form uses native POST; phone and email links remain available. Relay acceptance alone does not establish inbox delivery, and recipient activation is required.
+CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip require an authorized account. Enquiries use FormSubmit with validation, a sending state, timeout handling and preserved input on failure. Phone, email and the relay recipient are encoded in HTML to reduce basic scraping; contact buttons decode them on interaction. This is not encryption: public profiles, source history and browser execution still expose the details. Without JavaScript the form is hidden and a public business listing remains available. Relay acceptance alone does not establish inbox delivery, and recipient activation is required.
 
 ## Stack
 

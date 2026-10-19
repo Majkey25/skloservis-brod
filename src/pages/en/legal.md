@@ -15,8 +15,7 @@ Updated 17 October 2026.
 - Company ID: 02596491. Tax ID: CZ02596491.
 - Commercial Register: Regional Court in Brno, section C, entry 81823.
 - Workshop: Prakšická 281, 688 01 Uherský Brod.
-- Phone: [+420 608 031 206](tel:+420608031206).
-- Email: [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com).
+- Phone and email: [contact buttons and enquiry form](../contact/#contact-methods).
 
 The registered office and workshop are separate addresses. Check opening hours before visiting the workshop. The registered office and register entry were checked against the [public ARES system](https://ares.gov.cz/ekonomicke-subjekty/res/02596491).
 

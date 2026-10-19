@@ -35,4 +35,4 @@ Odkaz „Otevřít v Google Maps“ nebo jiný externí odkaz otevře samostatno
 
 ## Dotazy
 
-Napište na [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com). Další informace najdete v [zásadách soukromí](../ochrana-osobnich-udaju/) a v [údajích provozovatele](../pravni-informace/).
+Napište nám přes [kontaktní formulář nebo tlačítko Napsat e-mail](../kontakt/#contact-methods). Další informace najdete v [zásadách soukromí](../ochrana-osobnich-udaju/) a v [údajích provozovatele](../pravni-informace/).

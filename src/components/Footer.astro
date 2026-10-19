@@ -4,6 +4,7 @@ import logo from '../assets/brand/wordpress-logo.png';
 import { getSettings, getContact } from '../content.ts';
 import { pageUrl, type Language } from '../lib/urls.ts';
 import Icon from './Icon.astro';
+import ContactLink from './ContactLink.astro';
 interface Props {
   lang: Language;
 }
@@ -11,7 +12,6 @@ const { lang } = Astro.props;
 const settings = await getSettings();
 const contact = await getContact();
 const base = import.meta.env.BASE_URL;
-const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
 ---
 
 <footer class="site-footer">
@@ -24,12 +24,12 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       <p>{lang === 'cs' ? settings.footer_text_cs : settings.footer_text_en}</p>
     </div>
     <div class="footer-contact">
-      <a href={`tel:${contact.phone}`}>
-        <Icon name="phone" /> {phone}
-      </a>
-      <a href={`mailto:${settings.contact_email}`}>
-        <Icon name="mail" /> {settings.contact_email}
-      </a>
+      <ContactLink value={contact.phone} kind="phone" lang={lang}>
+        <Icon name="phone" /> {lang === 'cs' ? 'Zavolat' : 'Call us'}
+      </ContactLink>
+      <ContactLink value={settings.contact_email} kind="email" lang={lang}>
+        <Icon name="mail" /> {lang === 'cs' ? 'Napsat e-mail' : 'Write an email'}
+      </ContactLink>
       {contact.facebook_url && (
         <a href={contact.facebook_url} target="_blank" rel="noopener noreferrer">
           <Icon name="facebook" /> Facebook

@@ -369,8 +369,8 @@ const SCHEMA_DAYS = {
 /** Inputs come from the validated CMS getters; never imply closures or installation hours. */
 export function localBusiness(
   context: SeoContext,
-  settings: Pick<Settings, 'name' | 'contact_email'>,
-  contact: Pick<Contact, 'phone' | 'address' | 'company_id' | 'facebook_url'>,
+  settings: Pick<Settings, 'name'>,
+  contact: Pick<Contact, 'address' | 'company_id' | 'facebook_url'>,
   hours: Hours,
   profiles?: Pick<About, 'reputation' | 'google_reputation'>,
   logo?: string,
@@ -402,8 +402,6 @@ export function localBusiness(
     '@id': `${context.site}/#business`,
     name: settings.name,
     url: `${context.site}/`,
-    telephone: contact.phone,
-    email: settings.contact_email,
     identifier: contact.company_id,
     ...(sameAs.length ? { sameAs } : {}),
     ...(logo ? { logo: new URL(logo, context.site).href } : {}),

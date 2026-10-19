@@ -522,8 +522,8 @@ test('schema uses validated CMS facts and excludes installation/assumed hours an
   const business = localBusiness(production, settings, contact, hours)!;
   assert.equal(business['@id'], 'https://www.skloservis-brod.cz/#business');
   assert.equal(business.name, settings.name);
-  assert.equal(business.telephone, contact.phone);
-  assert.equal(business.email, settings.contact_email);
+  assert.equal('telephone' in business, false);
+  assert.equal('email' in business, false);
   assert.equal(business.identifier, contact.company_id);
   assert.deepEqual(business.address, {
     '@type': 'PostalAddress',

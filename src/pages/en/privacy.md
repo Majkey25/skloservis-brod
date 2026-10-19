@@ -11,13 +11,13 @@ Updated 18 October 2026.
 
 The controller for enquiries and projects is **SKLOSERVIS-BROD s.r.o.**, company ID **02596491**, with its registered office at **č.p. 314, 760 01 Březnice, Czech Republic**. The workshop is at Prakšická 281, 688 01 Uherský Brod.
 
-For privacy questions or rights requests, email [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) or call [+420 608 031 206](tel:+420608031206). Within the company, only the owner has access to the contact mailbox.
+For privacy questions or rights requests, use our [Write an email or Call us buttons, or the enquiry form](../contact/#contact-methods). Within the company, only the owner has access to the contact mailbox.
 
 ## Visiting the website
 
 This website presents products and services. It has no enquiry database, user accounts, online shop, first-party advertising or analytics measurement.
 
-When you submit the contact form, your name, email address and message are sent to **FormSubmit**, which relays them to `skloservis.brod@gmail.com`. FormSubmit also receives technical request information, such as your IP address. We do not save form details in browser local storage. The form confirmation means acceptance by the service, not verified inbox delivery. The homepage's “Write an email” button leads to the Contact page. On that page, “Write an email” and the email address link use `mailto:`: they open your mail application with the recipient filled in and do not send a message themselves.
+When you submit the contact form, your name, email address and message are sent to **FormSubmit**, which relays them to the company's Gmail mailbox. FormSubmit also receives technical request information, such as your IP address. We do not save form details in browser local storage. The form confirmation means acceptance by the service, not verified inbox delivery. The homepage's “Write an email” button leads to the Contact page. On that page, “Write an email” opens your mail application with the recipient filled in; it does not send a message itself. Contact details become available in the browser when you use a contact button, keeping them out of the page's plain HTML. This does not prevent all automated collection.
 
 When serving pages, GitHub Pages processes technical request information, such as your IP address and connection details, including for service security. This is distinct from storing an enquiry in a company database. See the [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
@@ -41,7 +41,7 @@ This website does not save enquiries in a separate database. Email correspondenc
 
 The owner handles retention and deletion; the website code does not delete Gmail messages or paper documents.
 
-**We retain an ordinary resolved enquiry and related material for one further month after it is resolved, so it can be retrieved.** A customer may email [skloservis.brod@gmail.com](mailto:skloservis.brod@gmail.com) to request longer retention for a specific continuation of discussions. We agree the purpose and additional period individually.
+**We retain an ordinary resolved enquiry and related material for one further month after it is resolved, so it can be retrieved.** A customer may [email us](../contact/#contact-methods) to request longer retention for a specific continuation of discussions. We agree the purpose and additional period individually.
 
 You may use the same email address at any time to request deletion of personal information, including emails, electronic files and paper material. Erasure is assessed under GDPR conditions. It does not cover information that must still be retained to meet a legal duty or legitimately protect specific legal claims.
 

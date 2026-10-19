@@ -1,10 +1,12 @@
 ---
-import { getContact, getSettings } from '../content';
+import { getAbout, getContact, getSettings } from '../content';
+import { encodeContact } from '../lib/contact';
 import { pageUrl, type Language } from '../lib/urls';
 import Hours from './Hours.astro';
 import Icon from './Icon.astro';
 import MapPreview from './MapPreview.astro';
 import Reputation from './Reputation.astro';
+import ContactLink from './ContactLink.astro';
 
 interface Props {
   lang: Language;
@@ -12,17 +14,13 @@ interface Props {
 }
 
 const { lang, compact = false } = Astro.props;
-const [contact, settings] = await Promise.all([getContact(), getSettings()]);
+const [contact, settings, about] = await Promise.all([getContact(), getSettings(), getAbout()]);
 const copy = {
   cs: {
     call: 'Zavolat',
     email: 'Napsat e-mail',
     copy: 'Kopírovat e-mail',
     copyPhone: 'Kopírovat telefon',
-    phoneCopied: 'Telefonní číslo zkopírováno.',
-    phoneCopyFailed: 'Číslo se nepodařilo zkopírovat. Označte a zkopírujte telefonní číslo výše.',
-    copied: 'E-mailová adresa zkopírována.',
-    copyFailed: 'Adresu se nepodařilo zkopírovat. Označte a zkopírujte e-mailovou adresu výše.',
     mailHelp: 'Odkaz otevře vaši e-mailovou aplikaci. Zprávu odešlete až v ní.',
     contactHelp:
       'Na stránce Kontakty nám můžete napsat přímo z formuláře nebo otevřít e-mailovou aplikaci.',
@@ -55,10 +53,6 @@ const copy = {
     email: 'Write an email',
     copy: 'Copy email address',
     copyPhone: 'Copy phone number',
-    phoneCopied: 'Phone number copied.',
-    phoneCopyFailed: 'The number could not be copied. Select and copy the phone number above.',
-    copied: 'Email address copied.',
-    copyFailed: 'The address could not be copied. Select and copy the email address above.',
     mailHelp: 'The link opens your email application. You send the message from there.',
     contactHelp: 'On the Contact page you can use our enquiry form or open your email application.',
     messageHelp:
@@ -89,8 +83,7 @@ const copy = {
 }[lang];
 const titleId = compact ? 'contact-enquiry-title' : 'contact-title';
 const Heading = compact ? 'h2' : 'h1';
-const phone = contact.phone.replace(/^(\+420)(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3 $4');
-const [emailName, emailDomain] = settings.contact_email.split('@');
+const profileUrl = about.google_reputation?.url ?? about.reputation?.url ?? contact.map_url;
 const limits = { name: 100, email: 254, message: 5000 };
 const enquiryTexts = JSON.stringify({
   required: copy.required,
@@ -122,63 +115,70 @@ const enquiryTexts = JSON.stringify({
             <p>{contact[`enquiry_text_${lang}`]}</p>
           </>
         )}
-        <div class="contact__direct">
-          <a class="contact__phone" href={`tel:${contact.phone}`}>
-            <Icon name="phone" />
-            <span>{phone}</span>
-          </a>
-          <a class="text-link contact__email" href={`mailto:${settings.contact_email}`}>
-            <Icon name="mail" />
-            <!-- prettier-ignore -->
-            <span>{emailName}@<wbr />{emailDomain}</span>
-          </a>
-        </div>
         {/* Copy buttons are laid out from the first paint, so enhancing them never shifts the page. */}
         <noscript>
           <style is:inline>
-            .contact__copy {
+            .contact__copy,
+            .contact__form {
               display: none !important;
             }
           </style>
+          <p class="contact__help">
+            {lang === 'cs'
+              ? 'Pro kontaktní tlačítka a formulář povolte JavaScript.'
+              : 'Enable JavaScript to use the contact buttons and enquiry form.'}
+          </p>
         </noscript>
-        <div class="contact__actions">
-          <a
-            class="button"
-            href={
-              compact
-                ? pageUrl('contact', lang, import.meta.env.BASE_URL)
-                : `mailto:${settings.contact_email}`
-            }
+        <div class="contact__actions" id="contact-methods">
+          {compact ? (
+            <a class="button" href={pageUrl('contact', lang, import.meta.env.BASE_URL)}>
+              <Icon name="mail" />
+              {copy.email}
+            </a>
+          ) : (
+            <ContactLink class="button" value={settings.contact_email} kind="email" lang={lang}>
+              <Icon name="mail" />
+              {copy.email}
+            </ContactLink>
+          )}
+          <ContactLink
+            class="button button--secondary"
+            value={contact.phone}
+            kind="phone"
+            lang={lang}
           >
-            <Icon name="mail" />
-            {copy.email}
-          </a>
-          <a class="button button--secondary" href={`tel:${contact.phone}`}>
             <Icon name="phone" />
             {copy.call}
-          </a>
-          <button
+          </ContactLink>
+          <ContactLink
             class="text-link contact__copy"
-            type="button"
-            data-copy-value={settings.contact_email}
-            data-copied={copy.copied}
-            data-copy-failed={copy.copyFailed}
+            value={settings.contact_email}
+            kind="email"
+            lang={lang}
+            copy
           >
             <Icon name="copy" />
             {copy.copy}
-          </button>
-          <button
+          </ContactLink>
+          <ContactLink
             class="text-link contact__copy"
-            type="button"
-            data-copy-value={contact.phone}
-            data-copied={copy.phoneCopied}
-            data-copy-failed={copy.phoneCopyFailed}
+            value={contact.phone}
+            kind="phone"
+            lang={lang}
+            copy
           >
             <Icon name="copy" />
             {copy.copyPhone}
-          </button>
+          </ContactLink>
         </div>
-        <p class="contact__help muted">{compact ? copy.contactHelp : copy.mailHelp}</p>
+        <p class="contact__help muted">
+          {compact ? copy.contactHelp : copy.mailHelp}{' '}
+          <a href={profileUrl} rel="noopener noreferrer">
+            {lang === 'cs'
+              ? 'Veřejný firemní profil a navigace'
+              : 'Public business listing and directions'}
+          </a>
+        </p>
         {compact && (
           <p class="contact__privacy">
             <a class="text-link" href={pageUrl('privacy', lang, import.meta.env.BASE_URL)}>
@@ -186,15 +186,35 @@ const enquiryTexts = JSON.stringify({
             </a>
           </p>
         )}
-        <p class="contact__status" role="status" aria-live="polite" data-copy-status></p>
+        <p
+          class="contact__status"
+          id="contact-copy-status"
+          role="status"
+          aria-live="polite"
+          data-copy-status
+        ></p>
+        <input
+          class="contact__input"
+          type="text"
+          readonly
+          hidden
+          data-copy-fallback
+          aria-label={
+            lang === 'cs'
+              ? 'Kontaktní údaj pro ruční kopírování'
+              : 'Contact detail for manual copying'
+          }
+          aria-describedby="contact-copy-status"
+        />
         {!compact && (
           <form
             class="contact__form"
-            action={`https://formsubmit.co/${settings.contact_email}`}
+            action={pageUrl('contact', lang, import.meta.env.BASE_URL)}
             method="POST"
+            inert
             data-astro-reload
             data-enquiry-form
-            data-endpoint={`https://formsubmit.co/ajax/${settings.contact_email}`}
+            data-recipient={encodeContact(settings.contact_email)}
             data-texts={enquiryTexts}
           >
             <p class="contact__form-note muted">{copy.formNote}</p>
@@ -334,6 +354,7 @@ const enquiryTexts = JSON.stringify({
 
 <script>
   import { sendEnquiry } from '../lib/enquiry';
+  import { decodeContact } from '../lib/contact';
 
   type FieldControl = HTMLInputElement | HTMLTextAreaElement;
 
@@ -349,32 +370,13 @@ const enquiryTexts = JSON.stringify({
   const boundForms = new WeakSet<HTMLFormElement>();
   const activeRequests = new Map<HTMLFormElement, AbortController>();
 
-  function initializeContactCopy() {
-    document.querySelectorAll<HTMLButtonElement>('[data-copy-value]').forEach((button) => {
-      if (button.dataset.copyBound) return;
-      button.dataset.copyBound = 'true';
-      button.addEventListener('click', async () => {
-        const value = button.dataset.copyValue;
-        const status = button.closest('[data-contact]')?.querySelector('[data-copy-status]');
-        if (!value || !status) return;
-        try {
-          await navigator.clipboard.writeText(value);
-          status.textContent = button.dataset.copied ?? '';
-        } catch {
-          status.textContent = button.dataset.copyFailed ?? '';
-        }
-      });
-    });
-  }
-
   function initializeEnquiryForm() {
     document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach((form) => {
       if (boundForms.has(form)) return;
-      const endpoint = form.dataset.endpoint;
       const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
       const label = button?.querySelector<HTMLElement>('[data-send-label]');
       const status = form.querySelector<HTMLElement>('[data-enquiry-status]');
-      if (!endpoint || !button || !label || !status) return;
+      if (!form.dataset.recipient || !button || !label || !status) return;
       boundForms.add(form);
       // Older open tabs copy drafts by the previous field names before this script loads.
       form.querySelectorAll<HTMLInputElement>('[data-draft-for]').forEach((alias) => {
@@ -425,7 +427,7 @@ const enquiryTexts = JSON.stringify({
           status.textContent = texts.sending;
           try {
             await sendEnquiry(
-              endpoint,
+              `https://formsubmit.co/ajax/${decodeContact(form.dataset.recipient ?? '', 'email')}`,
               {
                 Jméno: valueOf('Jméno'),
                 email: valueOf('email'),
@@ -452,12 +454,11 @@ const enquiryTexts = JSON.stringify({
         },
         true,
       );
+      form.inert = false;
     });
   }
 
-  initializeContactCopy();
   initializeEnquiryForm();
-  document.addEventListener('astro:page-load', initializeContactCopy);
   document.addEventListener('astro:after-swap', initializeEnquiryForm);
   document.addEventListener('astro:before-swap', (event) => {
     const current = document.querySelector<HTMLFormElement>('[data-enquiry-form]');
@@ -507,42 +508,6 @@ const enquiryTexts = JSON.stringify({
     border-radius: var(--radius, 6px);
   }
 
-  .contact__direct {
-    display: grid;
-    justify-items: start;
-    gap: 0.75rem;
-    margin-block: 1.5rem;
-  }
-
-  .contact__direct > a {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    max-width: 100%;
-  }
-
-  .contact__direct > a > span {
-    min-width: 0;
-  }
-
-  .contact__phone {
-    color: inherit;
-    font-size: var(--step-3, clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem));
-    font-weight: 650;
-    line-height: 1.2;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-  }
-
-  .contact__phone :global(svg) {
-    width: 0.75em;
-    height: 0.75em;
-  }
-
-  .contact__email {
-    overflow-wrap: anywhere;
-  }
-
   .contact__actions {
     display: flex;
     align-items: center;
@@ -574,6 +539,11 @@ const enquiryTexts = JSON.stringify({
 
   .contact__status:empty {
     margin: 0;
+  }
+
+  .contact__status {
+    overflow-wrap: anywhere;
+    user-select: all;
   }
 
   .contact__form {

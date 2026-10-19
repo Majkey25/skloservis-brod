@@ -228,8 +228,14 @@ Větší styly jsou místní opakovaně použitelné soubory. U inline SVG, krit
 bootstrapu a animovaných hodnot není odstranění každého inline zápisu cílem.
 Cache-Control určuje GitHub Pages; fiktivní `.htaccess` ani `_headers` by jej
 nezměnily. Měření a Meta Pixel nejsou podmínkou pořadí; na tomto webu se nepoužívají.
-Veřejný e-mail zůstává dostupným kontaktem; obrázek místo něj
-by zhoršil kopírování a přístupnost bez prokázaného bezpečnostního přínosu.
+Telefon a e-mail jsou dostupné přes kontaktní tlačítka. HTML obsahuje jejich
+zakódovanou podobu; aplikaci otevře nebo údaj zkopíruje až kliknutí. Při chybě
+kopírování lze údaj označit ručně. Bez JavaScriptu je na kontaktu náhradní odkaz
+na veřejný firemní profil; formulář bez skriptu neposílá údaje na vlastní stránku.
+Stejné pravidlo platí pro cíl formuláře, meta popis a právní stránky. JSON-LD
+ponechává firemní identitu/adresu/profily, ale záměrně nepublikuje telefon ani e-mail.
+Jde o kompromis proti jednoduchému sběru, ne SEO výhodu nebo šifrování. Údaje lze
+získat spuštěním prohlížeče, z veřejných profilů i historie veřejného zdrojového kódu.
 
 Zpětné odkazy získává firma skutečnými realizacemi, vlastními aktuálními profily
 a relevantními zmínkami. Nezakládáme prázdné profily, nepřidáváme placené či
