@@ -29,6 +29,11 @@ a obnovy popisuje [dokumentace nasazení](nasazeni.md).
   [Google nepřisuzuje výhodu duplikování do dalších metod](https://developers.google.com/search/docs/specialty/international/localized-versions).
 - Produkční sitemap vychází z téže mapy adres a vynechává 404. Nevymýšlí `lastmod`
   ani prioritu. Robots odkazuje na absolutní adresu sitemap.
+  Původní WordPress adresa `/sitemap_index.xml` zůstává dostupná jako XML index
+  aktuální `/sitemap.xml`. Také `/page-sitemap.xml` vrací stejný seznam stránek
+  a obrázků jako aktuální mapa; není to další obsahová stránka ani přesměrování.
+  Tyto dvě doložené historické adresy proto po migraci nevracejí 404. Náhled
+  ponechává index i seznam adres prázdné a nepropaguje produkční doménu.
   [Google](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
   a [Seznam](https://o-seznam.cz/napoveda/vyhledavani/seznambot/sitemap-xml/)
   uvádějí požadavky na sitemap. Žádná mapa nebyla odeslána vyhledávačům.
@@ -176,6 +181,11 @@ ve statickém HTML a text se bezpečně escapuje. Popisy fotografií nenahrazuj�
 o výrobku; počty slov ani opakování klíčových slov nejsou cílem. Detaily nepřidávají
 nové lokality, certifikace, ceny nebo přísliby odolnosti. Schéma CMS vyžaduje úplné
 české i anglické znění a dovoluje nejvýše čtyři oddíly na výrobek.
+
+Detaily šesti výrobků pro stavbu a interiér také zobrazují existující CMS text
+`about.consultation_*`: nezávaznou poptávku, návrh, kalkulaci a zaměření zdarma.
+Zákazník tak najde podmínky nabídky přímo u výrobku. Gravírované dekorace a náhrobní
+desky ponechávají vlastní poptávkový text bez zmínky o zaměření prostoru.
 
 `node --test tests/seo.test.ts` ověřuje cíle, odmítnutí nepovolené produkce v Actions,
 metadata všech dvojic, výjimky, výběr fotografií, jejich přiřazení v sitemap,

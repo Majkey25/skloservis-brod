@@ -1,6 +1,6 @@
 ---
 import { Picture } from 'astro:assets';
-import { getContact, getGallery, getServices, getSettings } from '../content';
+import { getAbout, getContact, getGallery, getServices } from '../content';
 import { pageUrl, type Language, type ServiceSlug } from '../lib/urls';
 import Gallery from './Gallery.astro';
 
@@ -10,8 +10,8 @@ interface Props {
 }
 
 const { lang, slug } = Astro.props;
-const [settings, services, gallery, contact] = await Promise.all([
-  getSettings(),
+const [about, services, gallery, contact] = await Promise.all([
+  getAbout(),
   getServices(),
   getGallery(),
   getContact(),
@@ -27,7 +27,6 @@ const labels = {
     products: 'Produkty',
     enquiry: 'Poptat tento výrobek',
     prepare: 'Co uvést do poptávky',
-    process: 'Od představy k realizaci',
     examples: 'Ukázky provedení',
     gallery: 'Prohlédnout fotografie tohoto výrobku',
     related: 'Další skleněné výrobky',
@@ -37,7 +36,6 @@ const labels = {
     products: 'Products',
     enquiry: 'Enquire about this product',
     prepare: 'What to include in your enquiry',
-    process: 'From your idea to the finished project',
     examples: 'Examples of our work',
     gallery: 'Browse photos of this product',
     related: 'More glass products',
@@ -236,9 +234,9 @@ const related = services.filter((item) => item.slug !== slug);
   <div class="wrap service-contact__grid">
     <div>
       <h2 class="section-title" id="service-contact-title">
-        {isEngraved ? contact[`enquiry_title_${lang}`] : labels.process}
+        {isEngraved ? contact[`enquiry_title_${lang}`] : about[`consultation_title_${lang}`]}
       </h2>
-      <p>{isEngraved ? contact[`enquiry_text_${lang}`] : settings[`process_${lang}`]}</p>
+      <p>{isEngraved ? contact[`enquiry_text_${lang}`] : about[`consultation_text_${lang}`]}</p>
     </div>
     <a class="button" href={url('contact')}>
       {labels.contact}
