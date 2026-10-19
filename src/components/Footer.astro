@@ -50,17 +50,17 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
       <p>
         {settings.name} · IČO {contact.company_id}
       </p>
-      <p class="footer-credit">
-        made by{' '}
-        <a class="footer-credit__name" href="https://majkey25.github.io/init/" data-scramble>
-          <span class="footer-credit__text">Majkey25</span>
-          <span class="footer-credit__code" aria-hidden="true"></span>
-        </a>
-      </p>
       <button type="button" class="footer-theme-system" data-theme-system hidden>
         {lang === 'cs' ? 'Použít nastavení zařízení' : 'Use device theme'}
       </button>
     </div>
+    <p class="footer-credit">
+      made by{' '}
+      <a class="footer-credit__name" href="https://majkey25.github.io/init/" data-scramble>
+        <span class="footer-credit__text">Majkey25</span>
+        <span class="footer-credit__code" aria-hidden="true"></span>
+      </a>
+    </p>
     <nav aria-label={lang === 'cs' ? 'Právní informace' : 'Legal information'}>
       <a href={pageUrl('privacy', lang, base)}>{lang === 'cs' ? 'Soukromí' : 'Privacy'}</a>
       <a href={pageUrl('cookies', lang, base)}>
@@ -197,23 +197,26 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
     color: var(--accent);
     overflow-wrap: anywhere;
   }
+  /* Narrow screens stack the bar as one centred column. Wide screens put the credit in an auto
+     column between two equal side columns, so it sits at the bar's true centre whatever the
+     side groups measure. The 1rem row gap exceeds the credit link's 0.75rem target overhang,
+     so a neighbouring row never shares hit area with it. */
   .footer-bottom {
     border-top: 1px solid var(--line);
     padding-block: 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: grid;
+    justify-items: center;
     gap: 1rem 2rem;
     font-size: var(--step--1);
     color: var(--muted);
+    text-align: center;
   }
-  /* The row gap must exceed the credit link's 0.75rem target overhang, so a wrapped row
-     (such as the theme reset) never shares hit area with the link. */
   .footer-legal {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
+    gap: 0 1rem;
   }
   .footer-legal p {
     max-width: none;
@@ -231,6 +234,7 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
   .footer-bottom nav {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem 1.5rem;
   }
   .footer-bottom a {
@@ -238,9 +242,6 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
   }
   .footer-bottom a:hover {
     text-decoration: underline;
-  }
-  .footer-legal .footer-credit {
-    margin: 0;
   }
   .footer-credit__name {
     position: relative;
@@ -302,6 +303,21 @@ const phone = contact.phone.replace(/^(\+\d{3})(\d{3})(\d{3})(\d{3})$/, '$1 $2 $
   @media (min-width: 48rem) {
     .footer-main {
       grid-template-columns: 1.4fr 1fr 1fr;
+    }
+  }
+  @media (min-width: 64rem) {
+    .footer-bottom {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      text-align: start;
+    }
+    .footer-legal {
+      justify-self: start;
+      justify-content: flex-start;
+    }
+    .footer-bottom nav {
+      justify-self: end;
+      justify-content: flex-end;
     }
   }
 </style>
