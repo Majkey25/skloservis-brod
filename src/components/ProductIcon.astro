@@ -90,27 +90,9 @@ const { slug, reveal = false } = Astro.props;
     overflow: visible;
   }
 
-  /* The pictogram redraws itself once when its link is pointed at or focused. */
+  /* Scroll reveals draw the strokes (motion.ts). Hover only recolours the surrounding glyph,
+     so a quick pass never blanks or snaps the pictogram. */
   path {
     stroke-dasharray: 1;
-  }
-
-  :global(a:focus-visible) path {
-    animation: product-icon-draw 640ms var(--ease, ease) both;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    :global(a:hover) path {
-      animation: product-icon-draw 640ms var(--ease, ease) both;
-    }
-  }
-
-  @keyframes product-icon-draw {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
   }
 </style>

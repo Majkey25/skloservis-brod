@@ -221,15 +221,6 @@ const reviews = google?.reviews ?? [];
         inset 1px 1px 0 var(--glass-edge),
         var(--lift);
     }
-    /* The stars refill once from the left when a source is pointed at. */
-    .reputation__badge:hover :global(.rating-stars__row--fill) {
-      animation: reputation-stars-fill 900ms var(--ease) both;
-    }
-  }
-  @keyframes reputation-stars-fill {
-    from {
-      clip-path: inset(0 100% 0 0);
-    }
   }
   .reputation__reviews {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));

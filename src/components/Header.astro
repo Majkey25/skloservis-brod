@@ -279,13 +279,11 @@ const products = {
     letter-spacing: 0.12em;
     text-decoration: none;
   }
-  /* Pointing at the other language draws its underline and opens the letters slightly.
+  /* Pointing at the other language brightens it and draws its underline; the letters never move.
      The switch itself stays instant: the new page renders with no transition at all. */
   a.language-nav__item {
     color: var(--muted);
-    transition:
-      color 220ms var(--ease),
-      letter-spacing 320ms var(--ease);
+    transition: color 220ms var(--ease);
   }
   a.language-nav__item::after {
     position: absolute;
@@ -309,7 +307,6 @@ const products = {
   @media (hover: hover) and (pointer: fine) {
     a.language-nav__item:hover {
       color: var(--text);
-      letter-spacing: 0.18em;
     }
     a.language-nav__item:hover::after {
       transform: scaleX(1);
@@ -339,8 +336,8 @@ const products = {
   .nav-products[open] > summary {
     color: var(--accent);
   }
-  /* Top links draw an underline in from the left on hover and sweep it out to the right on leave.
-     Only the line and the icons move, never the hover target itself. */
+  /* Top links draw an underline in from the left and retract it the same way. One fixed origin
+     lets a quick pass reverse smoothly instead of jumping. The hover target itself never moves. */
   .desktop-nav > a {
     position: relative;
     display: inline-flex;
@@ -363,7 +360,7 @@ const products = {
     background: currentColor;
     content: '';
     transform: scaleX(0);
-    transform-origin: right center;
+    transform-origin: left center;
     transition: transform 380ms var(--ease);
   }
   .desktop-nav > a:focus-visible::after,
@@ -373,24 +370,19 @@ const products = {
   .nav-products > summary[data-current]::after,
   .header-phone:focus-visible::after {
     transform: scaleX(1);
-    transform-origin: left center;
+  }
+  .header-phone :global([data-icon='phone']) {
+    transition: rotate 380ms var(--ease);
   }
   @media (hover: hover) and (pointer: fine) {
     .desktop-nav > a:hover::after,
     .nav-products > summary:hover::after,
     .header-phone:hover::after {
       transform: scaleX(1);
-      transform-origin: left center;
     }
     .brand:hover .brand-logo {
       rotate: -8deg;
       scale: 1.06;
-    }
-    .header-phone:hover :global([data-icon='phone']) {
-      animation: header-phone-ring 720ms var(--ease);
-    }
-    .products-panel ul a:hover .products-panel__title {
-      translate: 3px 0;
     }
     .mobile-menu:not([open]) > summary:hover {
       background: var(--surface);
@@ -399,18 +391,10 @@ const products = {
       transform: scaleX(0.6);
     }
   }
-  @keyframes header-phone-ring {
-    20% {
+  /* A tilt rather than a ring: a transition reverses smoothly when the pointer leaves early. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .header-phone:hover :global([data-icon='phone']) {
       rotate: -14deg;
-    }
-    40% {
-      rotate: 11deg;
-    }
-    60% {
-      rotate: -7deg;
-    }
-    80% {
-      rotate: 3deg;
     }
   }
   .nav-products {
@@ -491,7 +475,6 @@ const products = {
   }
   .products-panel__title {
     flex: 1;
-    transition: translate var(--dur-fast) var(--ease);
   }
   .products-panel__glyph {
     display: grid;
@@ -508,8 +491,7 @@ const products = {
     transition:
       background-color var(--dur-fast) var(--ease),
       border-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease),
-      transform var(--dur-fast) var(--ease);
+      color var(--dur-fast) var(--ease);
   }
   .products-panel a:hover .products-panel__glyph,
   .products-panel a:focus-visible .products-panel__glyph,
@@ -518,15 +500,10 @@ const products = {
     background: var(--accent);
     color: var(--on-accent);
   }
-  .products-panel a:hover .products-panel__glyph {
-    transform: scale(1.06);
-  }
+  /* The arrow only fades in; its own nudge is the single motion, so transforms never stack. */
   .products-panel ul a :global([data-icon='arrow-right']) {
     opacity: 0;
-    transform: translateX(-6px);
-    transition:
-      opacity var(--dur-fast) var(--ease),
-      transform var(--dur-fast) var(--ease);
+    transition: opacity var(--dur-fast) var(--ease);
   }
   .products-panel a:hover,
   .products-panel a:focus-visible {
@@ -536,7 +513,6 @@ const products = {
   .products-panel ul a:hover :global([data-icon='arrow-right']),
   .products-panel ul a:focus-visible :global([data-icon='arrow-right']) {
     opacity: 1;
-    transform: none;
   }
   .products-panel [aria-current='page'] {
     color: var(--accent);
@@ -639,10 +615,10 @@ const products = {
       transform: none;
     }
     .theme-toggle[aria-pressed='false']:hover .icon-moon {
-      transform: rotate(-24deg) scale(1.1);
+      transform: rotate(-24deg);
     }
     .theme-toggle[aria-pressed='true']:hover .icon-sun {
-      transform: rotate(60deg) scale(1.1);
+      transform: rotate(60deg);
     }
   }
   .theme-toggle .icon-sun,

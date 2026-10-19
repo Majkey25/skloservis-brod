@@ -129,7 +129,7 @@ const pictograms: Record<GroupId, readonly string[]> = {
     height: 2.6rem;
   }
 
-  /* The pictogram redraws itself once when its card is pointed at. */
+  /* Scroll reveals draw the strokes; hover fills the ring and never blanks the pictogram. */
   .service-highlights__pictogram path {
     stroke-dasharray: 1;
   }
@@ -139,19 +139,6 @@ const pictograms: Record<GroupId, readonly string[]> = {
       border-color: var(--accent);
       background: var(--accent);
       color: var(--on-accent);
-    }
-
-    .service-highlights__item:hover .service-highlights__pictogram path {
-      animation: service-pictogram-draw 760ms var(--ease) both;
-    }
-  }
-
-  @keyframes service-pictogram-draw {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
     }
   }
 

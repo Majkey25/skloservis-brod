@@ -461,9 +461,17 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
     position: relative;
     display: block;
     aspect-ratio: 3 / 2;
-    /* A transparent resting shadow keeps the filter layer stable, so expansion never flashes. */
-    filter: drop-shadow(0 0 0 rgb(7 30 40 / 0));
-    transition: filter var(--dur-bleed) var(--ease);
+  }
+
+  /* The shadow is a separate layer at the grown photo size that only fades, so the expansion
+     needs no per-frame filter repaint of the photo. */
+  .home-product__media::before {
+    position: absolute;
+    inset: calc(var(--bleed-y) * -1) calc(var(--bleed-x) * -1);
+    box-shadow: 0 16px 24px rgb(7 30 40 / 0.18);
+    content: '';
+    opacity: 0;
+    transition: opacity var(--dur-bleed) var(--ease);
   }
 
   .home-product__media :global(picture) {
@@ -489,8 +497,8 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
     clip-path: inset(0);
   }
 
-  .home-product:focus-visible .home-product__media {
-    filter: drop-shadow(0 16px 24px rgb(7 30 40 / 0.18));
+  .home-product:focus-visible .home-product__media::before {
+    opacity: 1;
   }
 
   .home-product h3 {
@@ -509,8 +517,8 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
       clip-path: inset(0);
     }
 
-    .home-product:hover .home-product__media {
-      filter: drop-shadow(0 16px 24px rgb(7 30 40 / 0.18));
+    .home-product:hover .home-product__media::before {
+      opacity: 1;
     }
   }
 

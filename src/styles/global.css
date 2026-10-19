@@ -188,9 +188,9 @@ summary:focus-visible {
 .muted {
   color: var(--muted);
 }
-/* Actions grow slightly with a springy settle, deepen in colour and gain a soft accent halo.
-   The box only ever grows under a hovering pointer and never shrinks on press, so an edge
-   click cannot slip off the button. */
+/* Actions expand through a soft accent band that grows out from the edge while the fill deepens.
+   The box and text never move or scale; an arrow icon keeps only its own small nudge. Entering,
+   leaving and quick passes stay calm, and an edge click cannot slip off the button. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -207,20 +207,15 @@ summary:focus-visible {
   transition:
     background-color 240ms var(--ease),
     border-color 240ms var(--ease),
-    box-shadow 360ms var(--ease),
-    color 240ms var(--ease),
-    scale 460ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.button svg {
-  transition: translate 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow 320ms var(--ease),
+    color 240ms var(--ease);
 }
 .button--secondary {
   background-color: transparent;
   color: var(--accent);
 }
 .button:focus-visible {
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
-  scale: 1.04;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .button:active:not(:disabled) {
   background-color: color-mix(in srgb, var(--accent-hover) 85%, var(--text));
@@ -234,17 +229,13 @@ summary:focus-visible {
   .button:hover:not(:disabled) {
     background-color: var(--accent-hover);
     box-shadow:
-      0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent),
-      0 16px 30px -16px var(--accent);
-    scale: 1.045;
+      0 0 0 5px color-mix(in srgb, var(--accent) 18%, transparent),
+      0 14px 28px -16px var(--accent);
   }
   .button--secondary:hover:not(:disabled) {
     border-color: var(--accent);
     background-color: color-mix(in srgb, var(--accent) 10%, transparent);
     color: var(--accent);
-  }
-  .button:hover:not(:disabled) svg {
-    translate: 3px 0;
   }
   .button:active:not(:disabled) {
     background-color: color-mix(in srgb, var(--accent-hover) 85%, var(--text));
@@ -437,9 +428,6 @@ html[data-preference-transition='theme']::view-transition-new(root) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-  .button:is(:hover, :focus-visible):not(:disabled) {
-    scale: none;
   }
   /* The universal selector does not reach this pseudo-element, so opening stays instant here. */
   .disclosure::details-content {

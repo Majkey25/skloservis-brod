@@ -193,28 +193,14 @@ const copy = {
     height: 2.75rem;
     margin-bottom: 0.9rem;
     color: #64d1ec;
-    transition: translate 420ms var(--ease);
   }
+  /* Scroll reveals draw the strokes; hover only runs the edge line, so the icon stays put. */
   .company-metrics__icon path {
     stroke-dasharray: 1;
   }
   @media (hover: hover) and (pointer: fine) {
     .company-metrics__grid > div:hover::before {
       transform: scaleX(1);
-    }
-    .company-metrics__grid > div:hover .company-metrics__icon {
-      translate: 0 -4px;
-    }
-    .company-metrics__grid > div:hover .company-metrics__icon path {
-      animation: metrics-icon-draw 900ms var(--ease) both;
-    }
-  }
-  @keyframes metrics-icon-draw {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
     }
   }
   .company-metrics__grid dt {

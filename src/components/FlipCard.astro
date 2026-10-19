@@ -232,9 +232,7 @@ const { id, openLabel, toggleLabel, closeLabel, class: className, hoverDelay = 1
     display: grid;
     height: 100%;
     transform-style: preserve-3d;
-    transition:
-      transform var(--dur-flip) var(--ease-flip, cubic-bezier(0.65, 0, 0.35, 1)),
-      translate var(--dur-bleed) var(--ease);
+    transition: transform var(--dur-flip) var(--ease-flip, cubic-bezier(0.65, 0, 0.35, 1));
   }
 
   /* Both faces share one grid cell, so the card height is the tallest face on both sides. */
@@ -285,10 +283,6 @@ const { id, openLabel, toggleLabel, closeLabel, class: className, hoverDelay = 1
       display: none;
     }
 
-    .flip-card[data-flip-ready]:hover .flip-card__inner {
-      translate: 0 -4px;
-    }
-
     .flip-card[data-flip-ready]:hover .flip-card__face {
       border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
       box-shadow:
@@ -316,10 +310,6 @@ const { id, openLabel, toggleLabel, closeLabel, class: className, hoverDelay = 1
 
     .flip-card__toggle-text {
       display: inline;
-    }
-
-    .flip-card[data-flip-ready]:hover .flip-card__inner {
-      translate: none;
     }
 
     .flip-card[data-flip-ready] .flip-card__inner,
