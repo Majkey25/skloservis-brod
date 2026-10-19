@@ -1,8 +1,10 @@
 # Technické SEO
 
-Implementace a níže uvedené zdroje zkontrolovány 18. října 2026. Web na GitHub Pages
-je nadále náhled. Produkční příprava není povolením přepnout doménu ani dokladem
-indexace. Postup a zbývající podmínky jsou v [dokumentaci nasazení](nasazeni.md).
+Web od 19. října 2026 běží na GitHub Pages na vlastní doméně
+`https://www.skloservis-brod.cz/` s vynuceným HTTPS. Produkční nasazení prošlo kontrolami
+artefaktu a živých adres; samotné nasazení není dokladem indexace ani pořadí ve vyhledávání.
+Níže uvedené zdroje byly zkontrolovány 18. října 2026. Postup produkčního sestavení
+a obnovy popisuje [dokumentace nasazení](nasazeni.md).
 
 ## Adresy, obsah a indexace
 
@@ -40,13 +42,40 @@ Není důvod zakazovat galerii v robots nebo nahrazovat odkazy obsluhou JavaScri
 
 ## Fotografie a sdílení
 
-Produktový detail pro Open Graph použije první skutečnou fotografii své kategorie,
-stejně jako viditelný detail. Galerie použije svou první fotografii. Bez odpovídající
-fotografie a na ostatních stránkách zůstává logo; cizí výrobek ji nenahrazuje.
-Astro vytvoří JPEG nejvýše 1200 pixelů široký bez zvětšení nebo ořezu. Obě jazykové
-verze sdílejí soubor, ale mají vlastní CMS alternativní text. Metadata obsahují
-absolutní adresu obrázku na právě zvoleném cíli, skutečné rozměry a MIME typ podle
-[Open Graph](https://ogp.me/). Náhled obrázkem neodkazuje na budoucí produkci.
+Náhledy pro sdílení jsou značkové kompozice **1200 × 630 pixelů v JPEG**, nikoli
+nezměněné fotografie realizací. Kombinují skutečné logo, petrolejovou identitu webu
+a vybraný místní snímek z validované galerie. Detail výrobku používá pouze vlastní
+kategorii; úvod, produkty, služby a galerie sdílejí obecný náhled se skleněnou příčkou.
+Kontakty, právní stránky, 404 a výrobek bez fotografie mají čistě značkovou grafiku.
+Pro náhrobní desky se fotografie nevymýšlí ani nepřebírá z jiné kategorie.
+
+Výběr v `src/lib/seo.ts` upřednostňuje konkrétní vizuálně zkontrolované soubory.
+Po jejich odebrání v CMS vezme další dostupný snímek příslušné kategorie, přednostně
+alespoň 1000 × 630 pixelů; bez snímku použije značkovou variantu. Galerie, popisky,
+jejích 139 položek, pořadí i dosavadní titulní snímky se tím nemění. Fotografie
+a logo se zmenšují do vymezené plochy **bez zvětšení a bez ořezu**. Text v obrázku
+obsahuje jen název značky; lokalizovaný titulek a popis stránky nesou metadata.
+
+[Statický endpoint Astro](https://docs.astro.build/en/guides/endpoints/#static-file-endpoints)
+`src/pages/social/[image].jpg.ts` při běžném sestavení vytvoří soubory pomocí již
+používaného Sharpu. Čte jen lokální zdroje přes veřejné
+[konfigurační API Astro](https://docs.astro.build/en/reference/modules/astro-config/).
+Nevyžaduje nový balíček, font, vzdálené médium ani běžící backend. Metadata nevyvolávají
+další obrazové požadavky běžného prohlížeče; náhled stahuje až služba, která jej používá.
+
+Obě jazykové verze sdílejí JPEG, ale mají vlastní alternativní text odvozený z CMS,
+který výslovně popisuje grafickou kompozici s logem a fotografií. Podle
+[Open Graph](https://ogp.me/) hlavička uvádí HTTPS adresu, `image/jpeg`, skutečné rozměry
+a alternativní text; přidává také `twitter:card=summary_large_image`, titulek, popis,
+obrázek a `twitter:image:alt`. Adresy respektují zvolený host i náhledový prefix.
+Náhled tedy obrázkem neodkazuje na produkční host.
+
+Pouze indexovatelné produkční stránky dovolují `max-image-preview:large` podle
+[aktuální specifikace Google](https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag#max-image-preview)
+ověřené 19. října 2026. Náhled, 404 a neznámé či jazykově nesouladné adresy zůstávají
+`noindex, follow`. Toto nastavení dovoluje větší obrázek, neurčuje však jeho výběr.
+Google sám rozhoduje, zda a jaký náhled zobrazí; sociální služby mohou uchovávat starší
+verzi v mezipaměti. Výsledný vzhled ve vyhledávání ani okamžité obnovení nejsou zaručeny.
 
 Viditelné obrázky nadále používají lokální responzivní varianty, rozměry a popisné
 alternativní texty. Text má popisovat fotografii, ne opakovat klíčová slova nebo
@@ -56,8 +85,9 @@ Produkční sitemap přidává `image:image` a `image:loc` podle
 [dokumentace Google](https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps).
 Obě jazykové galerie uvádějí všechny fotografie, nyní 139. Produktové stránky uvádějí
 jen snímky své kategorie. Adresa pochází z `image.src` validovaného obsahu, tedy ze
-stejného původního lokálního souboru, na který odkazuje fotografie v HTML. Nevznikají
-další obrazové varianty ani kopie. Jeden soubor je v každém záznamu stránky jen jednou.
+stejného původního lokálního souboru, na který odkazuje fotografie v HTML. Samotná
+sitemap nevytváří další obrazové varianty ani kopie a značkové náhledy do ní nepřidává.
+Jeden původní soubor je v každém záznamu stránky jen jednou.
 Nejde o tvrzení, že bez sitemap nebyly fotografie dostupné vyhledávačům.
 
 XML escapuje adresy. Generátor odmítne cizí host, náhledový prefix, zdrojovou cestu

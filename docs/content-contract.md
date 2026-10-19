@@ -183,8 +183,9 @@ The owner confirmed `skloservis.brod@gmail.com` on 2026-10-17. Obsolete privacy-
 address/phone have not been reused. This content does not replace a reviewed privacy
 notice or authorize a mail service.
 
-Po–Čt 08:00–15:00 and Friday “Realizace montáží” are archived source facts, not a fresh
-verification of current operation. The owner subsequently confirmed Saturday, Sunday
+The owner confirmed on 2026-10-19 that Monday–Thursday visiting hours are
+08:00–11:30 and 12:30–15:00, with a lunch break 11:30–12:30 shown on each day.
+Friday remains “Realizace montáží”. The owner also confirmed Saturday, Sunday
 and Czech public holidays closed, with phone/email available for arrangements.
 These seed weekend rows are confirmed (`assumed: false`). No dated exception has been supplied.
 Broad offerings follow pages 1388/1390 and product pages 1898/1942/1955/1971/1980/1990/

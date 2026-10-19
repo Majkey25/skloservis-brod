@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
-import { getImage } from 'astro:assets';
 import favicon from '../assets/brand/favicon.png';
 import logo from '../assets/brand/wordpress-logo.png';
 import { getSettings, getContact, getHours, getServices, getGallery } from '../content.ts';
@@ -12,7 +11,7 @@ import {
   defaultDescription,
   localBusiness,
   serviceBreadcrumbs,
-  socialPhoto,
+  socialPreview,
   jsonLd,
 } from '../lib/seo.ts';
 import Header from '../components/Header.astro';
@@ -43,11 +42,7 @@ const breadcrumbs = serviceBreadcrumbs(
   lang,
   services.find((service) => service.slug === page),
 );
-const photo = socialPhoto(seo, Astro.url.pathname, lang, gallery);
-// Generate one portable JPEG without cropping or upscaling the owner's photograph.
-const socialImage = photo
-  ? await getImage({ src: photo.image, width: Math.min(1200, photo.image.width), format: 'jpg' })
-  : undefined;
+const socialImage = socialPreview(seo, Astro.url.pathname, lang, gallery);
 ---
 
 <!doctype html>
@@ -162,11 +157,17 @@ const socialImage = photo
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'cs' ? 'cs_CZ' : 'en_GB'} />
     <meta property="og:site_name" content={settings.name} />
-    <meta property="og:image" content={new URL(socialImage?.src ?? logo.src, seo.site).href} />
-    <meta property="og:image:type" content={socialImage ? 'image/jpeg' : 'image/png'} />
-    <meta property="og:image:width" content={String(socialImage?.options.width ?? logo.width)} />
-    <meta property="og:image:height" content={String(socialImage?.options.height ?? logo.height)} />
-    <meta property="og:image:alt" content={photo?.[`alt_${lang}`] ?? settings.name} />
+    <meta property="og:image" content={socialImage.src} />
+    <meta property="og:image:secure_url" content={socialImage.src} />
+    <meta property="og:image:type" content={socialImage.type} />
+    <meta property="og:image:width" content={String(socialImage.width)} />
+    <meta property="og:image:height" content={String(socialImage.height)} />
+    <meta property="og:image:alt" content={socialImage.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={socialImage.src} />
+    <meta name="twitter:image:alt" content={socialImage.alt} />
   </head>
   <body>
     <a class="skip-link" href="#main">

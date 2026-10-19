@@ -8,7 +8,7 @@ Přihlášení, uložení změny a její zveřejnění byly ověřeny 18. říjn
 
 V části otevírací doby upravte příslušný den. Časy zapisujte jako `08:00`, každý otevřený interval musí končit později, než začíná. Prázdný seznam intervalů znamená, že pro návštěvy není zveřejněná otevírací doba. Poznámka může uvádět například páteční montáže.
 
-Pondělí až čtvrtek je otevřeno od 8:00 do 15:00. V pátek probíhají montáže. Majitel potvrdil, že v sobotu a neděli je zavřeno; pro domluvu návštěvníci mohou zavolat nebo napsat e-mail.
+Pondělí až čtvrtek je otevřeno 8:00–11:30 a 12:30–15:00, polední přestávka je 11:30–12:30. V pátek probíhají montáže. Majitel potvrdil, že v sobotu a neděli je zavřeno; pro domluvu návštěvníci mohou zavolat nebo napsat e-mail.
 
 Volba „O českých svátcích zavřeno“ automaticky zahrnuje i pohyblivý Velký pátek a Velikonoční pondělí v dalších letech. Konkrétní datovaná výjimka má před tímto pravidlem přednost.
 

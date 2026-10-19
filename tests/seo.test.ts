@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { Script, runInNewContext } from 'node:vm';
+import sharp from 'sharp';
 import { z } from 'astro/zod';
 import { createSchemas } from '../src/content.config.ts';
 import { ROUTES, SERVICE_ROUTES, type ServiceSlug } from '../src/lib/urls.ts';
@@ -387,8 +388,8 @@ test('production pairs have absolute self canonicals and reciprocal cs/en/x-defa
     const en = pageSeo(production, route.en, 'en');
     assert.equal(cs.canonical, `https://www.skloservis-brod.cz${route.cs}`);
     assert.equal(en.canonical, `https://www.skloservis-brod.cz${route.en}`);
-    assert.equal(cs.robots, 'index, follow');
-    assert.equal(en.robots, 'index, follow');
+    assert.equal(cs.robots, 'index, follow, max-image-preview:large');
+    assert.equal(en.robots, 'index, follow, max-image-preview:large');
     assert.deepEqual(cs.alternates, en.alternates);
     assert.deepEqual(cs.alternates, [
       { lang: 'cs', href: cs.canonical },
@@ -732,4 +733,102 @@ test('social photographs belong to the actual localized page and never substitut
   assert.equal(seo.socialPhoto(preview, '/sklenene-dvere/', 'cs', gallery), undefined);
   assert.equal(seo.socialPhoto(production, '/en/glass-doors/', 'cs', gallery), undefined);
   assert.equal(seo.socialPhoto(production, '/kontakt/', 'cs', gallery), undefined);
+});
+
+test('branded social previews share a JPEG across languages and respect the deployment base', () => {
+  assert.equal(typeof seo.socialPreview, 'function');
+  const photo = {
+    category: 'sklenene-dvere' as const,
+    image: { src: '/_astro/doors.jpg', width: 1200, height: 1600, format: 'jpg' as const },
+    alt_cs: 'Skleněné dveře',
+    alt_en: 'Glass doors',
+  };
+  for (const context of [preview, production]) {
+    const cs = seo.socialPreview(context, `${context.base}sklenene-dvere/`, 'cs', [photo]);
+    const en = seo.socialPreview(context, `${context.base}en/glass-doors/`, 'en', [photo]);
+    assert.equal(cs.src, en.src);
+    assert.equal(cs.src, `${context.site}${context.base}social/sklenene-dvere.jpg`);
+    assert.equal(cs.type, 'image/jpeg');
+    assert.equal(cs.width, 1200);
+    assert.equal(cs.height, 630);
+    assert.equal(cs.photo, photo);
+    assert.match(cs.alt, /Grafický náhled.*Skleněné dveře/);
+    assert.match(en.alt, /Brand graphic.*Glass doors/);
+    for (const path of ['sklenene-nahrobni-desky/', '404.html', 'unknown/']) {
+      const image = seo.socialPreview(context, `${context.base}${path}`, 'cs', [photo]);
+      assert.equal(image.key, 'brand');
+      assert.equal(image.photo, undefined);
+      assert.equal(image.src, `${context.site}${context.base}social/brand.jpg`);
+      assert.doesNotMatch(image.alt, /fotografi|photograph/i);
+    }
+    assert.equal(
+      seo.socialPreview(context, `${context.base}en/glass-doors/`, 'cs', [photo]).key,
+      'brand',
+    );
+    for (const path of ['', 'produkty/', 'sluzby/', 'galerie/']) {
+      assert.equal(
+        seo.socialPreview(context, `${context.base}${path}`, 'cs', [photo]).key,
+        'overview',
+      );
+    }
+  }
+});
+
+test('social art direction finds hashed local assets within their category without changing covers', () => {
+  const first = {
+    category: 'sklenene-dvere' as const,
+    image: { src: '/_astro/cover.jpg', width: 719, height: 960, format: 'jpg' as const },
+    alt_cs: 'Titulní fotografie dveří',
+    alt_en: 'Door cover photograph',
+  };
+  const detailed = { ...first, image: { ...first.image, src: '/_astro/detail.jpg', width: 1600 } };
+  const curated = {
+    ...first,
+    image: { ...detailed.image, src: '/_astro/wp-1891-frosted-double-sliding-door-front.ABC.jpg' },
+  };
+  const foreign = { ...curated, category: 'sklenene-zabradli' as const };
+  const gallery = Object.freeze([first, detailed, foreign, curated]);
+  const choose = (photos: typeof gallery) =>
+    seo.socialPhoto(production, '/sklenene-dvere/', 'cs', photos);
+  assert.equal(choose(gallery), curated);
+  assert.equal(choose([first, detailed, foreign]), detailed);
+  assert.equal(choose([first, foreign]), first);
+  assert.equal(choose([foreign]), undefined);
+  assert.equal(choose([]), undefined);
+  assert.deepEqual(gallery, [first, detailed, foreign, curated]);
+});
+
+test('social rendering produces a real 1200x630 JPEG without enlarging or cropping photographs', async () => {
+  const { renderSocialImage } = await import('../src/lib/social-image.ts');
+  const logo = readFileSync(new URL('../src/assets/brand/wordpress-logo.png', import.meta.url));
+  for (const size of [
+    { width: 33, height: 55 },
+    { width: 1200, height: 800 },
+  ]) {
+    const photo = await sharp({ create: { ...size, channels: 3, background: '#ff0000' } })
+      .png()
+      .toBuffer();
+    const result = await renderSocialImage(logo, photo);
+    const metadata = await sharp(result).metadata();
+    assert.equal(metadata.format, 'jpeg');
+    assert.equal(metadata.width, 1200);
+    assert.equal(metadata.height, 630);
+    assert.equal(metadata.exif, undefined);
+    const { data, info } = await sharp(result)
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    let count = 0;
+    for (let index = 0; index < data.length; index += info.channels) {
+      if (data[index]! > 230 && data[index + 1]! < 25 && data[index + 2]! < 25) count++;
+    }
+    const scale = Math.min(1, 744 / size.width, 550 / size.height);
+    const expected = Math.round(size.width * scale) * Math.round(size.height * scale);
+    assert.ok(
+      Math.abs(count - expected) < expected * 0.12,
+      `${count} red pixels, expected ${expected}`,
+    );
+  }
+  const brand = await sharp(await renderSocialImage(logo)).metadata();
+  assert.deepEqual([brand.format, brand.width, brand.height], ['jpeg', 1200, 630]);
 });

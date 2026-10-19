@@ -9,7 +9,11 @@ interface Props {
 
 const { lang } = Astro.props;
 const [about, gallery] = await Promise.all([getAbout(), getGallery()]);
-const photo = gallery.find((item) => item.image.src.includes('pergola-glazing')) ?? gallery[0];
+// A 1600px pergola photo downscaled from a 4000px original stays sharp across wide screens;
+// the 88% tint hides compression, so quality 40 keeps the background light.
+const photo =
+  gallery.find((item) => item.image.src.includes('wp-1998-timber-pergola-glass-panels')) ??
+  gallery[0];
 const number = new Intl.NumberFormat(lang === 'cs' ? 'cs-CZ' : 'en-GB');
 // Decorative line icons in metric order: orders, complete projects, glass tonnage, ground edges.
 const icons = [
@@ -43,8 +47,9 @@ const copy = {
         src={photo.image}
         alt=""
         formats={['avif', 'webp']}
-        widths={[480, 800, 1200].filter((width) => width <= photo.image.width)}
+        widths={[640, 960, 1280, 1600]}
         sizes="100vw"
+        quality={40}
         loading="lazy"
         decoding="async"
       />

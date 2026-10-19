@@ -1,10 +1,10 @@
 ---
-// Multi-part icons keep each stroke separate, so arrows and the menu icon can animate.
+// Multi-part icons keep each stroke separate, so their parts can animate.
 const paths = {
   phone:
     'M8 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-4l-5-2-2 3a15 15 0 0 1-7-7l3-2-2-5Z',
-  mail: 'M3 5h18v14H3Z M3 6l9 7 9-7',
-  copy: 'M9 9h12v12H9Z M15 9V3H3v12h6',
+  mail: ['M3 5h18v14H3Z', 'M3 6l9 7 9-7'],
+  copy: ['M9 9h12v12H9Z', 'M15 9V3H3v12h6'],
   send: 'm3 3 18 9-18 9 4-9-4-9Z M7 12h14',
   location: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
   clock: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z M12 6v6l4 2',
@@ -70,7 +70,8 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
     transform-box: fill-box;
     transition:
       transform var(--dur-fast, 160ms) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1)),
-      opacity var(--dur-fast, 160ms) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+      opacity var(--dur-fast, 160ms) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1)),
+      d var(--dur-fast, 160ms) var(--ease, cubic-bezier(0.2, 0.7, 0.2, 1));
   }
 
   [data-icon='arrow-right'] path:first-child {
@@ -154,6 +155,49 @@ const parts: readonly string[] = typeof shape === 'string' ? [shape] : shape;
     [data-icon='menu']
     path:nth-child(3) {
     transform: translateY(-5px) rotate(-45deg);
+  }
+
+  /* Contact icons answer their control while the icon box stays put: the envelope flap lifts, the
+     copied sheet fans out, the external arrow leaves its box and the paper plane noses up. Strokes
+     keep their width, and every change is a transition, so a quick pass reverses smoothly. */
+  [data-icon='send'] path {
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(:is(a, button):focus-visible) [data-icon='mail'] path:last-child {
+      d: path('M3 6l9 3.5 9-3.5');
+    }
+
+    :global(:is(a, button):focus-visible) [data-icon='copy'] path:last-child {
+      d: path('M13 9V1H1v12h8');
+    }
+
+    :global(:is(a, button):focus-visible) [data-icon='external'] path:not(:last-child) {
+      transform: translate(1.5px, -1.5px);
+    }
+
+    :global(button:focus-visible) [data-icon='send'] path {
+      transform: rotate(-12deg);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    :global(:is(a, button):hover) [data-icon='mail'] path:last-child {
+      d: path('M3 6l9 3.5 9-3.5');
+    }
+
+    :global(:is(a, button):hover) [data-icon='copy'] path:last-child {
+      d: path('M13 9V1H1v12h8');
+    }
+
+    :global(:is(a, button):hover) [data-icon='external'] path:not(:last-child) {
+      transform: translate(1.5px, -1.5px);
+    }
+
+    :global(button:not(:disabled):hover) [data-icon='send'] path {
+      transform: rotate(-12deg);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -25,7 +25,8 @@ test('seed content validates and preserves confirmed contacts and historical rou
   assert.equal(hours.weekly.length, 7);
   for (const day of ['mon', 'tue', 'wed', 'thu']) {
     assert.deepEqual(hours.weekly.find((row) => row.day === day)?.slots, [
-      { opens: '08:00', closes: '15:00' },
+      { opens: '08:00', closes: '11:30' },
+      { opens: '12:30', closes: '15:00' },
     ]);
   }
   assert.equal(hours.weekly.find((row) => row.day === 'fri')?.note_cs, 'Realizace montáží');

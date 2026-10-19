@@ -305,7 +305,7 @@ summary:focus-visible {
 .prose ul {
   margin-bottom: 1.1rem;
 }
-.prose a {
+.prose a:not(.button) {
   color: var(--accent);
 }
 .prose li + li {

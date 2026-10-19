@@ -158,7 +158,7 @@ export function pageSeo(context: SeoContext, pathname: string, lang: Language) {
   const route = pageRoute(context, pathname, lang);
   const indexable = context.target === 'production' && !!route;
   return {
-    robots: indexable ? 'index, follow' : 'noindex, follow',
+    robots: indexable ? 'index, follow, max-image-preview:large' : 'noindex, follow',
     canonical: indexable ? new URL(route[lang], context.site).href : undefined,
     alternates: indexable
       ? [
@@ -201,7 +201,19 @@ export function serviceBreadcrumbs(
   };
 }
 
-/** Use a photograph actually shown on the page; a missing product photo keeps the brand fallback. */
+// Art direction only: these are existing gallery files, never changes to gallery order or covers.
+const SOCIAL_PHOTOS: Partial<Record<keyof typeof SERVICE_ROUTES | 'overview', string>> = {
+  overview: 'office-glass-corridor',
+  'sklenene-dvere': 'wp-1891-frosted-double-sliding-door-front',
+  'sklenene-zabradli': 'entrance-stair-glass-railing',
+  'skleneny-sprchovy-kout': 'shower-clear-glass',
+  'sklenena-stena': 'office-glass-corridor',
+  'skleneny-obklad-do-kuchyne': 'kitchen-window-splashback',
+  'sklenene-strisky-zaskleni-pergol-zastreseni': 'wp-1992-glass-canopy-support-rods-entrance',
+  'sklenene-dekorace-gravirovani-fotek': 'wp-2005-music-motif-glass-coasters',
+};
+
+/** Brand overviews may use the gallery; a product may only use its own actual category. */
 export function socialPhoto(
   context: SeoContext,
   pathname: string,
@@ -210,10 +222,43 @@ export function socialPhoto(
 ) {
   const route = pageRoute(context, pathname, lang);
   if (!route) return undefined;
-  if (route.id === 'gallery') return gallery[0];
-  if (Object.hasOwn(SERVICE_ROUTES, route.id))
-    return gallery.find((photo) => photo.category === route.id);
-  return undefined;
+  const overview = ['home', 'products', 'services', 'gallery'].includes(route.id);
+  if (!overview && !Object.hasOwn(SERVICE_ROUTES, route.id)) return undefined;
+  const candidates = overview ? gallery : gallery.filter((photo) => photo.category === route.id);
+  const preferred =
+    SOCIAL_PHOTOS[overview ? 'overview' : (route.id as keyof typeof SERVICE_ROUTES)];
+  return (
+    candidates.find((photo) => photo.image.src.split('/').at(-1)?.startsWith(`${preferred}.`)) ??
+    candidates.find((photo) => photo.image.width >= 1000 && photo.image.height >= 630) ??
+    candidates[0]
+  );
+}
+
+/** Both language versions reference one build-time composite, with localized accessible text. */
+export function socialPreview(
+  context: SeoContext,
+  pathname: string,
+  lang: Language,
+  gallery: Parameters<typeof socialPhoto>[3],
+) {
+  const photo = socialPhoto(context, pathname, lang, gallery);
+  const route = pageRoute(context, pathname, lang);
+  const key = photo ? (Object.hasOwn(SERVICE_ROUTES, route!.id) ? route!.id : 'overview') : 'brand';
+  return {
+    key,
+    photo,
+    src: new URL(`${context.base}social/${key}.jpg`, context.site).href,
+    width: 1200,
+    height: 630,
+    type: 'image/jpeg',
+    alt: photo
+      ? lang === 'cs'
+        ? `Grafický náhled Skloservis Brod s logem a fotografií: ${photo.alt_cs}`
+        : `Brand graphic for Skloservis Brod with its logo and a photograph: ${photo.alt_en}`
+      : lang === 'cs'
+        ? 'Grafický náhled s logem Skloservis Brod na petrolejovém pozadí'
+        : 'Brand graphic with the Skloservis Brod logo on a teal background',
+  };
 }
 
 export function robotsText(context: SeoContext): string {
