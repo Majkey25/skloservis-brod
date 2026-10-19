@@ -1,10 +1,10 @@
 export interface Enquiry {
-  name: string;
+  Jméno: string;
   email: string;
-  message: string;
+  Zpráva: string;
   _honey: string;
   _subject: string;
-  _template: 'table';
+  _template: 'basic';
   _captcha: 'false';
 }
 

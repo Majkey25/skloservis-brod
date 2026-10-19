@@ -4,12 +4,12 @@ import { sendEnquiry, type Enquiry } from '../src/lib/enquiry.ts';
 
 const endpoint = 'https://formsubmit.co/ajax/recipient@example.com';
 const enquiry: Enquiry = {
-  name: 'Žofie Nováková',
+  Jméno: 'Žofie Nováková',
   email: 'visitor@example.com',
-  message: 'Skleněné dveře, prosím.',
+  Zpráva: 'Skleněné dveře, prosím.',
   _honey: '',
   _subject: 'SKLOSERVIS-BROD: Nezávazná poptávka',
-  _template: 'table',
+  _template: 'basic',
   _captcha: 'false',
 };
 

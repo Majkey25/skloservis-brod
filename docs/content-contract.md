@@ -183,6 +183,12 @@ The owner confirmed `skloservis.brod@gmail.com` on 2026-10-17. Obsolete privacy-
 address/phone have not been reused. This content does not replace a reviewed privacy
 notice or authorize a mail service.
 
+The owner selected FormSubmit's `basic` email template on 2026-10-19. Both site
+languages submit the Czech subject “SKLOSERVIS-BROD: Nezávazná poptávka” and field
+names `Jméno`, `email`, `Zpráva`; the standard `email` field preserves the provider's
+reply-to behavior. Interface labels stay localized. FormSubmit's own system text
+is outside this site's translation controls; no undocumented language flag is sent.
+
 The owner confirmed on 2026-10-19 that Monday–Thursday visiting hours are
 08:00–11:30 and 12:30–15:00. The owner subsequently removed duplicate lunch notes;
 the split intervals still close the workshop from 11:30 to 12:30 each day.

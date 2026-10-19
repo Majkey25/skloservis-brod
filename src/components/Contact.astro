@@ -41,7 +41,7 @@ const copy = {
     tooLong: 'Text je příliš dlouhý.',
     send: 'Odeslat poptávku',
     sending: 'Odesíláme…',
-    accepted: 'Děkujeme. Poptávka byla přijata k odeslání.',
+    accepted: 'Děkujeme. Poptávka byla přijata a budeme se jí věnovat v nejbližší pracovní době.',
     failed:
       'Přijetí poptávky se nepodařilo potvrdit, zpráva už ale mohla dorazit. Údaje zůstaly ve formuláři. Než ji odešlete znovu, kontaktujte nás e-mailem nebo telefonicky.',
     workshop: 'Provozovna',
@@ -76,7 +76,8 @@ const copy = {
     tooLong: 'This text is too long.',
     send: 'Send enquiry',
     sending: 'Sending…',
-    accepted: 'Thank you. Your enquiry has been accepted for sending.',
+    accepted:
+      'Thank you. Your enquiry has been received. We will review it during our next working hours.',
     failed:
       'We could not confirm acceptance, but your enquiry may already have arrived. Your details remain in the form. Before sending it again, contact us by email or phone.',
     workshop: 'Workshop',
@@ -212,7 +213,7 @@ const enquiryTexts = JSON.stringify({
               <input
                 class="contact__input"
                 id="contact-name"
-                name="name"
+                name="Jméno"
                 type="text"
                 autocomplete="name"
                 placeholder="Jan Novák"
@@ -251,7 +252,7 @@ const enquiryTexts = JSON.stringify({
               <textarea
                 class="contact__input"
                 id="contact-message"
-                name="message"
+                name="Zpráva"
                 rows="10"
                 placeholder={copy.messageExample}
                 aria-describedby="contact-message-help"
@@ -267,13 +268,11 @@ const enquiryTexts = JSON.stringify({
               autocomplete="off"
               aria-hidden="true"
             />
-            <input
-              type="hidden"
-              name="_subject"
-              value={`SKLOSERVIS-BROD: ${contact[`enquiry_title_${lang}`]}`}
-            />
-            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_subject" value="SKLOSERVIS-BROD: Nezávazná poptávka" />
+            <input type="hidden" name="_template" value="basic" />
             <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="name" data-draft-for="contact-name" disabled />
+            <input type="hidden" name="message" data-draft-for="contact-message" disabled />
             <div class="contact__actions">
               <button class="button" type="submit">
                 <Icon name="send" />
@@ -377,6 +376,12 @@ const enquiryTexts = JSON.stringify({
       const status = form.querySelector<HTMLElement>('[data-enquiry-status]');
       if (!endpoint || !button || !label || !status) return;
       boundForms.add(form);
+      // Older open tabs copy drafts by the previous field names before this script loads.
+      form.querySelectorAll<HTMLInputElement>('[data-draft-for]').forEach((alias) => {
+        const field = form.querySelector<FieldControl>(`#${alias.dataset.draftFor}`);
+        if (field && !field.value) field.value = alias.value;
+        alias.remove();
+      });
       form.noValidate = true;
       const texts = JSON.parse(form.dataset.texts || '{}') as EnquiryTexts;
       const controls = Array.from(form.querySelectorAll<FieldControl>('[required]'));
@@ -396,7 +401,7 @@ const enquiryTexts = JSON.stringify({
           status.textContent = '';
         }),
       );
-      // Capture owns submission even when a cached script version also bound a bubbling listener.
+      // Own submission before older page-load handlers bind an obsolete payload.
       form.addEventListener(
         'submit',
         async (event) => {
@@ -422,12 +427,12 @@ const enquiryTexts = JSON.stringify({
             await sendEnquiry(
               endpoint,
               {
-                name: valueOf('name'),
+                Jméno: valueOf('Jméno'),
                 email: valueOf('email'),
-                message: valueOf('message'),
+                Zpráva: valueOf('Zpráva'),
                 _honey: '',
                 _subject: valueOf('_subject'),
-                _template: 'table',
+                _template: 'basic',
                 _captcha: 'false',
               },
               controller.signal,
@@ -453,7 +458,7 @@ const enquiryTexts = JSON.stringify({
   initializeContactCopy();
   initializeEnquiryForm();
   document.addEventListener('astro:page-load', initializeContactCopy);
-  document.addEventListener('astro:page-load', initializeEnquiryForm);
+  document.addEventListener('astro:after-swap', initializeEnquiryForm);
   document.addEventListener('astro:before-swap', (event) => {
     const current = document.querySelector<HTMLFormElement>('[data-enquiry-form]');
     const incoming = event.newDocument.querySelector<HTMLFormElement>('[data-enquiry-form]');
@@ -463,9 +468,9 @@ const enquiryTexts = JSON.stringify({
       document.documentElement.lang !== event.newDocument.documentElement.lang
     ) {
       // Keep a language change from discarding an enquiry; never persist or resubmit it.
-      for (const name of ['name', 'email', 'message']) {
-        const source = current.querySelector<FieldControl>(`[name="${name}"]`);
-        const target = incoming.querySelector<FieldControl>(`[name="${name}"]`);
+      for (const id of ['contact-name', 'contact-email', 'contact-message']) {
+        const source = current.querySelector<FieldControl>(`#${id}`);
+        const target = incoming.querySelector<FieldControl>(`#${id}`);
         if (source && target) target.value = source.value;
       }
       if (current.getAttribute('aria-busy') === 'true') {
