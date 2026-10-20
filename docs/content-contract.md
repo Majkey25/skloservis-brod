@@ -25,9 +25,11 @@ for `astro:assets`. Paths in YAML are relative to `src/data`, normally
 `../assets/gallery/filename.jpg`. A CMS upload still needs a content row.
 
 `getHours()` returns **all** exceptions. `getNotices()` returns **all** notices, including
-disabled, future and expired records. Pass their complete public data to the browser;
-do not filter them away at build time. Import only `src/lib/schedule.ts` into browser
-code, never the Node/Astro content loader.
+disabled, future and expired records. Base omits the notices component when no notice
+is enabled; otherwise the component passes all notice records unchanged to the browser.
+Pass complete public schedules to the browser without filtering future or expired
+records at build time. Import only `src/lib/schedule.ts` into browser code, never the
+Node/Astro content loader.
 
 ## YAML schemas
 
@@ -40,8 +42,9 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
   `gallery_title`, `gallery_text`, `footer_text`, `seo_title`, `seo_description`.
   `seo_title` and `seo_description` describe the homepage. Other page titles/descriptions
   can use their matching editable heading/intro; product and contact descriptions
-  have dedicated fields. The contact form uses FormSubmit with the validated contact email;
-  changing that recipient requires its own activation and delivery verification.
+  have dedicated fields. Optional `web3forms_access_key` is the public UUID of a Web3Forms
+  form verified for the intended mailbox. A blank or missing key hides the web form;
+  contact links remain available. The key selects the recipient independently of `contact_email`.
 - `contact.yaml`: `phone` (`+420` plus nine digits), `company_id` (eight-character digit
   string), `address`, `billing_address`; required bilingual pairs `title`, `text`,
   `enquiry_title`, `enquiry_text`, `seo_description`. Each address has required `street`,
@@ -183,10 +186,10 @@ The owner confirmed `skloservis.brod@gmail.com` on 2026-10-17. Obsolete privacy-
 address/phone have not been reused. This content does not replace a reviewed privacy
 notice or authorize a mail service.
 
-The owner selected FormSubmit's `basic` email template on 2026-10-19. Both site
+The owner selected Web3Forms on 2026-10-19. Both site
 languages submit the Czech subject “SKLOSERVIS-BROD: Nezávazná poptávka” and field
 names `Jméno`, `email`, `Zpráva`; the standard `email` field preserves the provider's
-reply-to behavior. Interface labels stay localized. FormSubmit's own system text
+reply-to behavior. Interface labels stay localized. Web3Forms' own system text
 is outside this site's translation controls; no undocumented language flag is sent.
 The owner requested a one-minute response deadline on 2026-10-19. Requests retain
 navigation cancellation, never retry automatically and require explicit relay

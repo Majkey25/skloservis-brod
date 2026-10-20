@@ -10,8 +10,8 @@ See the [HTML referrer policy standard](https://html.spec.whatwg.org/multipage/s
 
 The CSP denies document base changes, object embeds, workers and inline event
 handler attributes. Images, fonts, media and manifests must use the same origin.
-Connections allow this origin and `https://formsubmit.co`. Form submissions allow
-only FormSubmit. Frames allow only `https://www.google.com/maps/embed`.
+Connections allow this origin and `https://api.web3forms.com`. Form submissions allow
+only Web3Forms. Frames allow only `https://www.google.com/maps/embed`.
 
 Allowing the map origin does not load a map or implement consent. `MapPreview.astro`
 still creates the iframe only after the visitor chooses to load it, and removes it
@@ -51,26 +51,18 @@ establish these protections. Header hardening needs a separately configured host
 or response-header layer and verification of actual responses. No such deployment
 or infrastructure change is part of the resource policy.
 
-## FormSubmit and CAPTCHA
+## Web3Forms and spam protection
 
-The checked [FormSubmit documentation](https://formsubmit.co/documentation) recommends
-its default reCAPTCHA and documents `_captcha=false` as an opt-out. The
-[AJAX documentation](https://formsubmit.co/ajax-documentation) shows JSON requests
-but does not document CAPTCHA token verification or an AJAX challenge protocol.
-This does not prove AJAX CAPTCHA is impossible; compatibility remains unverified.
+The form sends JSON to the documented [Web3Forms endpoint](https://docs.web3forms.com/getting-started/api-reference).
+Only a successful HTTP response with boolean `success: true` confirms acceptance.
+Requests have a cancellable one-minute deadline and never retry automatically.
+The public access key selects the receiving form; it is not a private API credential.
+Blank keys hide the form, and malformed configured UUIDs fail content validation.
 
-The current form supplies `_captcha=false` in HTML and AJAX. Client validation and
-the honeypot can be bypassed by a caller that submits directly to the provider.
-Removing a client-controlled flag alone would not prove that the provider requires
-CAPTCHA for every request to this recipient.
-
-The minimum documented route without a new backend, service or credentials is
-ordinary browser POST to the existing FormSubmit action, with its default CAPTCHA
-and `_honey` field. That would change the JavaScript submission flow and privacy
-description, so it requires coordinated implementation. Provider confirmation or
-an explicitly authorized validation is still needed before claiming protection
-against callers that disable CAPTCHA. No form flow, CAPTCHA setting or recipient
-activation has changed, and no real submission is needed for these source checks.
+The provider documents server-side spam filtering. The optional `botcheck` checkbox
+and client validation are additional checks, not proof that direct callers are blocked.
+No CAPTCHA SDK is loaded or mandatory challenge enforcement claimed. Stronger CAPTCHA
+protection requires the provider setting and its matching client integration together.
 
 ## Repository publishing permissions
 

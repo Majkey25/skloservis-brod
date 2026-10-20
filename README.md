@@ -25,7 +25,7 @@ Production address: [www.skloservis-brod.cz](https://www.skloservis-brod.cz/). T
 - Build-time content validation and focused tests for dates, schedules and invalid content.
 - GitHub Actions checks for formatting, TypeScript, tests and the static build, followed by Pages publication for successful pushes to `main`.
 
-CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip require an authorized account. Enquiries use FormSubmit with validation, a sending state, timeout handling and preserved input on failure. Phone, email and the relay recipient are encoded in HTML to reduce basic scraping; contact buttons decode them on interaction. This is not encryption: public profiles, public source code and its history, and browser execution still expose the details. Without JavaScript the form is hidden and a public business listing remains available. Relay acceptance alone does not establish inbox delivery, and recipient activation is required.
+CMS forms and content validation are configured. CMS sign-in, account permissions and a live save-to-deployment round-trip require an authorized account. Enquiries use Web3Forms with validation, a sending state, a one-minute deadline and preserved input on failure. The optional public `web3forms_access_key` selects a form and its verified recipient; without a key the form is hidden. Phone and email are encoded in HTML to reduce basic scraping; contact buttons decode them on interaction. This is not encryption: public profiles, public source code and its history, and browser execution still expose the details. Without JavaScript the form is hidden and a public business listing remains available. Relay acceptance alone does not establish inbox delivery.
 
 ## Stack
 
@@ -65,6 +65,6 @@ The [Czech deployment and domain handover guide](docs/nasazeni.md) covers produc
 
 ## Privacy and legal information
 
-The repository includes Czech and English [privacy notices](src/pages/ochrana-osobnich-udaju.md), [cookies and storage information](src/pages/cookies.md), and [company and consumer information](src/pages/pravni-informace.md). No analytics or advertising is configured. FormSubmit receives enquiry data only on submission. Legal notices describe the current implementation; account-specific provider arrangements and operational retention procedures require separate verification.
+The repository includes Czech and English [privacy notices](src/pages/ochrana-osobnich-udaju.md), [cookies and storage information](src/pages/cookies.md), and [company and consumer information](src/pages/pravni-informace.md). No analytics or advertising is configured. Web3Forms receives enquiry data only on submission. Legal notices describe the current implementation; account-specific provider arrangements and operational retention procedures require separate verification.
 
 Supplied photographs and branding belong to their respective rights holders. No open-source media license or stock-video rights are implied.

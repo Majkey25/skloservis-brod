@@ -1,6 +1,5 @@
 ---
 import { getAbout, getContact, getSettings } from '../content';
-import { encodeContact } from '../lib/contact';
 import { pageUrl, type Language } from '../lib/urls';
 import Hours from './Hours.astro';
 import Icon from './Icon.astro';
@@ -30,7 +29,7 @@ const copy = {
       'Dobrý den, prosím o nabídku 1 kusu skla na interiérovou polici: rozměr 200 × 200 mm (20 × 20 cm), tloušťka 6 mm, šedé kouřové, kalené. Všechny hrany broušené a leštěné, rohy zaoblené R5, bez otvorů a výřezů. Bez montáže, osobní odběr v Uherském Brodě. Prosím o cenu a předpokládaný termín zhotovení. Děkuji.\n\nToto je pouze příklad. Napište vlastní zadání.',
     privacy: 'Jak zpracováváme osobní údaje',
     formNote:
-      'Formulář předá vaše jméno, e-mail a zprávu službě FormSubmit k přeposlání na náš e-mail. Pole označená * jsou povinná.',
+      'Formulář předá vaše jméno, e-mail a zprávu službě Web3Forms k přeposlání na náš e-mail. Pole označená * jsou povinná.',
     nameLabel: 'Jméno',
     emailLabel: 'E-mail',
     messageLabel: 'Zpráva',
@@ -61,7 +60,7 @@ const copy = {
       'Hello, please quote for 1 glass pane for an indoor shelf: 200 × 200 mm (20 × 20 cm), 6 mm thick, grey smoked, tempered glass. All edges ground and polished, rounded corners R5, no holes or cut-outs. No installation, collection from your Uherský Brod workshop. Please include the price and estimated completion date. Thank you.\n\nThis is only an example. Write your own requirements.',
     privacy: 'How we process personal data',
     formNote:
-      'The form sends your name, email and message to FormSubmit for forwarding to our email address. Fields marked * are required.',
+      'The form sends your name, email and message to Web3Forms for forwarding to our email address. Fields marked * are required.',
     nameLabel: 'Name',
     emailLabel: 'Email',
     messageLabel: 'Message',
@@ -200,15 +199,15 @@ const enquiryTexts = JSON.stringify({
           }
           aria-describedby="contact-copy-status"
         />
-        {!compact && (
+        {!compact && settings.web3forms_access_key && (
           <form
             class="contact__form"
-            action={pageUrl('contact', lang, import.meta.env.BASE_URL)}
+            action="https://api.web3forms.com/submit"
             method="POST"
             inert
             data-astro-reload
             data-enquiry-form
-            data-recipient={encodeContact(settings.contact_email)}
+            data-access-key={settings.web3forms_access_key}
             data-texts={enquiryTexts}
           >
             <p class="contact__form-note muted">{copy.formNote}</p>
@@ -276,15 +275,13 @@ const enquiryTexts = JSON.stringify({
             </div>
             <input
               class="contact__trap"
-              type="text"
-              name="_honey"
+              type="checkbox"
+              name="botcheck"
               tabindex="-1"
               autocomplete="off"
               aria-hidden="true"
             />
-            <input type="hidden" name="_subject" value="SKLOSERVIS-BROD: Nezávazná poptávka" />
-            <input type="hidden" name="_template" value="basic" />
-            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="subject" value="SKLOSERVIS-BROD: Nezávazná poptávka" />
             <input type="hidden" name="name" data-draft-for="contact-name" disabled />
             <input type="hidden" name="message" data-draft-for="contact-message" disabled />
             <div class="contact__actions">
@@ -348,7 +345,6 @@ const enquiryTexts = JSON.stringify({
 
 <script>
   import { sendEnquiry } from '../lib/enquiry';
-  import { decodeContact } from '../lib/contact';
 
   type FieldControl = HTMLInputElement | HTMLTextAreaElement;
 
@@ -370,7 +366,8 @@ const enquiryTexts = JSON.stringify({
       const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
       const label = button?.querySelector<HTMLElement>('[data-send-label]');
       const status = form.querySelector<HTMLElement>('[data-enquiry-status]');
-      if (!form.dataset.recipient || !button || !label || !status) return;
+      const accessKey = form.dataset.accessKey;
+      if (!accessKey || !button || !label || !status) return;
       boundForms.add(form);
       // Older open tabs copy drafts by the previous field names before this script loads.
       form.querySelectorAll<HTMLInputElement>('[data-draft-for]').forEach((alias) => {
@@ -407,7 +404,7 @@ const enquiryTexts = JSON.stringify({
           if (!form.isConnected || activeRequests.has(form)) return;
           controls.forEach(validate);
           if (!form.reportValidity()) return;
-          if (valueOf('_honey')) {
+          if (form.querySelector<HTMLInputElement>('[name="botcheck"]')?.checked) {
             status.textContent = texts.failed;
             return;
           }
@@ -421,15 +418,14 @@ const enquiryTexts = JSON.stringify({
           status.textContent = texts.sending;
           try {
             await sendEnquiry(
-              `https://formsubmit.co/ajax/${decodeContact(form.dataset.recipient ?? '', 'email')}`,
+              'https://api.web3forms.com/submit',
               {
+                access_key: accessKey,
                 Jméno: valueOf('Jméno'),
                 email: valueOf('email'),
                 Zpráva: valueOf('Zpráva'),
-                _honey: '',
-                _subject: valueOf('_subject'),
-                _template: 'basic',
-                _captcha: 'false',
+                botcheck: false,
+                subject: valueOf('subject'),
               },
               controller.signal,
             );

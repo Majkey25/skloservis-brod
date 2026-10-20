@@ -141,8 +141,8 @@ export function defaultDescription(
   switch (route.id) {
     case 'privacy':
       return lang === 'cs'
-        ? 'Jak Skloservis Brod zpracovává a uchovává osobní údaje z poptávek. Informace o formuláři, službě FormSubmit, příjemcích údajů a možnostech uplatnění vašich práv.'
-        : 'How Skloservis Brod processes and retains personal information from enquiries. Read about the form, FormSubmit, data recipients and how to exercise your privacy rights.';
+        ? 'Jak Skloservis Brod zpracovává a uchovává osobní údaje z poptávek. Informace o formuláři, službě Web3Forms, příjemcích údajů a možnostech uplatnění vašich práv.'
+        : 'How Skloservis Brod processes and retains personal information from enquiries. Read about the form, Web3Forms, data recipients and how to exercise your privacy rights.';
     case 'cookies':
       return lang === 'cs'
         ? 'Cookies a úložiště prohlížeče na webu Skloservis Brod. Jak se ukládá ruční volba jazyka a motivu, jak ji odstranit a kdy se po souhlasu načítá volitelná mapa Google.'

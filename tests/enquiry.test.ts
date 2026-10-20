@@ -2,40 +2,37 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { sendEnquiry, type Enquiry } from '../src/lib/enquiry.ts';
 
-const endpoint = 'https://formsubmit.co/ajax/recipient@example.com';
+const endpoint = 'https://api.web3forms.com/submit';
 const enquiry: Enquiry = {
+  access_key: '12345678-1234-4123-8123-123456789abc',
   Jméno: 'Žofie Nováková',
   email: 'visitor@example.com',
   Zpráva: 'Skleněné dveře, prosím.',
-  _honey: '',
-  _subject: 'SKLOSERVIS-BROD: Nezávazná poptávka',
-  _template: 'basic',
-  _captcha: 'false',
+  botcheck: false,
+  subject: 'SKLOSERVIS-BROD: Nezávazná poptávka',
 };
 
 test('relay acceptance requires explicit true and sends one JSON payload without extra recipients', async (t) => {
-  for (const success of [true, 'true']) {
-    const fetch = t.mock.method(
-      globalThis,
-      'fetch',
-      async (url: RequestInfo | URL, options?: RequestInit) => {
-        assert.equal(url, endpoint);
-        assert.equal(options?.method, 'POST');
-        assert.equal(options?.redirect, 'error');
-        assert.equal(options?.credentials, 'omit');
-        assert.deepEqual(options?.headers, {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        });
-        assert.deepEqual(JSON.parse(String(options?.body)), enquiry);
-        assert.ok(options?.signal instanceof AbortSignal);
-        return Response.json({ success });
-      },
-    );
-    await sendEnquiry(endpoint, enquiry, new AbortController().signal);
-    assert.equal(fetch.mock.callCount(), 1);
-    fetch.mock.restore();
-  }
+  const fetch = t.mock.method(
+    globalThis,
+    'fetch',
+    async (url: RequestInfo | URL, options?: RequestInit) => {
+      assert.equal(url, endpoint);
+      assert.equal(options?.method, 'POST');
+      assert.equal(options?.redirect, 'error');
+      assert.equal(options?.credentials, 'omit');
+      assert.deepEqual(options?.headers, {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      });
+      assert.deepEqual(JSON.parse(String(options?.body)), enquiry);
+      assert.ok(options?.signal instanceof AbortSignal);
+      return Response.json({ success: true });
+    },
+  );
+  await sendEnquiry(endpoint, enquiry, new AbortController().signal);
+  assert.equal(fetch.mock.callCount(), 1);
+  fetch.mock.restore();
 });
 
 test('HTTP errors, HTML, malformed JSON and ambiguous success never confirm acceptance', async (t) => {
@@ -43,9 +40,15 @@ test('HTTP errors, HTML, malformed JSON and ambiguous success never confirm acce
     Response.json({ success: true }, { status: 500 }),
     new Response('<h1>Thank you</h1>'),
     new Response('{"success":'),
-    ...[null, [], {}, { success: false }, { success: 'false' }, { success: 1 }].map((body) =>
-      Response.json(body),
-    ),
+    ...[
+      null,
+      [],
+      {},
+      { success: false },
+      { success: 'true' },
+      { success: 'false' },
+      { success: 1 },
+    ].map((body) => Response.json(body)),
   ];
   const original = structuredClone(enquiry);
   for (const response of responses) {

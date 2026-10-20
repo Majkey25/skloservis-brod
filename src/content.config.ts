@@ -109,6 +109,7 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
   const settings = z.strictObject({
     name: text,
     contact_email: z.email(),
+    web3forms_access_key: optional(z.uuid()),
     hero_title_cs: text,
     hero_title_en: text,
     hero_text_cs: text,

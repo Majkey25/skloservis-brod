@@ -78,6 +78,10 @@ content:
         label: Potvrzený kontaktní e-mail
         type: string
         required: true
+      - name: web3forms_access_key
+        label: Veřejný přístupový klíč formuláře Web3Forms
+        type: string
+        description: UUID formuláře pro firemní schránku. Prázdné pole skryje webový formulář; e-mailová a telefonní tlačítka zůstanou dostupná. Nevkládejte heslo ani soukromý API token.
       - name: hero_title_cs
         label: Úvodní nadpis — česky
         type: string

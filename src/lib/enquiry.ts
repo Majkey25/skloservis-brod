@@ -1,11 +1,10 @@
 export interface Enquiry {
+  access_key: string;
   Jméno: string;
   email: string;
   Zpráva: string;
-  _honey: string;
-  _subject: string;
-  _template: 'basic';
-  _captcha: 'false';
+  botcheck: boolean;
+  subject: string;
 }
 
 /** Resolves only when the relay explicitly accepts the request, not on inbox delivery. */
@@ -20,7 +19,7 @@ export async function sendEnquiry(
   else signal.addEventListener('abort', abort, { once: true });
   // Keep the deadline cancellable and support browsers without AbortSignal.any/timeout.
   const timer = setTimeout(
-    () => controller.abort(new DOMException('FormSubmit response timed out', 'TimeoutError')),
+    () => controller.abort(new DOMException('Web3Forms response timed out', 'TimeoutError')),
     60_000,
   );
   try {
@@ -32,15 +31,15 @@ export async function sendEnquiry(
       credentials: 'omit',
       signal: controller.signal,
     });
-    if (!response.ok) throw new Error(`FormSubmit HTTP ${response.status}`);
+    if (!response.ok) throw new Error(`Web3Forms HTTP ${response.status}`);
     const result: unknown = await response.json();
     if (
       typeof result !== 'object' ||
       result === null ||
       !('success' in result) ||
-      (result.success !== true && result.success !== 'true')
+      result.success !== true
     ) {
-      throw new Error('FormSubmit did not confirm acceptance');
+      throw new Error('Web3Forms did not confirm acceptance');
     }
   } finally {
     clearTimeout(timer);

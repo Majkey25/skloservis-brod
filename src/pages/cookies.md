@@ -29,7 +29,7 @@ Souhlas platí pouze pro právě otevřenou mapu a web jej neukládá do cookies
 
 ## Formulář a externí odkazy
 
-Po odeslání formuláře dostane služba FormSubmit jeho obsah a technické údaje požadavku. Web nenačítá její sledovací skript ani vloženou CAPTCHA. JavaScriptový požadavek se odesílá bez cookies této služby; při odeslání bez JavaScriptu se otevře její vlastní stránka s vlastními pravidly. Podrobnosti uvádějí [zásady soukromí](../ochrana-osobnich-udaju/).
+Po odeslání formuláře dostane služba Web3Forms jeho obsah a technické údaje požadavku. Web nenačítá její sledovací skript ani vloženou CAPTCHA. JavaScriptový požadavek se odesílá bez cookies této služby. Bez JavaScriptu není formulář dostupný; můžete využít odkaz na veřejný firemní profil. Podrobnosti uvádějí [zásady soukromí](../ochrana-osobnich-udaju/).
 
 Odkaz „Otevřít v Google Maps“ nebo jiný externí odkaz otevře samostatnou službu nezávisle na souhlasu s vloženou mapou. Její provozovatel může po otevření zpracovávat údaje podle vlastních pravidel.
 

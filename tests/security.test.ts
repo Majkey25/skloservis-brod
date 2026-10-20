@@ -16,8 +16,8 @@ test('resource policy blocks base replacement, plugins, workers and inline event
 });
 
 test('resource policy limits connections, forms, frames and local assets', () => {
-  assert.deepEqual(directives.get('connect-src'), ["'self'", 'https://formsubmit.co']);
-  assert.deepEqual(directives.get('form-action'), ['https://formsubmit.co']);
+  assert.deepEqual(directives.get('connect-src'), ["'self'", 'https://api.web3forms.com']);
+  assert.deepEqual(directives.get('form-action'), ['https://api.web3forms.com']);
   assert.deepEqual(directives.get('frame-src'), ['https://www.google.com/maps/embed']);
   for (const name of ['img-src', 'font-src', 'media-src', 'manifest-src']) {
     assert.deepEqual(directives.get(name), ["'self'"], name);

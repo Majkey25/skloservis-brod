@@ -29,7 +29,7 @@ Consent applies only to the currently open map; this website does not save it in
 
 ## Form and external links
 
-Submitting the form sends its content and technical request information to FormSubmit. The website does not load its tracking script or an embedded CAPTCHA. The JavaScript request omits that service's cookies; submitting without JavaScript opens its own page with its own policies. See the [privacy notice](../privacy/).
+Submitting the form sends its content and technical request information to Web3Forms. The website does not load its tracking script or an embedded CAPTCHA. The JavaScript request omits that service's cookies. The form is unavailable without JavaScript; you can use the public business listing link instead. See the [privacy notice](../privacy/).
 
 “Open in Google Maps” and other external links open separate services independently of consent to the embedded map. After you open a link, its operator may process information under its own policies.
 

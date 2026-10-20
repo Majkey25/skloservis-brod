@@ -55,6 +55,24 @@ test('seed content validates and preserves confirmed contacts and historical rou
   schemas.gallery.parse(await read('gallery'));
 });
 
+test('form access key is optional but configured values must be UUIDs', async () => {
+  const settings = schemas.settings.parse(await read('settings'));
+  for (const web3forms_access_key of [undefined, '', null]) {
+    assert.equal(
+      schemas.settings.parse({ ...settings, web3forms_access_key }).web3forms_access_key,
+      undefined,
+    );
+  }
+  const key = '12345678-1234-4123-8123-123456789abc';
+  assert.equal(
+    schemas.settings.parse({ ...settings, web3forms_access_key: key }).web3forms_access_key,
+    key,
+  );
+  for (const web3forms_access_key of ['YOUR_ACCESS_KEY_HERE', 'not-a-key']) {
+    assert.equal(schemas.settings.safeParse({ ...settings, web3forms_access_key }).success, false);
+  }
+});
+
 test('hours reject missing or duplicate days, invalid/overnight/overlapping slots and exceptions', async () => {
   const valid = schemas.hours.parse(await read('hours'));
   const rejected = (value: unknown) => assert.equal(schemas.hours.safeParse(value).success, false);
