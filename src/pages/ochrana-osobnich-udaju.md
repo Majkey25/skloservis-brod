@@ -5,7 +5,7 @@ lang: cs
 alternate: /en/privacy/
 ---
 
-Aktualizováno 18. října 2026.
+Aktualizováno 20. října 2026.
 
 ## Správce a kontakt
 
@@ -41,15 +41,15 @@ Poptávky se z tohoto webu neukládají do samostatné databáze. E-mailová kom
 
 Uchování a odstranění podkladů zajišťuje majitel; kód webu nemaže zprávy v Gmailu ani papírové dokumenty.
 
-**Běžnou vyřízenou poptávku a související podklady uchováváme ještě jeden měsíc od jejího vyřízení pro zpětné dohledání.** Zákazník může [e-mailem](../kontakt/#contact-methods) požádat o delší uchování pro konkrétní pokračování jednání. Účel a další dobu uchování s ním dohodneme individuálně.
+**Běžnou vyřízenou poptávku a související podklady uchováváme ještě 7 dní od jejího vyřízení pro zpětné dohledání.** Zákazník může [e-mailem](../kontakt/#contact-methods) požádat o delší uchování pro konkrétní pokračování jednání. Účel a další dobu uchování s ním dohodneme individuálně.
 
 [E-mailem](../kontakt/#contact-methods) můžete kdykoli poslat žádost o odstranění osobních údajů, včetně e-mailů, elektronických souborů a papírových podkladů. Výmaz se posuzuje podle podmínek GDPR. Nevztahuje se na údaje, které musíme dále uchovávat kvůli zákonné povinnosti nebo oprávněné ochraně konkrétních právních nároků.
 
-Pokud vznikne zakázka, údaje potřebné k jejímu plnění se uchovávají po dobu zakázky a řešení souvisejících povinností a nároků. Účetní, daňové a další povinné doklady mají vlastní zákonné lhůty podle druhu dokumentu. Jednoměsíční lhůta pro vyřízenou poptávku nenahrazuje tyto povinnosti ani retenční pravidla poskytovatelů hostingu a e-mailu.
+Pokud vznikne zakázka, údaje potřebné k jejímu plnění se uchovávají po dobu zakázky a řešení souvisejících povinností a nároků. Účetní, daňové a další povinné doklady mají vlastní zákonné lhůty podle druhu dokumentu. Sedmidenní lhůta pro vyřízenou poptávku nenahrazuje tyto povinnosti ani retenční pravidla poskytovatelů hostingu a e-mailu.
 
 ## Poskytovatelé služeb a předávání
 
-Stránky hostuje GitHub Pages. Kontaktní adresa využívá službu Gmail společnosti Google. Při odeslání e-mailu se zpráva zpracovává také v e-mailových službách odesílatele a příjemce. Webový formulář využívá Web3Forms. Pro tento formulář jsme nastavili automatické mazání přijatých podání starších než sedm dní. Další informace o zpracování uvádějí [zásady soukromí Web3Forms](https://web3forms.com/privacy). Uchování u poskytovatele je oddělené od naší jednoměsíční lhůty po vyřízení poptávky.
+Stránky hostuje GitHub Pages. Kontaktní adresa využívá službu Gmail společnosti Google. Při odeslání e-mailu se zpráva zpracovává také v e-mailových službách odesílatele a příjemce. Webový formulář využívá Web3Forms. Pro tento formulář jsme nastavili automatické mazání podání starších než 7 dní od jejich přijetí. Další informace o zpracování uvádějí [zásady soukromí Web3Forms](https://web3forms.com/privacy). Web3Forms počítá tuto lhůtu od přijetí formuláře, nikoli od vyřízení poptávky ve firmě. Toto nastavení nemaže kopie doručené do Gmailu.
 
 Poskytovatelé mohou zpracovávat údaje také mimo Evropský hospodářský prostor, včetně USA a Indie. Informace o jejich zpracování a popisovaných mechanismech předávání najdete v [prohlášení GitHubu](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement#international-data-transfers), [zásadách Google](https://policies.google.com/privacy?hl=cs) a [zásadách Web3Forms](https://web3forms.com/privacy). Web3Forms popisuje využití standardních smluvních doložek ve své smlouvě o zpracování a zpracování IP a e-mailové adresy také službami pro kontrolu spamu. Na uvedeném firemním kontaktu si můžete vyžádat další informace nebo poptávku vyřídit telefonicky.
 

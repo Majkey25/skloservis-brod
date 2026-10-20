@@ -15,7 +15,7 @@ Před skutečným přechodem ještě potřebujeme:
 - Před přechodem na jiný host znovu ověřit funkčnost formuláře. Web3Forms vyžaduje `web3forms_access_key` formuláře ověřeného pro `skloservis.brod@gmail.com`; bez klíče není webový formulář dostupný. Zkontrolovat také limit tarifu a uchování zpráv v administraci služby. Historický jediný povolený test FormSubmit byl spotřebován; další skutečný test vyžaduje nové povolení. Potvrzení služby ani `mailto:` samy neprokazují doručení. Prověřit také podmínky poskytovatele popsané v právních poznámkách.
 - Dokončit inventuru starých adres a médií včetně případných `?page_id=…` aliasů. Kód zachovává 14 známých českých adres, to ale samo neprokazuje úplnost historických odkazů.
 - Ověřit výsledný produkční výběr jazyka. Produkční sestavení již nechává českou úvodní adresu českou bez automatického přechodu na `/en/`; náhled zachovává výchozí výběr podle zařízení. Přímé jazykové adresy a ruční přepínač zůstávají dostupné. [Google doporučuje samostatné jazykové adresy a varuje před automatickým přesměrováním mezi nimi](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites). Skutečný dopad na indexaci zatím není změřený.
-- Před přechodem potvrdit aktuální firemní informace a provozní pravidla. Jednoměsíční uchování vyřízených poptávek zajišťuje majitel v e-mailu a papírových záznamech, nikoli tento web.
+- Před přechodem potvrdit aktuální firemní informace a provozní pravidla. Uchování běžných vyřízených poptávek po dobu 7 dní od vyřízení zajišťuje majitel v e-mailu a papírových záznamech, nikoli tento web. Sedmidenní mazání ve Web3Forms se počítá od přijetí formuláře a nemaže doručené kopie v Gmailu.
 
 ## Alternativa: Pages ponechat jako samostatný náhled
 

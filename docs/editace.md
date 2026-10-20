@@ -40,7 +40,7 @@ Firemní údaje zahrnují zkušenosti, roční čísla a čtyři skupiny služeb
 
 Hodnocení Google opište z veřejného profilu firmy na Google Maps: odkaz `https://www.google.com/maps?cid=…`, průměr, počet recenzí a datum, kdy jste je zkontrolovali. Nejvýše čtyři vybrané recenze vkládejte doslova, s počtem hvězd a autorem ve tvaru jméno a iniciála. Smazaná nebo změněná recenze na Google znamená, že ji odstraníte nebo upravíte i zde. Pokud autor požádá o odstranění citace, smažte ji. Vymazáním všech polí se blok Google skryje.
 
-V části „Soukromí a právní informace“ lze upravit české i anglické dokumenty. Změna zásad musí odpovídat skutečnému fungování firmy. Běžné vyřízené poptávky mají podle potvrzené politiky lhůtu jeden měsíc od vyřízení; zákazník může e-mailem požádat o odůvodněné prodloužení nebo o výmaz elektronických i papírových podkladů. Zákonné povinnosti uchování zůstávají zachované. Web sám nemaže firemní schránku ani fyzické dokumenty.
+V části „Soukromí a právní informace“ lze upravit české i anglické dokumenty. Změna zásad musí odpovídat skutečnému fungování firmy. Běžné vyřízené poptávky mají podle potvrzené politiky lhůtu 7 dní od vyřízení; zákazník může e-mailem požádat o odůvodněné prodloužení nebo o výmaz elektronických i papírových podkladů. Web3Forms má samostatné automatické mazání podání starších než 7 dní od přijetí; toto nastavení nemaže kopie v Gmailu. Zákonné povinnosti uchování zůstávají zachované. Web sám nemaže firemní schránku ani fyzické dokumenty.
 
 ## Zveřejnění
 

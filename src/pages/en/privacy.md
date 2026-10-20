@@ -5,7 +5,7 @@ lang: en
 alternate: /ochrana-osobnich-udaju/
 ---
 
-Updated 18 October 2026.
+Updated 20 October 2026.
 
 ## Controller and contact
 
@@ -41,15 +41,15 @@ This website does not save enquiries in a separate database. Email correspondenc
 
 The owner handles retention and deletion; the website code does not delete Gmail messages or paper documents.
 
-**We retain an ordinary resolved enquiry and related material for one further month after it is resolved, so it can be retrieved.** A customer may [email us](../contact/#contact-methods) to request longer retention for a specific continuation of discussions. We agree the purpose and additional period individually.
+**We retain an ordinary resolved enquiry and related material for 7 days after it is resolved, so it can be retrieved.** A customer may [email us](../contact/#contact-methods) to request longer retention for a specific continuation of discussions. We agree the purpose and additional period individually.
 
 You may also [email us](../contact/#contact-methods) at any time to request deletion of personal information, including emails, electronic files and paper material. Erasure is assessed under GDPR conditions. It does not cover information that must still be retained to meet a legal duty or legitimately protect specific legal claims.
 
-If an enquiry becomes a project, information needed for performance is retained for the project and related duties and claims. Accounting, tax and other mandatory documents follow the statutory periods applicable to their category. The one-month period for a resolved enquiry does not replace those duties or the hosting and email providers' own retention rules.
+If an enquiry becomes a project, information needed for performance is retained for the project and related duties and claims. Accounting, tax and other mandatory documents follow the statutory periods applicable to their category. The seven-day period for a resolved enquiry does not replace those duties or the hosting and email providers' own retention rules.
 
 ## Service providers and transfers
 
-GitHub Pages hosts the website. The contact address uses Google's Gmail service. Sending an email also involves the sender's and recipient's email services. The web form uses Web3Forms. We configured this form to automatically delete submissions older than seven days. Further processing information is available in the [Web3Forms privacy policy](https://web3forms.com/privacy). Provider retention is separate from our one-month period after an enquiry is resolved.
+GitHub Pages hosts the website. The contact address uses Google's Gmail service. Sending an email also involves the sender's and recipient's email services. The web form uses Web3Forms. We configured this form to automatically delete submissions older than 7 days. Further processing information is available in the [Web3Forms privacy policy](https://web3forms.com/privacy). Web3Forms counts this period from submission, rather than from the resolution of an enquiry by the company. This setting does not delete copies delivered to Gmail.
 
 Providers may process data outside the European Economic Area, including in the United States and India. Their processing and described transfer mechanisms are explained in the [GitHub statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement#international-data-transfers), [Google privacy policy](https://policies.google.com/privacy?hl=en) and [Web3Forms privacy policy](https://web3forms.com/privacy). Web3Forms describes Standard Contractual Clauses in its processing agreement and may also send IP and email addresses to spam-checking services. You can request further information using the company contact above or make your enquiry by telephone.
 
