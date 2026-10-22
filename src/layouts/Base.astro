@@ -37,9 +37,7 @@ interface Props {
 const { lang, page, title, description } = Astro.props;
 const settings = await getSettings();
 const hasEnabledNotices = (await getNotices()).some((notice) => notice.enabled);
-const pageTitle = (
-  title ?? (lang === 'cs' ? settings.seo_title_cs : settings.seo_title_en)
-).replace(/\s+[—–-]\s+/g, ' | ');
+const pageTitle = title ?? (lang === 'cs' ? settings.seo_title_cs : settings.seo_title_en);
 const base = import.meta.env.BASE_URL;
 const seo = seoContext(import.meta.env.SITE_BUILD_TARGET, Astro.site, base);
 const metadata = pageSeo(seo, Astro.url.pathname, lang);
