@@ -421,6 +421,11 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
       const activeCard = () =>
         cards.find((card) => Number(card.dataset.index) === visibleItems[activeIndex]?.index);
 
+      const viewerSizes = (item: GalleryItemData) => {
+        const ratio = item.width / item.height;
+        return `(max-width: 39.99rem) min(calc(96vw - 1.5rem), calc((86svh - 15rem) * ${ratio})), min(calc(94vw - 9.5rem), calc(72rem - 9.5rem), calc((86svh - 12rem) * ${ratio}))`;
+      };
+
       const renderSlide = (index: number) => {
         if (closing || !visibleItems.length) return;
         stopFlight();
@@ -450,10 +455,10 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
         activeImage.width = item.width;
         activeImage.height = item.height;
         // Match the contained image, including portrait photos, without requesting full originals.
-        const ratio = item.width / item.height;
-        const sizes = `(max-width: 39.99rem) min(calc(96vw - 1.5rem), calc((86svh - 15rem) * ${ratio})), min(calc(94vw - 9.5rem), calc(72rem - 9.5rem), calc((86svh - 12rem) * ${ratio}))`;
+        const sizes = viewerSizes(item);
 
         const preloader = new Image();
+        preloader.fetchPriority = 'high';
         pendingImage = preloader;
         preloader.onload = () => {
           if (currentReq !== requestId || !activeDialog.open) return;
@@ -578,6 +583,17 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
       };
 
       cards.forEach((card) => {
+        const warm = () => {
+          const item = items.find((item) => item.index === Number(card.dataset.index));
+          if (!item) return;
+          const image = new Image();
+          image.fetchPriority = 'low';
+          image.sizes = viewerSizes(item);
+          image.srcset = item.srcset;
+          image.src = item.src;
+        };
+        card.addEventListener('pointerenter', warm, { ...listenerOptions, once: true });
+        card.addEventListener('focus', warm, { ...listenerOptions, once: true });
         card.addEventListener(
           'click',
           (e) => {
