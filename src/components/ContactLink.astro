@@ -7,25 +7,32 @@ interface Props {
   kind: ContactKind;
   lang: Language;
   copy?: boolean;
+  reveal?: boolean;
   class?: string;
   style?: string;
 }
 
-const { value, kind, lang, copy = false, ...attributes } = Astro.props;
-const Tag = copy ? 'button' : 'a';
+const { value, kind, lang, copy = false, reveal = false, ...attributes } = Astro.props;
+const Tag = copy || reveal ? 'button' : 'a';
 ---
 
 <Tag
   {...attributes}
-  type={copy ? 'button' : undefined}
-  href={copy ? undefined : `${pageUrl('contact', lang, import.meta.env.BASE_URL)}#contact-methods`}
+  type={copy || reveal ? 'button' : undefined}
+  href={
+    copy || reveal
+      ? undefined
+      : `${pageUrl('contact', lang, import.meta.env.BASE_URL)}#contact-methods`
+  }
   data-astro-reload
   data-contact-value={encodeContact(value)}
   data-contact-kind={kind}
   data-contact-copy={copy ? '' : undefined}
+  data-contact-reveal={reveal ? '' : undefined}
 >
   <slot />
 </Tag>
+{reveal && <a class="text-link" data-contact-revealed data-astro-reload hidden></a>}
 
 <script>
   import { contactUri, decodeContact } from '../lib/contact';
@@ -44,6 +51,17 @@ const Tag = copy ? 'button' : 'a';
     try {
       value = decodeContact(control.dataset.contactValue ?? '', kind);
     } catch {
+      return;
+    }
+    if (control.hasAttribute('data-contact-reveal')) {
+      const link = control.nextElementSibling;
+      if (!(link instanceof HTMLAnchorElement)) return;
+      event.preventDefault();
+      link.href = contactUri(value, kind);
+      link.textContent = value;
+      link.hidden = false;
+      control.hidden = true;
+      link.focus({ preventScroll: true });
       return;
     }
     if (control instanceof HTMLAnchorElement) {
@@ -82,3 +100,13 @@ const Tag = copy ? 'button' : 'a';
     }
   });
 </script>
+
+<style>
+  [data-contact-reveal][hidden] {
+    display: none;
+  }
+
+  [data-contact-revealed] {
+    overflow-wrap: anywhere;
+  }
+</style>

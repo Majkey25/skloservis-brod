@@ -20,6 +20,8 @@ const copy = {
     email: 'Napsat e-mail',
     copy: 'Kopírovat e-mail',
     copyPhone: 'Kopírovat telefon',
+    revealEmail: 'Zobrazit e-mail',
+    revealPhone: 'Zobrazit telefon',
     mailHelp: 'Odkaz otevře vaši e-mailovou aplikaci. Zprávu odešlete až v ní.',
     contactHelp:
       'Na stránce Kontakty nám můžete napsat přímo z formuláře nebo otevřít e-mailovou aplikaci.',
@@ -52,6 +54,8 @@ const copy = {
     email: 'Write an email',
     copy: 'Copy email address',
     copyPhone: 'Copy phone number',
+    revealEmail: 'Reveal email',
+    revealPhone: 'Reveal phone',
     mailHelp: 'The link opens your email application. You send the message from there.',
     contactHelp: 'On the Contact page you can use our enquiry form or open your email application.',
     messageHelp:
@@ -163,6 +167,32 @@ const enquiryTexts = JSON.stringify({
             <Icon name="copy" />
             {copy.copyPhone}
           </ContactLink>
+          {!compact && (
+            <>
+              <div>
+                <ContactLink
+                  class="text-link contact__copy"
+                  value={settings.contact_email}
+                  kind="email"
+                  lang={lang}
+                  reveal
+                >
+                  {copy.revealEmail}
+                </ContactLink>
+              </div>
+              <div>
+                <ContactLink
+                  class="text-link contact__copy"
+                  value={contact.phone}
+                  kind="phone"
+                  lang={lang}
+                  reveal
+                >
+                  {copy.revealPhone}
+                </ContactLink>
+              </div>
+            </>
+          )}
         </div>
         <p class="contact__help muted">
           {compact ? copy.contactHelp : copy.mailHelp}{' '}
