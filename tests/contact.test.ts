@@ -11,12 +11,21 @@ test('contact actions preserve the exact number and email including mail URI del
   assert.equal(contactUri(email, 'email'), 'mailto:enquiries%2Bglass@example.com');
 });
 
+test('email URI restores every encoded @ and preserves other escapes', () => {
+  assert.equal(contactUri('a@b@example.com', 'email'), 'mailto:a@b@example.com');
+  assert.equal(
+    contactUri('a%40b?subject=x&body=y@example.com', 'email'),
+    'mailto:a%2540b%3Fsubject%3Dx%26body%3Dy@example.com',
+  );
+});
+
 test('contact decoding rejects malformed payloads and non-contact values', () => {
   assert.throws(() => decodeContact('%%%', 'email'));
   for (const value of [
     'javascript:alert(1)',
     'name@example.com\r\nBcc:other@example.com',
     'not-an-email',
+    'a@b@example.com',
   ])
     assert.throws(() => decodeContact(encodeContact(value), 'email'));
   for (const value of ['+42012345', '123456789', '+420123456789?body=test'])
