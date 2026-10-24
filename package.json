@@ -5,7 +5,7 @@
   "private": true,
   "description": "Bilingual Astro website for SKLOSERVIS-BROD s.r.o.",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.23.4"
   },
   "scripts": {
     "dev": "astro dev",
@@ -13,6 +13,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "node --test tests/*.test.ts",
+    "lighthouse": "lhci autorun",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "astro": "astro"
@@ -22,15 +23,26 @@
     "sharp": true
   },
   "dependencies": {
-    "astro": "^7.3.5",
+    "astro": "^7.4.2",
     "js-yaml": "^5.4.2",
     "sharp": "^0.35.4"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.12",
+    "@lhci/cli": "0.15.1",
     "@types/node": "^24.19.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "@lhci/cli@0.15.1": {
+      "basic-ftp": "6.2.3",
+      "lighthouse": "13.5.0",
+      "proxy-agent": "8.0.2",
+      "puppeteer-core": "25.15.0",
+      "tmp": "0.2.7",
+      "uuid": "11.1.1"
+    }
   }
 }
