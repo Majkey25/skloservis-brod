@@ -16,5 +16,5 @@ export function decodeContact(encoded: string, kind: ContactKind): string {
 export function contactUri(value: string, kind: ContactKind): string {
   return kind === 'phone'
     ? `tel:${value}`
-    : `mailto:${encodeURIComponent(value).replace('%40', '@')}`;
+    : `mailto:${encodeURIComponent(value).replaceAll('%40', '@')}`;
 }
