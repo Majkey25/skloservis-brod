@@ -1,4 +1,6 @@
-- enabled: false
-  level: info
-  text_cs: Z důvodu dovolené bude skloservis-brod zavřený.
+- enabled: true
+  level: attention
+  from: 2026-10-26
+  to: 2026-10-30
+  text_cs: Z důvodu svátků bude skloservis-brod zavřený.
   text_en: Due to vacation skloservis-brod will be closed.
