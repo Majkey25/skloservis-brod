@@ -30,7 +30,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@lhci/cli": "0.15.1",
-    "@types/node": "^24.19.0",
+    "@types/node": "^26.6.5",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.2",
     "typescript": "^6.0.3"
