@@ -157,6 +157,15 @@ přenesených dat při procházení, ale přibližně o 150 ms pomalejší prvn�
 zrychlení webu. Před změnou se porovnává první zobrazení, přenos při procházení
 a výsledný vzhled; laboratorní skóre není měřením pořadí.
 
+Varianta `'always'` byla 28. října 2026 změřena znovu: Lighthouse 12, mobilní profil,
+produkční sestavení s gzipem, střídavé běhy před a po. Odstranila blokující styly
+a zkrátila FCP úvodu z 1,38 na 1,27 s, ale medián TBT vzrostl na úvodu z 25 na 134 ms
+a v galerii z 24 na 344 ms. Rozvržení stránky se přesunulo za první vykreslení
+a skóre výkonu galerie kleslo ze 100 na 88–93. Proto zůstává `'auto'`.
+Upozornění „Vynucené přeformátování“ pochází z `ClientRouter` Astra, který při startu
+čte pozici posunu stránky a tím vynutí první výpočet rozvržení; tato práce
+se provádí tak jako tak.
+
 Ruční volba jazyka a motivu i výchozí nastavení zařízení zůstávají beze změny.
 Pouze náhled může při čerstvé návštěvě české homepage bez parametrů, fragmentu
 a interního referreru přejít podle jazyka zařízení či uložené angličtiny na `/en/`.
@@ -173,6 +182,14 @@ produkční nasazení vyžaduje také kontrolu výsledného HTML a prohlížeče
 Český titul homepage uvádí obor, město, sklo na míru a značku. Změna doplňuje
 skutečnou nabídku, nesleduje pevný počet znaků. Vyhledávač může titulek přepsat;
 [Google doporučuje výstižný text bez zbytečného opakování](https://developers.google.com/search/docs/appearance/title-link).
+
+Detaily výrobků mají volitelný `seo_title` z CMS. Formuluje stejný výrobek slovy
+běžných dotazů, například „Sklo za kuchyňskou linku na míru“; nadpis H1, navigace
+a drobečková navigace dál používají název výrobku. Popisy uvádějí bezplatný návrh
+a zaměření jen u šesti výrobků, kde to potvrzuje text `about.consultation_*`.
+Patička a popis úvodu přebírají potvrzenou oblast „Uherský Brod, celý Zlínský kraj
+i další kraje“ z textu O společnosti. Text služeb jmenuje i zrcadla, sklo na nábytek,
+vitríny a krbová skla, které dokládá galerie; nevznikají pro ně nové stránky.
 
 Krátké shrnutí výrobku doplňují volitelné dvojjazyčné oddíly `details` v CMS.
 Obsahují doložené možnosti skel, kování a uchycení převzaté z původních firemních

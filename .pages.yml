@@ -754,6 +754,16 @@ content:
           - { name: title_en, label: 'Nadpis — anglicky', type: string, required: true }
           - { name: text_cs, label: 'Text — česky', type: text, required: true }
           - { name: text_en, label: 'Text — anglicky', type: text, required: true }
+      - name: seo_title_cs
+        label: SEO titulek — česky (volitelné)
+        description: Titulek ve vyhledávání bez názvu značky, nejvýše 60 znaků. Prázdné pole použije název výrobku.
+        type: string
+        options: { maxlength: 60 }
+      - name: seo_title_en
+        label: SEO titulek — anglicky (volitelné)
+        description: Search title without the brand name, at most 60 characters. Empty uses the product name.
+        type: string
+        options: { maxlength: 60 }
       - name: seo_description_cs
         label: SEO popis — česky
         type: text

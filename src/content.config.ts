@@ -250,6 +250,9 @@ export const createSchemas = <T extends z.ZodType>(image: T) => {
           .array(z.strictObject({ title_cs: text, title_en: text, text_cs: text, text_en: text }))
           .max(4),
       ),
+      // Search title without the brand suffix; the page title falls back to the product name.
+      seo_title_cs: optional(text.max(60)),
+      seo_title_en: optional(text.max(60)),
       seo_description_cs: text,
       seo_description_en: text,
       image: optional(image),
