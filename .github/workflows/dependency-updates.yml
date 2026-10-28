@@ -26,6 +26,6 @@ jobs:
       actions: write
       checks: read
       statuses: read
-    uses: Majkey25/Project-Guard/.github/workflows/dependency-patch-merge.yml@0be6e1daeb1c1e6e923e1e4065877f5f57c9dfcb
+    uses: Majkey25/Project-Guard/.github/workflows/dependency-patch-merge.yml@c18ff6c13bea2735646088c03358302a4f0c571b
     with:
       auto-merge: true
