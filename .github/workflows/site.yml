@@ -22,39 +22,73 @@ env:
   ASTRO_TELEMETRY_DISABLED: 1
 
 jobs:
+  ci:
+    name: Locked dependency checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: node_modules/.astro
+          key: astro-ci-${{ hashFiles('src/assets/**', 'package-lock.json', 'astro.config.mjs') }}
+          restore-keys: astro-ci-
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm run build -- --timings
+      - run: npm test
+      - run: node --test tests/output.test.mjs
+      - run: node scripts/check-output.mjs
+      - run: node scripts/check-artifact.ts
+      # Preview indexing rules are checked above; Lighthouse covers runtime quality.
+      - run: npm run lighthouse
+
   verify:
     name: Verify and build
+    needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
       target: ${{ steps.target.outputs.target }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npm run format:check
-      - run: npm run check
-      - run: npm test
       # Preview unless this is main and the repository variable SITE_DEPLOY_TARGET is production.
       - id: target
         name: Select Pages target
         run: node scripts/pages-target.ts
         env:
           SITE_DEPLOY_TARGET: ${{ vars.SITE_DEPLOY_TARGET }}
-      - run: npm run build
+      - uses: withastro/action@a8b97df764791eb61fbf3338ef713b0e61ae05c5 # v6.1.4
+        with:
+          out-dir: ${{ steps.target.outputs.out }}
+          build-cmd: |
+            set -euo pipefail
+            git diff --exit-code -- package.json package-lock.json
+            npm audit --audit-level=high
+            npm run format:check
+            npm run check
+            npm run build -- --timings
+            npm test
+            node scripts/check-output.mjs "$OUT_DIR"
+            node scripts/check-artifact.ts
         env:
+          OUT_DIR: ${{ steps.target.outputs.out }}
           SITE_BUILD_TARGET: ${{ steps.target.outputs.target }}
           SITE_DEPLOY_TARGET: ${{ vars.SITE_DEPLOY_TARGET }}
-      - name: Check the artifact's indexing state
-        run: node scripts/check-artifact.ts
-        env:
-          SITE_BUILD_TARGET: ${{ steps.target.outputs.target }}
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: ${{ steps.target.outputs.out }}
 
   deploy:
     name: Publish ${{ needs.verify.outputs.target }}

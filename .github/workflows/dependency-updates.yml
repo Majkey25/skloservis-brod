@@ -1,0 +1,31 @@
+# Only init, exhalace, WeTheGods and skloservis-brod. Pin both calls to the same published commit.
+name: Dependency context
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions: {}
+
+jobs:
+  context:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: read
+      statuses: read
+    uses: Majkey25/Project-Guard/.github/workflows/dependency-context.yml@0be6e1daeb1c1e6e923e1e4065877f5f57c9dfcb
+
+  patch-merge:
+    needs: context
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: read
+      actions: write
+      checks: read
+      statuses: read
+    uses: Majkey25/Project-Guard/.github/workflows/dependency-patch-merge.yml@0be6e1daeb1c1e6e923e1e4065877f5f57c9dfcb
+    with:
+      auto-merge: true

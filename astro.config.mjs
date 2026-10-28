@@ -26,6 +26,7 @@ export default defineConfig({
   outDir: `./${target.outDir}/`,
   trailingSlash: 'always',
   compressHTML: true,
+  experimental: { parallelPrerender: { workers: 2 } },
   build: { inlineStylesheets: 'auto' },
   vite: {
     define: { 'import.meta.env.SITE_BUILD_TARGET': JSON.stringify(target.target) },
