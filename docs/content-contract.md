@@ -117,8 +117,10 @@ slot and exception lists normalize to `[]`. Booleans are actual booleans.
   Blank bounds are unbounded. Both absent means permanent until disabled. Notices may
   overlap and do **not** change opening hours.
 - `services.yaml`: exactly eight entries, each `{slug, slug_en, title_cs, title_en,
-text_cs, text_en, details?, seo_description_cs, seo_description_en, image?}`. Every established
+text_cs, text_en, details?, seo_title_cs?, seo_title_en?, seo_description_cs, seo_description_en, image?}`. Every established
   Czech slug must occur once; English must match its fixed pair below.
+  Optional `seo_title_cs/en` (at most 60 characters) replaces the product name in the page
+  title before `| Skloservis Brod`; blank falls back to `title_cs/en`. Headings stay unchanged.
   Keep `text_cs/en` as the short introduction used on product cards and detail pages.
   Optional `details` holds at most four strict `{title_cs, title_en, text_cs, text_en}`
   objects. Each field must be nonblank. Omission, `null` and `''` normalize to

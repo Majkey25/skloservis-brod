@@ -229,7 +229,23 @@ test('service details allow CMS clearing but reject incomplete translations and 
   }
 });
 
-test('CMS service details match the optional bounded bilingual content contract', async () => {
+test('optional service search titles clear when empty and stay within 60 characters', async () => {
+  const [service] = schemas.services.parse(await read('services'));
+  for (const value of [undefined, null, '']) {
+    assert.equal(
+      schemas.service.parse({ ...service, seo_title_cs: value }).seo_title_cs,
+      undefined,
+    );
+  }
+  const longest = 'x'.repeat(60);
+  assert.equal(schemas.service.parse({ ...service, seo_title_en: longest }).seo_title_en, longest);
+  assert.equal(
+    schemas.service.safeParse({ ...service, seo_title_en: 'x'.repeat(61) }).success,
+    false,
+  );
+});
+
+test('CMS service details and search titles match the optional bounded content contract', async () => {
   const cms = z
     .object({
       content: z.array(
@@ -244,9 +260,14 @@ test('CMS service details match the optional bounded bilingual content contract'
         schema: CORE_SCHEMA,
       }),
     );
-  const details = cms.content
-    .find(({ name }) => name === 'services')
-    ?.fields?.find(({ name }) => name === 'details');
+  const serviceFields = cms.content.find(({ name }) => name === 'services')?.fields ?? [];
+  for (const name of ['seo_title_cs', 'seo_title_en']) {
+    const field = serviceFields.find((row) => row.name === name);
+    assert.equal(field?.type, 'string');
+    assert.notEqual(field?.required, true);
+    assert.deepEqual(field?.options, { maxlength: 60 });
+  }
+  const details = serviceFields.find(({ name }) => name === 'details');
   assert.ok(details);
   assert.equal(details.type, 'object');
   assert.notEqual(details.required, true);

@@ -44,7 +44,7 @@ const labels = {
 const title =
   page === 'home'
     ? undefined
-    : `${service ? (lang === 'cs' ? service.title_cs : service.title_en) : labels[page as keyof typeof labels]} | Skloservis Brod`;
+    : `${service ? (service[`seo_title_${lang}`] ?? service[`title_${lang}`]) : labels[page as keyof typeof labels]} | Skloservis Brod`;
 const description = service
   ? lang === 'cs'
     ? service.seo_description_cs
