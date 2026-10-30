@@ -60,22 +60,11 @@ const featured = featuredSlugs.map((slug) => {
 });
 const otherServices = services.filter((service) => !featuredSlugs.includes(service.slug));
 const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
-// Each headline word rises from its own mask during the first-load entrance; the text is unchanged.
-const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
 ---
 
 <section class="home-hero" aria-labelledby="home-title">
   <div class="home-hero__copy">
-    <h1 id="home-title">
-      {heroWords.map((word, index) => (
-        <>
-          <span class="home-hero__word" style={`--i: ${index}`}>
-            <span>{word}</span>
-          </span>
-          {index < heroWords.length - 1 && ' '}
-        </>
-      ))}
-    </h1>
+    <h1 id="home-title">{settings[`hero_title_${lang}`]}</h1>
     <p class="lead">{settings[`hero_text_${lang}`]}</p>
     <div class="home-actions">
       <a class="button" href={url('contact')}>
@@ -246,21 +235,7 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
       max(1.5rem, calc(100% - 620px));
   }
 
-  /* First-load entrance, played by motion.ts once the page has painted (state set in Base.astro).
-     Only the photo and headline move; the text, actions and phone are visible and usable from the
-     first paint. The entrance animates transforms without changing the layout. */
-  .home-hero__word {
-    display: inline-block;
-    padding-block: 0.12em 0.16em;
-    margin-block: -0.12em -0.16em;
-    overflow: clip;
-    vertical-align: top;
-  }
-
-  .home-hero__word > span {
-    display: inline-block;
-  }
-
+  /* Only the photo animates on first load; the heading stays readable while scripts load. */
   .home-hero__doors {
     display: none;
   }
@@ -318,21 +293,6 @@ const heroWords = settings[`hero_title_${lang}`].trim().split(/\s+/);
 
     :global(html[data-entry='play']) .home-hero__media :global(img) {
       animation: home-hero-settle 1700ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both;
-    }
-
-    :global(html[data-entry='pending']) .home-hero__word > span {
-      transform: translateY(112%);
-    }
-
-    :global(html[data-entry='play']) .home-hero__word > span {
-      animation: home-hero-word 950ms cubic-bezier(0.16, 1, 0.3, 1) both;
-      animation-delay: calc(180ms + var(--i) * 70ms);
-    }
-  }
-
-  @keyframes home-hero-word {
-    from {
-      transform: translateY(112%) rotate(4deg);
     }
   }
 

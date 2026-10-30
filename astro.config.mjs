@@ -27,7 +27,7 @@ export default defineConfig({
   trailingSlash: 'always',
   compressHTML: true,
   experimental: { parallelPrerender: { workers: 2 } },
-  build: { inlineStylesheets: 'auto' },
+  build: { inlineStylesheets: 'always' },
   vite: {
     define: { 'import.meta.env.SITE_BUILD_TARGET': JSON.stringify(target.target) },
   },
