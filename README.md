@@ -51,6 +51,16 @@ npm test
 npm run build
 ```
 
+Measure every built page and its sections at mobile and desktop widths with an installed Chrome:
+
+```sh
+node scripts/measure-performance.mjs dist .reference/performance/before
+node scripts/measure-performance.mjs dist .reference/performance/after
+node scripts/compare-performance.mjs .reference/performance/before .reference/performance/after
+```
+
+Save the baseline before changing and rebuilding the site. Reports preserve the measured HTML and reject reuse of an existing report directory. They include fixed network/CPU profiles, section layouts, asset bytes, screenshots and three mobile homepage Lighthouse runs with DevTools throttling. The comparison checks content, metadata, layout and animation parity; it lists changed screenshot pixels for inspection. Use the optional `lighthouse` argument to repeat only the Lighthouse samples of an existing report. These are local lab measurements, not field INP.
+
 ## Editing content
 
 Business content lives in [`src/data`](src/data). The [Pages CMS configuration](.pages.yml) exposes editing forms. See the [Czech editing guide](docs/editace.md) for opening hours, notices and gallery updates. An authorized GitHub account and Pages CMS access are required.

@@ -37,24 +37,36 @@ interface Props {
 const { lang, page, title, description } = Astro.props;
 const settings = await getSettings();
 const hasEnabledNotices = (await getNotices()).some((notice) => notice.enabled);
-const pageTitle = title ?? (lang === 'cs' ? settings.seo_title_cs : settings.seo_title_en);
+const [services, gallery, contact] = await Promise.all([getServices(), getGallery(), getContact()]);
+const service = services.find((item) => item.slug === page);
+const titles: Partial<Record<PageId, string>> = {
+  products: settings[`products_title_${lang}`],
+  services: settings[`services_title_${lang}`],
+  gallery: settings[`gallery_title_${lang}`],
+  contact: contact[`title_${lang}`],
+};
+const descriptions: Partial<Record<PageId, string>> = {
+  products: settings[`products_text_${lang}`],
+  services: settings[`services_text_${lang}`],
+  gallery: settings[`gallery_text_${lang}`],
+  contact: contact[`seo_description_${lang}`],
+};
+const contentTitle = service?.[`seo_title_${lang}`] ?? service?.[`title_${lang}`] ?? titles[page];
+const pageTitle =
+  title ?? (contentTitle ? `${contentTitle} | ${SITE_NAME}` : settings[`seo_title_${lang}`]);
 const base = import.meta.env.BASE_URL;
 const seo = seoContext(import.meta.env.SITE_BUILD_TARGET, Astro.site, base);
 const metadata = pageSeo(seo, Astro.url.pathname, lang);
 const pageDescription =
   description ??
+  service?.[`seo_description_${lang}`] ??
+  descriptions[page] ??
   defaultDescription(seo, Astro.url.pathname, lang, settings[`seo_description_${lang}`]);
 const business = metadata.business
-  ? localBusiness(seo, settings, await getContact(), await getHours(), await getAbout(), logo.src)
+  ? localBusiness(seo, settings, contact, await getHours(), await getAbout(), logo.src)
   : undefined;
 const siteName = metadata.website ? website(seo) : undefined;
-const [services, gallery] = await Promise.all([getServices(), getGallery()]);
-const breadcrumbs = serviceBreadcrumbs(
-  seo,
-  Astro.url.pathname,
-  lang,
-  services.find((service) => service.slug === page),
-);
+const breadcrumbs = serviceBreadcrumbs(seo, Astro.url.pathname, lang, service);
 const socialImage = socialPreview(seo, Astro.url.pathname, lang, gallery);
 const searchImage = primaryImage(seo, Astro.url.pathname, lang, gallery);
 // Apply bookmarked gallery filters before image loading, including without JavaScript.
@@ -89,15 +101,18 @@ const galleryFilterStyles =
     <script is:inline>
       (() => {
         const root = document.documentElement;
-        // First full load only: hold the entrance until the page has painted; motion.ts plays it.
-        // The timer guarantees the content appears even if the module script never runs.
+        // The hero starts its entrance after first paint, independently of module downloads.
+        // Keep the fallback if that inline script cannot run.
         if (
+          root.dataset.page === 'home' &&
           document.readyState === 'loading' &&
           !matchMedia('(prefers-reduced-motion: reduce)').matches
         ) {
           root.dataset.entry = 'pending';
           setTimeout(() => {
-            if (root.dataset.entry === 'pending') root.dataset.entry = 'play';
+            if (root.dataset.entry !== 'pending') return;
+            root.dataset.entry = 'play';
+            setTimeout(() => delete root.dataset.entry, 2400);
           }, 2500);
         }
         const readPreference = (key, values) => {

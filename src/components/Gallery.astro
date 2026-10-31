@@ -124,6 +124,13 @@ const itemsData = await Promise.all(
 const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
 ---
 
+{filterable && (
+  <div class="wrap page-intro">
+    <h1>{settings[`gallery_title_${lang}`]}</h1>
+    <p class="lead">{settings[`gallery_text_${lang}`]}</p>
+  </div>
+)}
+
 <section
   id={heroId ? `${heroId}-gallery` : undefined}
   class="section gallery-section"
