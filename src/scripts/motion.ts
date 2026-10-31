@@ -239,28 +239,7 @@ document.addEventListener('astro:before-preparation', (event) => {
 });
 document.addEventListener('astro:before-swap', stopMotion);
 document.addEventListener('astro:page-load', initializeMotion);
-// First-load entrance: Base.astro marks a fresh document as pending; the CSS plays once the page
-// has parsed and painted, when the main thread is free. Client navigation replaces the root
-// attributes, so the entrance never replays on internal, language or history changes.
-function playEntrance() {
-  const root = document.documentElement;
-  if (root.dataset.entry !== 'pending') return;
-  requestAnimationFrame(() =>
-    requestAnimationFrame(() => {
-      if (root.dataset.entry !== 'pending') return;
-      root.dataset.entry = 'play';
-      // Drop the state once the longest step has ended, so a later motion-preference change
-      // cannot replay the entrance.
-      window.setTimeout(() => delete root.dataset.entry, 2400);
-    }),
-  );
-}
 motionQuery?.addEventListener?.('change', () => delete document.documentElement.dataset.entry);
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', playEntrance, { once: true });
-} else {
-  playEntrance();
-}
 window.addEventListener('pagehide', stopMotion);
 window.addEventListener('pageshow', (event) => {
   if (event.persisted) initializeMotion();

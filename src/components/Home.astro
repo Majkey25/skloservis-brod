@@ -106,6 +106,25 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
   )}
 </section>
 
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    if (root.dataset.entry !== 'pending') return;
+    // Wait for this photo's first paint, independently of unrelated module downloads.
+    const play = () =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (root.dataset.entry !== 'pending') return;
+          root.dataset.entry = 'play';
+          window.setTimeout(() => delete root.dataset.entry, 2400);
+        }),
+      );
+    const photo = document.querySelector('.home-hero__media img');
+    if (photo instanceof HTMLImageElement) photo.decode().then(play, play);
+    else play();
+  })();
+</script>
+
 <ServiceHighlights lang={lang} />
 
 <section class="section home-products" aria-labelledby="home-products-title">

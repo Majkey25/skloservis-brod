@@ -1,85 +1,22 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import Base from '../layouts/Base.astro';
-import Home from '../components/Home.astro';
-import Products from '../components/Products.astro';
 import ServiceDetail from '../components/ServiceDetail.astro';
-import Services from '../components/Services.astro';
-import Gallery from '../components/Gallery.astro';
-import Contact from '../components/Contact.astro';
-import { getSettings, getContact, getServices } from '../content.ts';
-import {
-  ROUTES,
-  SERVICE_ROUTES,
-  type Language,
-  type PageId,
-  type ServiceSlug,
-} from '../lib/urls.ts';
+import { ROUTES, SERVICE_ROUTES, type Language, type ServiceSlug } from '../lib/urls.ts';
 export const getStaticPaths = (() =>
-  ROUTES.filter((route) => !['privacy', 'cookies', 'legal'].includes(route.id)).flatMap((route) =>
+  ROUTES.filter((route) => route.id in SERVICE_ROUTES).flatMap((route) =>
     (['cs', 'en'] as const).map((lang) => ({
-      params: { path: route[lang].replace(/^\//, '').replace(/\/$/, '') || undefined },
+      params: { path: route[lang].replace(/^\//, '').replace(/\/$/, '') },
       props: { lang, page: route.id },
     })),
   )) satisfies GetStaticPaths;
 interface Props {
   lang: Language;
-  page: PageId;
+  page: ServiceSlug;
 }
 const { lang, page } = Astro.props;
-const settings = await getSettings();
-const contact = await getContact();
-const services = await getServices();
-const service = services.find((s) => s.slug === page);
-const labels = {
-  home: lang === 'cs' ? 'Úvod' : 'Home',
-  products: lang === 'cs' ? settings.products_title_cs : settings.products_title_en,
-  services: lang === 'cs' ? settings.services_title_cs : settings.services_title_en,
-  gallery: lang === 'cs' ? settings.gallery_title_cs : settings.gallery_title_en,
-  contact: lang === 'cs' ? contact.title_cs : contact.title_en,
-  privacy: '',
-  cookies: '',
-  legal: '',
-};
-const title =
-  page === 'home'
-    ? undefined
-    : `${service ? (service[`seo_title_${lang}`] ?? service[`title_${lang}`]) : labels[page as keyof typeof labels]} | Skloservis Brod`;
-const description = service
-  ? lang === 'cs'
-    ? service.seo_description_cs
-    : service.seo_description_en
-  : page === 'contact'
-    ? lang === 'cs'
-      ? contact.seo_description_cs
-      : contact.seo_description_en
-    : page === 'products'
-      ? settings[`products_text_${lang}`]
-      : page === 'services'
-        ? settings[`services_text_${lang}`]
-        : page === 'gallery'
-          ? settings[`gallery_text_${lang}`]
-          : undefined;
 ---
 
-<Base lang={lang} page={page} title={title} description={description}>
-  {page === 'home' ? (
-    <Home lang={lang} />
-  ) : page === 'products' ? (
-    <Products lang={lang} />
-  ) : page === 'services' ? (
-    <Services lang={lang} />
-  ) : page === 'gallery' ? (
-    <>
-      <div class="wrap page-intro">
-        <h1>{lang === 'cs' ? settings.gallery_title_cs : settings.gallery_title_en}</h1>
-        <p class="lead">{lang === 'cs' ? settings.gallery_text_cs : settings.gallery_text_en}</p>
-      </div>
-      <Gallery lang={lang} />
-    </>
-  ) : page === 'contact' ? (
-    <Contact lang={lang} />
-  ) : page in SERVICE_ROUTES ? (
-    <ServiceDetail lang={lang} slug={page as ServiceSlug} />
-  ) : null}
+<Base lang={lang} page={page}>
+  <ServiceDetail lang={lang} slug={page} />
 </Base>
