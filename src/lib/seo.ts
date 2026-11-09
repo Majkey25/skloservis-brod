@@ -63,9 +63,9 @@ export function artifactProblems(
   const problems: string[] = [];
   // Each route's built file, e.g. '/kontakt/' -> 'kontakt/index.html', and its own canonical.
   const canonicals = new Map(
-    ROUTES.flatMap(({ cs, en }) => [cs, en]).map((path) => [
+    [...ROUTES.flatMap(({ cs, en }) => [cs, en]), '/home/'].map((path) => [
       `${path.slice(1)}index.html`,
-      new URL(path, PRODUCTION_ORIGIN).href,
+      new URL(path === '/home/' ? '/' : path, PRODUCTION_ORIGIN).href,
     ]),
   );
   const expected = new Set([...canonicals.keys(), '404.html']);
@@ -75,6 +75,12 @@ export function artifactProblems(
   for (const { path, html } of pages) {
     const noindex = blocksIndexing(html);
     const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    if (
+      path === 'home/index.html' &&
+      !html.includes(`<meta http-equiv="refresh" content="0;url=${deployment(target).base}"`)
+    ) {
+      problems.push(`${path}: legacy homepage must immediately redirect to the current root`);
+    }
     if (target === 'preview') {
       if (!noindex) problems.push(`${path}: preview page is missing noindex`);
       if (canonical) problems.push(`${path}: preview page must not declare a canonical URL`);

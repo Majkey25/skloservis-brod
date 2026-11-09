@@ -275,15 +275,41 @@ test('artifact checks refuse a preview or production build with the wrong indexi
   const origin = 'https://www.skloservis-brod.cz';
   const sitemap = paths.map(() => '<loc>x</loc>').join('');
   const robotsLine = `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
-  const previewPages = [...paths, '404.html'].map((path) => page(path, 'noindex, follow'));
+  const redirect = (target: 'preview' | 'production') =>
+    page(
+      'home/index.html',
+      target === 'preview' ? 'noindex, follow' : 'index, follow',
+      target === 'production' ? `${origin}/` : undefined,
+      `<meta http-equiv="refresh" content="0;url=${deployment(target).base}">`,
+    );
+  const previewPages = [
+    ...[...paths, '404.html'].map((path) => page(path, 'noindex, follow')),
+    redirect('preview'),
+  ];
   assert.deepEqual(artifactProblems('preview', previewPages, 'User-agent: *\nAllow: /\n', ''), []);
   const productionPages = [
     ...paths.map((path) =>
       page(path, 'index, follow', `${origin}/${path.replace(/index\.html$/, '')}`),
     ),
     page('404.html', 'noindex, follow'),
+    redirect('production'),
   ];
   assert.deepEqual(artifactProblems('production', productionPages, robotsLine, sitemap), []);
+  const withoutRedirect = productionPages.filter(({ path }) => path !== 'home/index.html');
+  assert.ok(
+    artifactProblems('production', withoutRedirect, robotsLine, sitemap).some((problem) =>
+      problem.startsWith('home/index.html: page is missing'),
+    ),
+  );
+  const brokenRedirect = [
+    ...withoutRedirect,
+    page('home/index.html', 'index, follow', `${origin}/`),
+  ];
+  assert.ok(
+    artifactProblems('production', brokenRedirect, robotsLine, sitemap).some((problem) =>
+      problem.includes('must immediately redirect'),
+    ),
+  );
   // The author credit may link to another github.io site; only the preview address is refused.
   const withCredit = productionPages.map((item) => ({
     ...item,

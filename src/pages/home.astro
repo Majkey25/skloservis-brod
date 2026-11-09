@@ -1,0 +1,25 @@
+---
+import { seoContext } from '../lib/seo.ts';
+import { pageUrl } from '../lib/urls.ts';
+
+const context = seoContext(import.meta.env.SITE_BUILD_TARGET, Astro.site, import.meta.env.BASE_URL);
+const destination = pageUrl('home', 'cs', context.base);
+const production = context.target === 'production';
+---
+
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+    <meta name="robots" content={production ? 'index, follow' : 'noindex, follow'} />
+    {production && <link rel="canonical" href={`${context.site}/`} />}
+    <title>Přesměrování na úvod | Skloservis Brod</title>
+  </head>
+  <body>
+    <p>
+      Úvodní stránka je na nové adrese. <a href={destination}>Přejít na úvod</a>.
+    </p>
+  </body>
+</html>

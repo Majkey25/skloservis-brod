@@ -8,6 +8,12 @@ a obnovy popisuje [dokumentace nasazení](nasazeni.md).
 
 ## Adresy, obsah a indexace
 
+Stará adresa `/home/` odkazuje na český úvod `/`. Na statickém GitHub Pages ji
+převádí okamžité HTML přesměrování `meta refresh`, nikoli HTTP 301. Produkční
+canonical ukazuje na `/`; sitemap obsahuje jen cílovou adresu. Náhled zachovává
+svůj prefix a `noindex`. Kontrola artefaktu odmítne chybějící přesměrování,
+nesprávný cíl i nesprávný canonical.
+
 - Statické HTML obsahuje české a anglické texty, nadpisy, běžné odkazy na produkty,
   kontakt a galerie. Zachovává osm produktových dvojic a všechny historické cesty
   z [mapy adres](routes.md). Nové galerie nevytvářejí stránky pro smyšlené provozovny.
