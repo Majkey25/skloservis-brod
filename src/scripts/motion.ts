@@ -326,6 +326,10 @@ document.addEventListener(
   (event) => {
     const details = event.target;
     if (!(details instanceof HTMLDetailsElement) || !details.hasAttribute('data-stream')) return;
+    if (details.hasAttribute('data-skip-stream')) {
+      details.removeAttribute('data-skip-stream');
+      return;
+    }
     if (details.open) startStream(details);
     else if (stream?.details === details) endStream();
   },

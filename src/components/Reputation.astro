@@ -80,7 +80,10 @@ const reviews = google?.reviews ?? [];
     <div class="wrap">
       <div class="reputation__head" data-reveal="rise">
         <h2 id="reputation-title">{copy.title}</h2>
-        <p class="muted">{copy.note}</p>
+        <p class="muted">
+          {copy.note}
+          {reviews.length > 0 && copy.original ? ` ${copy.original}` : ''}
+        </p>
       </div>
       <ul class="reputation__sources">
         {sources.map((source) => (
@@ -128,7 +131,6 @@ const reviews = google?.reviews ?? [];
               </li>
             ))}
           </ul>
-          {copy.original && <p class="reputation__original muted">{copy.original}</p>}
         </>
       )}
     </div>
@@ -249,10 +251,6 @@ const reviews = google?.reviews ?? [];
     color: var(--muted);
     font-size: var(--step--1);
     font-weight: 600;
-  }
-  .reputation__original {
-    margin: 1rem 0 0;
-    font-size: var(--step--1);
   }
   @media (max-width: 47.99rem) {
     .reputation__head {
