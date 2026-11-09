@@ -272,7 +272,16 @@ document.addEventListener('astro:before-swap', (event) => {
   applyTheme(event.newDocument);
   const state = navigation?.signal === event.signal ? navigation : undefined;
   observeTransition(event.viewTransition, () => state?.dispose());
-  if (state?.language) state.scroll = { left: scrollX, top: scrollY };
+  if (state?.language) {
+    state.scroll = { left: scrollX, top: scrollY };
+    const incoming = event.newDocument.querySelectorAll<HTMLDetailsElement>('main details');
+    document.querySelectorAll<HTMLDetailsElement>('main details').forEach((section, index) => {
+      const target = incoming[index];
+      if (!target) return;
+      target.open = section.open;
+      if (target.open) target.setAttribute('data-skip-stream', '');
+    });
+  }
   // Astro creates its own transition for every route, language changes included; never give it
   // a page snapshot, so the swap is immediate and nothing fades, slides or glides.
   event.viewTransition.skipTransition();
