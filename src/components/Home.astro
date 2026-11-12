@@ -2,6 +2,7 @@
 import { Picture } from 'astro:assets';
 import { getAbout, getContact, getGallery, getServices, getSettings } from '../content';
 import { pageUrl, type Language, type ServiceSlug } from '../lib/urls';
+import { homePhoto } from '../lib/gallery';
 import CompanyMetrics from './CompanyMetrics.astro';
 import Contact from './Contact.astro';
 import ContactLink from './ContactLink.astro';
@@ -46,7 +47,7 @@ const labels = {
     about: 'More about us',
   },
 }[lang];
-const hero = gallery.find((item) => item.image.src.includes('office-glass-corridor')) ?? gallery[0];
+const hero = homePhoto(gallery);
 const featuredSlugs: ServiceSlug[] = [
   'sklenene-dvere',
   'sklenene-zabradli',
