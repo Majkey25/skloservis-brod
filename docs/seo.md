@@ -53,10 +53,19 @@ Není důvod zakazovat galerii v robots nebo nahrazovat odkazy obsluhou JavaScri
 
 ## Fotografie a sdílení
 
-Náhledy pro sdílení jsou značkové kompozice **1200 × 630 pixelů v JPEG**, nikoli
+Úvodní stránka v obou jazycích používá pro `og:image`, Twitter a produkční
+`primaryImageOfPage` přímo fotografii viditelnou v úvodním bloku. Bez loga,
+textu, rámečku nebo přidaného pozadí. Metadata přebírají skutečný formát, rozměry
+a přeložený popis původního místního souboru. `homePhoto` v `src/lib/gallery.ts`
+vybírá stejný snímek pro viditelný úvod, metadata i produkční sitemap. Po odebrání
+preferovaného snímku v CMS se všude použije první zbývající fotografie. Bez fotografií
+zůstává značkový náhled a preference fotografie se nevydává. Tato úprava z 12. listopadu
+2026 odpovídá [doporučení Google pro preferovaný obrázek](https://developers.google.com/search/docs/appearance/google-images#preferred-image).
+
+Ostatní náhledy pro sdílení jsou značkové kompozice **1200 × 630 pixelů v JPEG**, nikoli
 nezměněné fotografie realizací. Kombinují skutečné logo, petrolejovou identitu webu
 a vybraný místní snímek z validované galerie. Detail výrobku používá pouze vlastní
-kategorii; úvod, produkty, služby a galerie sdílejí obecný náhled se skleněnou příčkou.
+kategorii; produkty, služby a galerie sdílejí obecný náhled se skleněnou příčkou.
 Kontakty, právní stránky, 404 a výrobek bez fotografie mají čistě značkovou grafiku.
 Pro náhrobní desky se fotografie nevymýšlí ani nepřebírá z jiné kategorie.
 
@@ -74,7 +83,7 @@ používaného Sharpu. Čte jen lokální zdroje přes veřejné
 Nevyžaduje nový balíček, font, vzdálené médium ani běžící backend. Metadata nevyvolávají
 další obrazové požadavky běžného prohlížeče; náhled stahuje až služba, která jej používá.
 
-Obě jazykové verze sdílejí JPEG, ale mají vlastní alternativní text odvozený z CMS,
+U značkových kompozic obě jazykové verze sdílejí JPEG, ale mají vlastní alternativní text odvozený z CMS,
 který výslovně popisuje grafickou kompozici s logem a fotografií. Podle
 [Open Graph](https://ogp.me/) hlavička uvádí HTTPS adresu, `image/jpeg`, skutečné rozměry
 a alternativní text; přidává také `twitter:card=summary_large_image`, titulek, popis,
@@ -92,16 +101,17 @@ Viditelné obrázky nadále používají lokální responzivní varianty, rozmě
 alternativní texty. Text má popisovat fotografii, ne opakovat klíčová slova nebo
 neověřené místo realizace; viz [doporučení Google pro obrázky](https://developers.google.com/search/docs/appearance/google-images).
 
-Produkční galerie a detaily výrobků s fotografiemi navíc vydávají `WebPage`
-s `primaryImageOfPage`: původní fotografii viditelnou v galerii dané stránky,
+Produkční úvod, galerie a detaily výrobků s fotografiemi navíc vydávají `WebPage`
+s `primaryImageOfPage`: původní fotografii viditelnou na dané stránce,
 bez přidaného loga či textu. Výběr používá tutéž ověřenou kategorii a přednostní
-snímek jako sociální kompozice, kterou nemění. Bez fotografie, v náhledu,
+snímek jako sociální metadata. Bez fotografie, v náhledu,
 na neznámé nebo jazykově nesouladné adrese se značení nevydává. Jde o
 [Googlem podporovanou preferenci obrázku](https://developers.google.com/search/docs/appearance/google-images#preferred-image),
 nikoli příslib jeho zobrazení nebo lepší pozice.
 
 Produkční sitemap přidává `image:image` a `image:loc` podle
 [dokumentace Google](https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps).
+Obě jazykové verze úvodu uvádějí pouze svou skutečnou úvodní fotografii.
 Obě jazykové galerie uvádějí všechny fotografie, nyní 139. Produktové stránky uvádějí
 jen snímky své kategorie. Adresa pochází z `image.src` validovaného obsahu, tedy ze
 stejného původního lokálního souboru, na který odkazuje fotografie v HTML. Samotná

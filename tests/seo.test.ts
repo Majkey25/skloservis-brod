@@ -442,7 +442,7 @@ test('production pairs have absolute self canonicals and reciprocal cs/en/x-defa
   );
 });
 
-test('image sitemap maps original photos only to their visible gallery and service pages', () => {
+test('image sitemap maps original photos only to their visible home, gallery and service pages', () => {
   const doors = {
     category: 'sklenene-dvere' as const,
     image: { src: '/_astro/doors&detail.jpg', width: 960, height: 640, format: 'jpg' as const },
@@ -472,7 +472,13 @@ test('image sitemap maps original photos only to their visible gallery and servi
     assert.match(images, /doors&amp;detail.jpg/);
     assert.doesNotMatch(images, /mirror/);
   }
-  for (const path of ['/', '/en/', '/kontakt/', '/sklenene-zabradli/', '/en/glass-railings/']) {
+  for (const path of ['/', '/en/']) {
+    assert.equal(
+      pages.get(`${production.site}${path}`),
+      `<image:image><image:loc>${production.site}/_astro/doors&amp;detail.jpg</image:loc></image:image>`,
+    );
+  }
+  for (const path of ['/kontakt/', '/sklenene-zabradli/', '/en/glass-railings/']) {
     assert.equal(pages.get(`${production.site}${path}`), '');
   }
   assert.doesNotMatch(
@@ -503,7 +509,7 @@ test('image sitemap rejects preview, source and foreign URLs and never silently 
     assert.doesNotMatch(sitemapXml(preview, [photo(src)]), /<loc>|<image:loc>/);
   }
   const photos = Array.from({ length: 1000 }, (_, index) => photo(`/_astro/photo-${index}.jpg`));
-  assert.equal((sitemapXml(production, photos).match(/<image:loc>/g) ?? []).length, 4000);
+  assert.equal((sitemapXml(production, photos).match(/<image:loc>/g) ?? []).length, 4002);
   assert.throws(
     () => sitemapXml(production, [...photos, photo('/_astro/extra.jpg')]),
     /1000 images per page/,
@@ -806,7 +812,7 @@ test('social photographs belong to the actual localized page and never substitut
   assert.equal(seo.socialPhoto(production, '/kontakt/', 'cs', gallery), undefined);
 });
 
-test('search image metadata uses only visible product/gallery photos on indexable language URLs', () => {
+test('search image metadata uses only visible home, product and gallery photos on indexable URLs', () => {
   assert.equal(typeof seo.primaryImage, 'function');
   const photo = {
     category: 'sklenene-dvere' as const,
@@ -815,8 +821,8 @@ test('search image metadata uses only visible product/gallery photos on indexabl
     alt_en: 'Glass doors',
   };
   for (const [lang, paths] of [
-    ['cs', ['/sklenene-dvere/', '/galerie/']],
-    ['en', ['/en/glass-doors/', '/en/gallery/']],
+    ['cs', ['/', '/sklenene-dvere/', '/galerie/']],
+    ['en', ['/en/', '/en/glass-doors/', '/en/gallery/']],
   ] as const) {
     for (const path of paths) {
       assert.deepEqual(seo.primaryImage(production, path, lang, [photo]), {
@@ -830,7 +836,6 @@ test('search image metadata uses only visible product/gallery photos on indexabl
     }
   }
   for (const path of [
-    '/',
     '/produkty/',
     '/sluzby/',
     '/kontakt/',
@@ -850,6 +855,81 @@ test('search image metadata uses only visible product/gallery photos on indexabl
       ]),
     /built local/,
   );
+});
+
+test('home search and sharing images use the visible hero without a logo card, including CMS fallback', () => {
+  const first = {
+    category: 'sklenene-dvere' as const,
+    image: { src: '/_astro/first.jpg', width: 640, height: 480, format: 'jpg' as const },
+    alt_cs: 'První fotografie',
+    alt_en: 'First photograph',
+  };
+  const larger = {
+    ...first,
+    image: { ...first.image, src: '/_astro/larger.jpg', width: 1600, height: 900 },
+  };
+  const hero = {
+    ...larger,
+    image: { ...larger.image, src: '/_astro/office-glass-corridor.HASH.jpg' },
+    alt_cs: 'Skleněná příčka',
+    alt_en: 'Glass partition',
+  };
+  for (const [gallery, expected] of [
+    [[first, larger, hero], hero],
+    [[first, larger], first],
+  ] as const) {
+    for (const context of [preview, production]) {
+      const photos = gallery.map((photo) => ({
+        ...photo,
+        image: { ...photo.image, src: `${context.base}${photo.image.src.slice(1)}` },
+      }));
+      const selected = photos[gallery.findIndex((photo) => photo === expected)]!;
+      for (const lang of ['cs', 'en'] as const) {
+        const path = `${context.base}${lang === 'en' ? 'en/' : ''}`;
+        const image = seo.socialPreview(context, path, lang, photos);
+        const source = new URL(selected.image.src, context.site).href;
+        assert.equal(image.photo, selected);
+        assert.equal(image.src, source);
+        assert.equal(image.width, expected.image.width);
+        assert.equal(image.height, expected.image.height);
+        assert.equal(image.type, 'image/jpeg');
+        assert.equal(image.alt, expected[`alt_${lang}`]);
+        assert.equal(
+          seo.primaryImage(context, path, lang, photos)?.primaryImageOfPage,
+          context.target === 'production' ? source : undefined,
+        );
+      }
+    }
+    const home = sitemapXml(production, gallery).match(
+      /<url><loc>https:\/\/www\.skloservis-brod\.cz\/<\/loc>(.*?)<\/url>/,
+    )?.[1];
+    assert.equal(
+      home,
+      `<image:image><image:loc>${production.site}${expected.image.src}</image:loc></image:image>`,
+    );
+  }
+  assert.equal(seo.socialPreview(production, '/', 'cs', []).key, 'brand');
+  assert.equal(seo.primaryImage(production, '/', 'cs', []), undefined);
+  for (const context of [preview, production]) {
+    const path = `${context.base}en/`;
+    const png = {
+      ...first,
+      image: { ...first.image, src: `${context.base}_astro/first.png`, format: 'png' as const },
+    };
+    assert.equal(seo.socialPreview(context, path, 'en', [png]).type, 'image/png');
+    assert.equal(seo.socialPreview(context, path, 'cs', [png]).key, 'brand');
+    for (const src of [
+      'https://example.com/photo.jpg',
+      `${context.base}_astro/photo.jpg?source=gallery`,
+      `${context.base}_astro/photo.jpg#detail`,
+      `${context.base}photo.jpg`,
+    ]) {
+      assert.throws(
+        () => seo.socialPreview(context, path, 'en', [{ ...png, image: { ...png.image, src } }]),
+        /built local/,
+      );
+    }
+  }
 });
 
 test('branded social previews share a JPEG across languages and respect the deployment base', () => {
@@ -884,7 +964,9 @@ test('branded social previews share a JPEG across languages and respect the depl
     );
     for (const path of ['', 'produkty/', 'sluzby/', 'galerie/']) {
       assert.equal(
-        seo.socialPreview(context, `${context.base}${path}`, 'cs', [photo]).key,
+        seo.socialPreview(context, `${context.base}${path}`, 'cs', [
+          { ...photo, image: { ...photo.image, src: `${context.base}_astro/doors.jpg` } },
+        ]).key,
         'overview',
       );
     }

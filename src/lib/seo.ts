@@ -1,6 +1,7 @@
 import { PRODUCTION_ORIGIN, ROUTES, SERVICE_ROUTES, pageUrl, type Language } from './urls.ts';
 import type { About, Contact, GalleryItem, Service, Settings } from '../content.ts';
 import type { Hours } from './schedule.ts';
+import { homePhoto } from './gallery.ts';
 
 export type BuildTarget = 'preview' | 'production';
 
@@ -233,6 +234,20 @@ const SOCIAL_PHOTOS: Partial<Record<keyof typeof SERVICE_ROUTES | 'overview', st
   'sklenene-dekorace-gravirovani-fotek': 'wp-2005-music-motif-glass-coasters',
 };
 
+function builtImageUrl(context: SeoContext, src: string): URL {
+  const image = new URL(src, context.site);
+  if (
+    image.origin !== context.site ||
+    !image.pathname.startsWith(`${context.base}_astro/`) ||
+    image.username ||
+    image.password ||
+    image.search ||
+    image.hash
+  )
+    throw new TypeError(`Images must use built local ${context.base}_astro/ URLs`);
+  return image;
+}
+
 /** Brand overviews may use the gallery; a product may only use its own actual category. */
 export function socialPhoto(
   context: SeoContext,
@@ -242,7 +257,8 @@ export function socialPhoto(
 ) {
   const route = pageRoute(context, pathname, lang);
   if (!route) return undefined;
-  const overview = ['home', 'products', 'services', 'gallery'].includes(route.id);
+  if (route.id === 'home') return homePhoto(gallery);
+  const overview = ['products', 'services', 'gallery'].includes(route.id);
   if (!overview && !Object.hasOwn(SERVICE_ROUTES, route.id)) return undefined;
   const candidates = overview ? gallery : gallery.filter((photo) => photo.category === route.id);
   const preferred =
@@ -254,7 +270,7 @@ export function socialPhoto(
   );
 }
 
-/** Both language versions reference one build-time composite, with localized accessible text. */
+/** Home uses its visible photo; other pages retain their existing branded sharing artwork. */
 export function socialPreview(
   context: SeoContext,
   pathname: string,
@@ -264,6 +280,16 @@ export function socialPreview(
   const photo = socialPhoto(context, pathname, lang, gallery);
   const route = pageRoute(context, pathname, lang);
   const key = photo ? (Object.hasOwn(SERVICE_ROUTES, route!.id) ? route!.id : 'overview') : 'brand';
+  if (route?.id === 'home' && photo)
+    return {
+      key,
+      photo,
+      src: builtImageUrl(context, photo.image.src).href,
+      width: photo.image.width,
+      height: photo.image.height,
+      type: `image/${photo.image.format === 'jpg' ? 'jpeg' : photo.image.format}`,
+      alt: photo[`alt_${lang}`],
+    };
   return {
     key,
     photo,
@@ -292,14 +318,12 @@ export function primaryImage(
   if (
     context.target !== 'production' ||
     !route ||
-    (route.id !== 'gallery' && !Object.hasOwn(SERVICE_ROUTES, route.id))
+    (!['home', 'gallery'].includes(route.id) && !Object.hasOwn(SERVICE_ROUTES, route.id))
   )
     return undefined;
   const photo = socialPhoto(context, pathname, lang, gallery);
   if (!photo) return undefined;
-  const image = new URL(photo.image.src, context.site);
-  if (image.origin !== context.site || !image.pathname.startsWith('/_astro/'))
-    throw new TypeError('Search images must use built local /_astro/ URLs');
+  const image = builtImageUrl(context, photo.image.src);
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -329,24 +353,12 @@ export function sitemapXml(
   const urls =
     context.target === 'production'
       ? ROUTES.flatMap(({ id, cs, en }) => {
+          const hero = id === 'home' ? homePhoto(gallery) : undefined;
           const images = [
             ...new Set(
               gallery
-                .filter((photo) => id === 'gallery' || photo.category === id)
-                .map(({ image }) => {
-                  const url = new URL(image.src, context.site);
-                  if (
-                    url.origin !== context.site ||
-                    !url.pathname.startsWith('/_astro/') ||
-                    url.username ||
-                    url.password ||
-                    url.search ||
-                    url.hash
-                  ) {
-                    throw new TypeError('Sitemap images must use built local /_astro/ URLs');
-                  }
-                  return url.href;
-                }),
+                .filter((photo) => id === 'gallery' || photo.category === id || photo === hero)
+                .map(({ image }) => builtImageUrl(context, image.src).href),
             ),
           ];
           if (images.length > 1000) throw new RangeError('Sitemap allows 1000 images per page');

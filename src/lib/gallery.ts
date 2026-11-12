@@ -1,5 +1,12 @@
 import { SERVICE_ROUTES, type ServiceSlug } from './urls.ts';
 
+/** The visible home hero and its search metadata must share the same CMS fallback. */
+export function homePhoto<T extends { image: { src: string } }>(
+  photos: readonly T[],
+): T | undefined {
+  return photos.find((photo) => photo.image.src.includes('office-glass-corridor')) ?? photos[0];
+}
+
 /** Gallery subjects without a corresponding product page. Never use these as route IDs. */
 export const GALLERY_ONLY_CATEGORIES = {
   vitriny: { cs: 'Vitríny a skleněné police', en: 'Display cases and glass shelves' },
