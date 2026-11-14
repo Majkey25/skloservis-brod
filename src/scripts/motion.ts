@@ -51,13 +51,15 @@ function hold(element: HTMLElement, animations: Animation[], stagger = 0): Revea
 
 // Keep the first frame hidden without creating offscreen animations until they are needed.
 function holdOpacity(element: HTMLElement, keyframes: Keyframe[], duration: number): Reveal {
+  const create = () =>
+    hold(element, [element.animate(keyframes, { easing: EASE, fill: 'backwards', duration })]);
+  // Full galleries benefit from deferred construction; other pages keep their original setup.
+  if (!element.closest('[data-gallery-key]')) return create();
   element.dataset.revealPending = '';
   let reveal: Reveal | undefined;
   return {
     play(delay) {
-      reveal = hold(element, [
-        element.animate(keyframes, { easing: EASE, fill: 'backwards', duration }),
-      ]);
+      reveal = create();
       reveal.play(delay);
       delete element.dataset.revealPending;
     },
