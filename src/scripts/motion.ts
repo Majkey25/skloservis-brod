@@ -49,6 +49,25 @@ function hold(element: HTMLElement, animations: Animation[], stagger = 0): Revea
   };
 }
 
+// Keep the first frame hidden without creating offscreen animations until they are needed.
+function holdOpacity(element: HTMLElement, keyframes: Keyframe[], duration: number): Reveal {
+  element.dataset.revealPending = '';
+  let reveal: Reveal | undefined;
+  return {
+    play(delay) {
+      reveal = hold(element, [
+        element.animate(keyframes, { easing: EASE, fill: 'backwards', duration }),
+      ]);
+      reveal.play(delay);
+      delete element.dataset.revealPending;
+    },
+    cancel() {
+      reveal?.cancel();
+      delete element.dataset.revealPending;
+    },
+  };
+}
+
 // Counts up to four numbers in one container with a single frame loop, starting from zero.
 function holdCount(container: HTMLElement): Reveal | undefined {
   const formatter = new Intl.NumberFormat(document.documentElement.lang);
@@ -119,15 +138,14 @@ function prepare(element: HTMLElement): Reveal | undefined {
       return strokes.length ? hold(element, strokes, 90) : undefined;
     }
     case 'rise':
-      return hold(element, [
-        element.animate(
-          [
-            { opacity: 0, transform: 'translateY(18px)' },
-            { opacity: 1, transform: 'none' },
-          ],
-          { ...timing, duration: 700 },
-        ),
-      ]);
+      return holdOpacity(
+        element,
+        [
+          { opacity: 0, transform: 'translateY(18px)' },
+          { opacity: 1, transform: 'none' },
+        ],
+        700,
+      );
     case 'line':
       // The connector is the ::before pseudo-element. Leave it drawn where that cannot animate.
       try {
@@ -142,15 +160,14 @@ function prepare(element: HTMLElement): Reveal | undefined {
         return undefined;
       }
     default:
-      return hold(element, [
-        element.animate(
-          [
-            { opacity: 0, transform: 'scale(1.04)' },
-            { opacity: 1, transform: 'none' },
-          ],
-          { ...timing, duration: 900 },
-        ),
-      ]);
+      return holdOpacity(
+        element,
+        [
+          { opacity: 0, transform: 'scale(1.04)' },
+          { opacity: 1, transform: 'none' },
+        ],
+        900,
+      );
   }
 }
 

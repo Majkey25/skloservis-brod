@@ -316,6 +316,10 @@ summary:focus-visible {
   margin-top: 0.4rem;
 }
 
+[data-reveal-pending] {
+  opacity: 0;
+}
+
 /* Disable UA crossfades; only a theme change has its own motion. Language swaps are instant. */
 ::view-transition-group(root) {
   animation: none;
