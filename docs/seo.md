@@ -3,7 +3,8 @@
 Web od 19. října 2026 běží na GitHub Pages na vlastní doméně
 `https://www.skloservis-brod.cz/` s vynuceným HTTPS. Produkční nasazení prošlo kontrolami
 artefaktu a živých adres; samotné nasazení není dokladem indexace ani pořadí ve vyhledávání.
-Níže uvedené zdroje byly zkontrolovány 18.–19. října 2026. Postup produkčního sestavení
+Základní zdroje byly zkontrolovány 18. a 19. října 2026; kontroly artefaktu a aktuální
+konfigurace byly rozšířeny při auditu 15. listopadu 2026. Postup produkčního sestavení
 a obnovy popisuje [dokumentace nasazení](nasazeni.md).
 
 ## Adresy, obsah a indexace
@@ -42,7 +43,7 @@ nesprávný cíl i nesprávný canonical.
   ponechává index i seznam adres prázdné a nepropaguje produkční doménu.
   [Google](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
   a [Seznam](https://o-seznam.cz/napoveda/vyhledavani/seznambot/sitemap-xml/)
-  uvádějí požadavky na sitemap. Žádná mapa nebyla odeslána vyhledávačům.
+  uvádějí požadavky na sitemap. Přijetí sitemap není záruka indexace všech adres.
 
 Filtry galerie používají fragmenty `#gallery-…`, ne nové stránky nebo kombinace
 parametrů. Všechny fotografie a jejich odkazy jsou už ve statickém HTML; filtr je
@@ -128,16 +129,17 @@ podpora rozšíření Google z těchto zdrojů není doložena. Není slíbená 
 
 ## Strukturovaná data
 
-- Produkční kontakty vydávají jednu identitu `LocalBusiness` se skutečnými CMS
+- Produkční úvod a kontakty vydávají jednu identitu `LocalBusiness` se skutečnými CMS
   kontakty a adresou provozovny. Sídlo není další pobočka. Nepřidávají se hodnocení,
   ceny, souřadnice ani certifikace. [Pravidla Google](https://developers.google.com/search/docs/appearance/structured-data/local-business)
   vyžadují odpovídající údaje; samostatně stanovují
   [omezení vlastních firemních hodnocení](https://developers.google.com/search/docs/appearance/structured-data/review-snippet).
-- Obě kontaktní stránky sdílejí stabilní `@id` zakončené `/#business`. Volitelné
-  `sameAs` používá jen `contact.facebook_url`, který je také běžným odkazem v patičce.
+- Úvodní a kontaktní stránky obou jazyků sdílejí stabilní `@id` zakončené `/#business`.
+  Volitelné `sameAs` používá veřejné profily z `contact.facebook_url`,
+  `about.reputation.url` a `about.google_reputation.url`, které mají také viditelné odkazy.
   Odkaz `https://www.facebook.com/skloservisbrod/` byl 18. října 2026 ověřen v HTML
   [původního firemního webu](https://www.skloservis-brod.cz/). Vymazání pole v CMS odstraní
-  i `sameAs`. [Google uvádí sociální profily jako příklad tohoto pole](https://developers.google.com/search/docs/appearance/structured-data/organization).
+  odpovídající položku `sameAs`. [Google uvádí sociální profily jako příklad tohoto pole](https://developers.google.com/search/docs/appearance/structured-data/organization).
   Vyhledávací odkaz mapy není identitou profilu. IČO a adresa provozovny odpovídají
   viditelným údajům; telefon a e-mail schema záměrně vynechává. Právní stránky rozlišují sídlo
   v Březnici od provozovny v Uherském Brodě; nevytváří se druhá firemní entita.
@@ -164,23 +166,14 @@ Odkazy ze skupin služeb používají názvy cílových stránek z CMS; odkaz na
 služeb na ní samotné se neopakuje. Popisný text pomáhá návštěvníkovi i robotovi
 [rozpoznat cíl odkazu](https://developers.google.com/search/docs/crawling-indexing/links-crawlable).
 
-Astro používá `build.inlineStylesheets: 'auto'`: větší styly vydá jako místní
-soubory, které může prohlížeč znovu použít mezi stránkami. Malé styly ponechá v HTML;
-viz [konfigurace Astro](https://docs.astro.build/en/reference/configuration-reference/#buildinlinestylesheets).
-Nejde o odložené načítání stylů. Dosavadní lokální porovnání naměřilo méně
-přenesených dat při procházení, ale přibližně o 150 ms pomalejší první načtení
-úvodu kvůli dvěma požadavkům na styly. Nastavení proto nepovažujeme za obecné
-zrychlení webu. Před změnou se porovnává první zobrazení, přenos při procházení
-a výsledný vzhled; laboratorní skóre není měřením pořadí.
-
-Varianta `'always'` byla 28. října 2026 změřena znovu: Lighthouse 12, mobilní profil,
-produkční sestavení s gzipem, střídavé běhy před a po. Odstranila blokující styly
-a zkrátila FCP úvodu z 1,38 na 1,27 s, ale medián TBT vzrostl na úvodu z 25 na 134 ms
-a v galerii z 24 na 344 ms. Rozvržení stránky se přesunulo za první vykreslení
-a skóre výkonu galerie kleslo ze 100 na 88–93. Proto zůstává `'auto'`.
-Upozornění „Vynucené přeformátování“ pochází z `ClientRouter` Astra, který při startu
-čte pozici posunu stránky a tím vynutí první výpočet rozvržení; tato práce
-se provádí tak jako tak.
+Aktuální [konfigurace](../astro.config.mjs) používá `build.inlineStylesheets: 'always'`.
+Styly jednotlivých stránek se vkládají do HTML podle
+[pravidel Astro](https://docs.astro.build/en/reference/configuration-reference/#buildinlinestylesheets).
+Dřívější měření z 28. října před oddělením prostředků jednotlivých stránek
+nepopisuje současný výstup. Změnu této volby je nutné znovu měřit na stejných
+stránkách a za stejných podmínek. [Lighthouse CI](../lighthouserc.json) hlídá
+medián LCP nejvýše 2500 ms a CLS nejvýše 0,1 na třech vybraných stránkách.
+Laboratorní výsledky nejsou skutečné uživatelské INP ani měřením pořadí.
 
 Ruční volba jazyka a motivu i výchozí nastavení zařízení zůstávají beze změny.
 Pouze náhled může při čerstvé návštěvě české homepage bez parametrů, fragmentu
@@ -220,6 +213,10 @@ Detaily šesti výrobků pro stavbu a interiér také zobrazují existující CM
 Zákazník tak najde podmínky nabídky přímo u výrobku. Gravírované dekorace a náhrobní
 desky ponechávají vlastní poptávkový text bez zmínky o zaměření prostoru.
 
+Detail skleněné stěny propojuje otázku na cenovou nabídku s následujícím seznamem
+podkladů. Používá existující dvojjazyčné `details` v CMS, neopakuje celý seznam
+a nevydává odhadované ceny ani nový technický příslib.
+
 `node --test tests/seo.test.ts` ověřuje cíle, odmítnutí nepovolené produkce v Actions,
 metadata všech dvojic, výjimky, výběr fotografií, jejich přiřazení v sitemap,
 prázdný náhled, neplatné adresy, limit obrázků, vymazání profilu a bezpečné JSON-LD. Testovací
@@ -228,10 +225,22 @@ Integrační kontrola musí navíc projít skutečné HTML obou sestavení, nač
 a aktualizaci hlavičky po jazykovém přepnutí v prohlížeči. Kontrola externími
 validátory, indexace a výsledky na budoucím hostingu nejsou těmito testy doložené.
 
-## Co zbývá po povoleném spuštění produkce
+Před publikací `scripts/check-artifact.ts` kontroluje skutečné HTML a sitemap.
+Produkční seznam musí obsahovat přesně všechny jedinečné canonical adresy z
+[mapy cest](../src/lib/urls.ts), ne jen správný počet. Každá cílová stránka musí mít
+právě jeden vlastní canonical a svou trojici `cs`/`en`/`x-default`; alias `/home/`
+zachovává samostatné přesměrování. Kontrola rozlišuje obrázkové `image:loc`
+a běžné jazykové odkazy v navigaci. Náhled odmítá také hreflang metadata,
+`og:url`, JSON-LD a adresy v sitemap. Testy zahrnují úmyslné záměny, duplicity
+a platné kontroly. `og:image`, `twitter:image`, `logo`, `primaryImageOfPage` a
+`image:loc` musí odkazovat na skutečný místní soubor vybraného sestavení; adresář
+se za soubor nepovažuje. Parser `ultrahtml` je přímá závislost projektu. Kontroluje
+generovaný výstup, nenahrazuje obecný validátor HTML/XML ani Google Rich Results Test.
+
+## Měření a externí účty
 
 Náhled zůstává `noindex`; nelze na něm ověřit výslednou indexaci produkce ani dopad
-na návštěvnost. Po spuštění je třeba zkontrolovat skutečné HTTP odpovědi všech cest,
+na návštěvnost. Po každém schváleném nasazení je třeba zkontrolovat skutečné HTTP odpovědi všech cest,
 canonical, jazykové dvojice, robots, sitemap a dostupnost každého uvedeného obrázku.
 Návrat proměnné cíle na preview při stále připojené doméně není návratem produkce.
 Obnova patří do [postupu nasazení](nasazeni.md).
@@ -270,7 +279,7 @@ záměrně prázdné `alt`; obsahové fotografie mají věcný přeložený popi
 oznámení není aktivní nadpis stránky. Viditelná hierarchie zachovává jeden H1
 a oddíly H2/H3. Samotný počet slov není měřítkem užitečnosti.
 
-Větší styly jsou místní opakovaně použitelné soubory. U inline SVG, kritického
+Styly se podle aktuální konfigurace vkládají do HTML. U inline SVG, kritického
 bootstrapu a animovaných hodnot není odstranění každého inline zápisu cílem.
 Cache-Control určuje GitHub Pages; fiktivní `.htaccess` ani `_headers` by jej
 nezměnily. Měření a Meta Pixel nejsou podmínkou pořadí; na tomto webu se nepoužívají.

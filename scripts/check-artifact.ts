@@ -1,20 +1,24 @@
 // Refuses to hand an artifact to Pages unless its indexing state matches the selected target.
 import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { artifactProblems, deployment } from '../src/lib/seo.ts';
 import { decodeContact } from '../src/lib/contact.ts';
 
 const { target, outDir } = deployment(process.env.SITE_BUILD_TARGET);
-const files = (await readdir(outDir, { recursive: true })).filter((file) => file.endsWith('.html'));
+const files = (await readdir(outDir, { recursive: true, withFileTypes: true }))
+  .filter((entry) => entry.isFile())
+  .map((entry) => relative(outDir, join(entry.parentPath, entry.name)).replaceAll('\\', '/'));
 const pages = await Promise.all(
-  files.map(async (file) => ({
-    path: file.replaceAll('\\', '/'),
-    html: await readFile(join(outDir, file), 'utf8'),
-  })),
+  files
+    .filter((file) => file.endsWith('.html'))
+    .map(async (file) => ({
+      path: file.replaceAll('\\', '/'),
+      html: await readFile(join(outDir, file), 'utf8'),
+    })),
 );
 const robots = await readFile(join(outDir, 'robots.txt'), 'utf8');
 const sitemap = await readFile(join(outDir, 'sitemap.xml'), 'utf8').catch(() => '');
-const problems = artifactProblems(target, pages, robots, sitemap);
+const problems = artifactProblems(target, pages, robots, sitemap, new Set(files));
 const contacts = new Set(
   pages.flatMap(({ html }) =>
     [...html.matchAll(/<[^>]*data-contact-value="([^"]+)"[^>]*>/g)].map(([tag, encoded]) => {
@@ -32,9 +36,7 @@ for (const { path, html } of pages) {
       problems.push(`${path}: raw contact exposed`);
   }
 }
-for (const file of (await readdir(outDir, { recursive: true })).filter((file) =>
-  /\.(js|json|xml)$/.test(file),
-)) {
+for (const file of files.filter((file) => /\.(js|json|xml)$/.test(file))) {
   const text = await readFile(join(outDir, file), 'utf8');
   for (const value of contacts) {
     if (text.includes(value) || text.includes(encodeURIComponent(value)))

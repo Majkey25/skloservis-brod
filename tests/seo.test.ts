@@ -6,7 +6,7 @@ import { Script, runInNewContext } from 'node:vm';
 import sharp from 'sharp';
 import { z } from 'astro/zod';
 import { createSchemas } from '../src/content.config.ts';
-import { ROUTES, SERVICE_ROUTES, type ServiceSlug } from '../src/lib/urls.ts';
+import { PRODUCTION_ORIGIN, ROUTES, SERVICE_ROUTES, type ServiceSlug } from '../src/lib/urls.ts';
 import * as seo from '../src/lib/seo.ts';
 import {
   artifactProblems,
@@ -265,15 +265,33 @@ test('the workflow selects production only for approved main runs and otherwise 
 });
 
 test('artifact checks refuse a preview or production build with the wrong indexing state', () => {
-  const page = (path: string, robots: string, canonical?: string, extra = '') => ({
-    path,
-    html: `<meta name="robots" content="${robots}">${canonical ? `<link rel="canonical" href="${canonical}">` : ''}${extra}`,
-  });
+  const page = (path: string, robots: string, canonical?: string, extra = '') => {
+    const route = ROUTES.find(({ cs, en }) =>
+      [cs, en].some((url) => `${url.slice(1)}index.html` === path),
+    );
+    const alternates =
+      canonical && route
+        ? [
+            ['cs', route.cs],
+            ['en', route.en],
+            ['x-default', route.cs],
+          ]
+            .map(
+              ([lang, url]) =>
+                `<link rel="alternate" hreflang="${lang}" href="${PRODUCTION_ORIGIN}${url}">`,
+            )
+            .join('')
+        : '';
+    return {
+      path,
+      html: `<meta name="robots" content="${robots}">${canonical ? `<link rel="canonical" href="${canonical}">` : ''}${alternates}${extra}`,
+    };
+  };
   const paths = ROUTES.flatMap(({ cs, en }) => [cs, en]).map((route) =>
     route === '/' ? 'index.html' : `${route.slice(1)}index.html`,
   );
   const origin = 'https://www.skloservis-brod.cz';
-  const sitemap = paths.map(() => '<loc>x</loc>').join('');
+  const sitemap = sitemapXml(production);
   const robotsLine = `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
   const redirect = (target: 'preview' | 'production') =>
     page(
@@ -373,6 +391,93 @@ test('artifact checks refuse a preview or production build with the wrong indexi
     has(artifactProblems('production', homeCanonical, robotsLine, sitemap), /canonical must be/),
   );
   assert.ok(has(artifactProblems('preview', previewPages, robotsLine, ''), /must not advertise/));
+  for (const invalid of [
+    sitemap.replace(`${origin}/en/`, `${origin}/`),
+    sitemap.replace(`${origin}/en/`, `${origin}/missing/`),
+    sitemap.replace(`${origin}/en/`, 'https://example.com/en/'),
+  ]) {
+    assert.ok(has(artifactProblems('production', productionPages, robotsLine, invalid), /sitemap/));
+  }
+  const imageSitemap = sitemap.replace(
+    '</url>',
+    '<image:image><image:loc>https://example.com/photo.jpg</image:loc></image:image></url>',
+  );
+  const languageNavigation = productionPages.map((item) => ({
+    ...item,
+    html: `${item.html}<a hreflang="en" href="${origin}/en/">English</a>`,
+  }));
+  assert.deepEqual(
+    artifactProblems('production', languageNavigation, robotsLine, imageSitemap),
+    [],
+  );
+  const reorderedLinks = productionPages.map((item) => ({
+    ...item,
+    html: item.html.replace(
+      /<link rel="canonical" href="([^"]+)">/,
+      "<link href='$1' rel='canonical'>",
+    ),
+  }));
+  assert.deepEqual(artifactProblems('production', reorderedLinks, robotsLine, sitemap), []);
+  const duplicateCanonical = productionPages.map((item, index) =>
+    index === 0 ? { ...item, html: `${item.html}<link rel="canonical" href="${origin}/">` } : item,
+  );
+  assert.ok(
+    has(artifactProblems('production', duplicateCanonical, robotsLine, sitemap), /canonical/),
+  );
+  for (const html of [
+    productionPages[0].html.replace(/<link rel="alternate"[^>]+>/g, ''),
+    productionPages[0].html.replace('hreflang="en"', 'hreflang="de"'),
+    productionPages[0].html.replace(`href="${origin}/en/"`, `href="${origin}/kontakt/"`),
+    `${productionPages[0].html}<link rel="alternate" hreflang="en" href="${origin}/en/">`,
+  ]) {
+    const changed = [{ ...productionPages[0], html }, ...productionPages.slice(1)];
+    assert.ok(has(artifactProblems('production', changed, robotsLine, sitemap), /hreflang/));
+  }
+  for (const extra of [
+    '<link rel="alternate" hreflang="en" href="https://example.com/en/">',
+    '<meta property="og:url" content="https://example.com/">',
+    '<script type="application/ld+json">{}</script>',
+  ]) {
+    const changed = previewPages.map((item) => ({ ...item, html: item.html + extra }));
+    assert.ok(has(artifactProblems('preview', changed, 'User-agent: *\n', ''), /discovery/));
+  }
+  assert.ok(has(artifactProblems('preview', previewPages, 'User-agent: *\n', sitemap), /sitemap/));
+});
+
+test('artifact image references must resolve to real files in the selected build', () => {
+  for (const context of [preview, production]) {
+    const image = `${context.site}${context.base}_astro/photo&detail&finish.jpg`;
+    const logo = `${context.site}${context.base}_astro/logo.png`;
+    const fixtures = [
+      `<meta property="og:image" content="${image.replaceAll('&', '&amp;')}">`,
+      `<meta property="og:image:secure_url" content="${image}">`,
+      `<meta name="twitter:image" content="${image}">`,
+      `<script type="application/ld+json">${JSON.stringify({ primaryImageOfPage: image })}</script>`,
+      `<script type="application/ld+json">${JSON.stringify({ logo })}</script>`,
+    ];
+    const files = new Set(['_astro/photo&detail&finish.jpg', '_astro/logo.png']);
+    for (const html of fixtures) {
+      const check = (assets: ReadonlySet<string>, markup = html) =>
+        artifactProblems(
+          context.target,
+          [{ path: 'index.html', html: markup }],
+          '',
+          '',
+          assets,
+        ).filter((problem) => problem.includes('image asset'));
+      assert.deepEqual(check(files), [], html);
+      assert.equal(check(new Set()).length, 1, html);
+      assert.equal(check(files, html.replaceAll(context.site, 'https://example.com')).length, 1);
+      assert.equal(check(files, html.replaceAll('_astro/', '_astro/../')).length, 1);
+    }
+    const xml = `<urlset><url><image:image><image:loc>${image.replaceAll('&', '&amp;')}</image:loc></image:image></url></urlset>`;
+    const checkSitemap = (assets: ReadonlySet<string>) =>
+      artifactProblems(context.target, [], '', xml, assets).filter((problem) =>
+        problem.includes('image asset'),
+      );
+    assert.deepEqual(checkSitemap(files), []);
+    assert.equal(checkSitemap(new Set()).length, 1);
+  }
 });
 
 test('wrong origins, credentials, paths and deployment bases fail closed', () => {
