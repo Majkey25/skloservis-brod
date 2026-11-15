@@ -446,16 +446,16 @@ test('artifact checks refuse a preview or production build with the wrong indexi
 
 test('artifact image references must resolve to real files in the selected build', () => {
   for (const context of [preview, production]) {
-    const image = `${context.site}${context.base}_astro/photo&detail.jpg`;
+    const image = `${context.site}${context.base}_astro/photo&detail&finish.jpg`;
     const logo = `${context.site}${context.base}_astro/logo.png`;
     const fixtures = [
-      `<meta property="og:image" content="${image.replace('&', '&amp;')}">`,
+      `<meta property="og:image" content="${image.replaceAll('&', '&amp;')}">`,
       `<meta property="og:image:secure_url" content="${image}">`,
       `<meta name="twitter:image" content="${image}">`,
       `<script type="application/ld+json">${JSON.stringify({ primaryImageOfPage: image })}</script>`,
       `<script type="application/ld+json">${JSON.stringify({ logo })}</script>`,
     ];
-    const files = new Set(['_astro/photo&detail.jpg', '_astro/logo.png']);
+    const files = new Set(['_astro/photo&detail&finish.jpg', '_astro/logo.png']);
     for (const html of fixtures) {
       const check = (assets: ReadonlySet<string>, markup = html) =>
         artifactProblems(
@@ -470,7 +470,7 @@ test('artifact image references must resolve to real files in the selected build
       assert.equal(check(files, html.replaceAll(context.site, 'https://example.com')).length, 1);
       assert.equal(check(files, html.replaceAll('_astro/', '_astro/../')).length, 1);
     }
-    const xml = `<urlset><url><image:image><image:loc>${image.replace('&', '&amp;')}</image:loc></image:image></url></urlset>`;
+    const xml = `<urlset><url><image:image><image:loc>${image.replaceAll('&', '&amp;')}</image:loc></image:image></url></urlset>`;
     const checkSitemap = (assets: ReadonlySet<string>) =>
       artifactProblems(context.target, [], '', xml, assets).filter((problem) =>
         problem.includes('image asset'),
