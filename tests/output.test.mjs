@@ -1,15 +1,59 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
 import { ROUTES } from '../src/lib/urls.ts';
 import { encodeContact } from '../src/lib/contact.ts';
 
 const checker = fileURLToPath(new URL('../scripts/check-output.mjs', import.meta.url));
 const artifactChecker = fileURLToPath(new URL('../scripts/check-artifact.ts', import.meta.url));
+const targetSelector = fileURLToPath(new URL('../scripts/pages-target.ts', import.meta.url));
 const scratch = resolve('.reference/tmp');
+
+test('Pages target selection runs before dependency installation', async (t) => {
+  await mkdir(scratch, { recursive: true });
+  const root = await mkdtemp(join(scratch, 'output-bootstrap-'));
+  t.after(async () => {
+    assert.equal(dirname(root), scratch);
+    await rm(root, { recursive: true, force: true });
+  });
+  const preload = join(root, 'no-packages.mjs');
+  await writeFile(
+    preload,
+    `import { isBuiltin, registerHooks } from 'node:module';
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (!isBuiltin(specifier) && !specifier.startsWith('.') && !specifier.startsWith('file:'))
+      throw new Error('Package unavailable before installation: ' + specifier);
+    return nextResolve(specifier, context);
+  }
+});`,
+  );
+  for (const [event, ref, expected] of [
+    ['pull_request', 'refs/pull/31/merge', 'target=preview\nout=dist\n'],
+    ['push', 'refs/heads/main', 'target=production\nout=.reference/build-production\n'],
+  ]) {
+    const output = join(root, `${event}.txt`);
+    const result = spawnSync(
+      process.execPath,
+      ['--import', pathToFileURL(preload).href, targetSelector],
+      {
+        env: {
+          ...process.env,
+          GITHUB_EVENT_NAME: event,
+          GITHUB_REF: ref,
+          SITE_DEPLOY_TARGET: 'production',
+          GITHUB_OUTPUT: output,
+        },
+        encoding: 'utf8',
+      },
+    );
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(await readFile(output, 'utf8'), expected);
+  }
+});
 
 test('artifact safety checks inspect real output files', async (t) => {
   await mkdir(scratch, { recursive: true });

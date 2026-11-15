@@ -1,7 +1,7 @@
 // Selects the Pages target for this workflow run and hands it to later steps.
 // The single control is the repository variable SITE_DEPLOY_TARGET; see docs/nasazeni.md.
 import { appendFileSync } from 'node:fs';
-import { deployment, workflowTarget } from '../src/lib/seo.ts';
+import { deployment, workflowTarget } from '../src/lib/deployment.ts';
 
 const target = workflowTarget(
   process.env.GITHUB_EVENT_NAME ?? '',
