@@ -2,6 +2,7 @@ import { PRODUCTION_ORIGIN, ROUTES, SERVICE_ROUTES, pageUrl, type Language } fro
 import type { About, Contact, GalleryItem, Service, Settings } from '../content.ts';
 import type { Hours } from './schedule.ts';
 import { homePhoto } from './gallery.ts';
+import { parse, walkSync, ELEMENT_NODE, TEXT_NODE, type ElementNode } from 'ultrahtml';
 
 export type BuildTarget = 'preview' | 'production';
 
@@ -34,6 +35,15 @@ export function workflowTarget(event: string, ref: string, configured = ''): Bui
   return main ? value : 'preview';
 }
 
+/** Parse generated markup without treating quoted attributes or raw script text as HTML tags. */
+function elements(html: string): ElementNode[] {
+  const result: ElementNode[] = [];
+  walkSync(parse(html), (node) => {
+    if (node.type === ELEMENT_NODE) result.push(node);
+  });
+  return result;
+}
+
 /** One attribute value of an HTML tag, double, single or unquoted. */
 function attribute(tag: string, name: string): string | undefined {
   const match = new RegExp(
@@ -60,8 +70,23 @@ export function artifactProblems(
   pages: readonly { path: string; html: string }[],
   robots: string,
   sitemap: string,
+  files?: ReadonlySet<string>,
 ): string[] {
   const problems: string[] = [];
+  const context = deployment(target);
+  const imageUrls = files
+    ? new Set(
+        [...files].flatMap((file) => {
+          const url = new URL(context.base, context.site);
+          url.pathname = `${context.base}${file}`;
+          return [url.href, xmlText(url.href)];
+        }),
+      )
+    : undefined;
+  const checkImage = (value: unknown, source: string) => {
+    if (imageUrls && (typeof value !== 'string' || !imageUrls.has(value)))
+      problems.push(`${source}: image asset must be a built local file`);
+  };
   // Each route's built file, e.g. '/kontakt/' -> 'kontakt/index.html', and its own canonical.
   const canonicals = new Map(
     [...ROUTES.flatMap(({ cs, en }) => [cs, en]), '/home/'].map((path) => [
@@ -74,8 +99,36 @@ export function artifactProblems(
   for (const path of expected) if (!found.has(path)) problems.push(`${path}: page is missing`);
   for (const path of found) if (!expected.has(path)) problems.push(`${path}: unexpected page`);
   for (const { path, html } of pages) {
+    const tags = elements(html);
+    if (imageUrls) {
+      for (const tag of tags) {
+        const { name, attributes } = tag;
+        const field = attributes.property ?? attributes.name;
+        if (name === 'meta' && ['og:image', 'og:image:secure_url', 'twitter:image'].includes(field))
+          checkImage(attributes.content, `${path}: ${field}`);
+        if (name !== 'script' || attributes.type !== 'application/ld+json') continue;
+        try {
+          const data: unknown = JSON.parse(
+            tag.children.map((child) => (child.type === TEXT_NODE ? child.value : '')).join(''),
+          );
+          if (!data || typeof data !== 'object' || Array.isArray(data))
+            throw new TypeError('Expected the project JSON-LD object');
+          if ('logo' in data) checkImage(data.logo, `${path}: logo`);
+          if ('primaryImageOfPage' in data)
+            checkImage(data.primaryImageOfPage, `${path}: primaryImageOfPage`);
+        } catch {
+          problems.push(`${path}: invalid JSON-LD object`);
+        }
+      }
+    }
     const noindex = blocksIndexing(html);
-    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    const canonicalTags = tags.filter(
+      ({ name, attributes }) => name === 'link' && attributes.rel === 'canonical',
+    );
+    const canonical = canonicalTags[0]?.attributes.href;
+    const alternates = tags.filter(
+      ({ name, attributes }) => name === 'link' && 'hreflang' in attributes,
+    );
     if (
       path === 'home/index.html' &&
       !html.includes(`<meta http-equiv="refresh" content="0;url=${deployment(target).base}"`)
@@ -84,7 +137,16 @@ export function artifactProblems(
     }
     if (target === 'preview') {
       if (!noindex) problems.push(`${path}: preview page is missing noindex`);
-      if (canonical) problems.push(`${path}: preview page must not declare a canonical URL`);
+      if (canonicalTags.length)
+        problems.push(`${path}: preview page must not declare a canonical URL`);
+      if (
+        alternates.length ||
+        tags.some(
+          ({ attributes }) =>
+            attributes.property === 'og:url' || attributes.type === 'application/ld+json',
+        )
+      )
+        problems.push(`${path}: preview page must not declare discovery metadata`);
       continue;
     }
     const own = canonicals.get(path);
@@ -92,7 +154,32 @@ export function artifactProblems(
       if (!noindex) problems.push(`${path}: a page without a route must stay noindex`);
     } else {
       if (noindex) problems.push(`${path}: production page is marked noindex`);
-      if (canonical !== own) problems.push(`${path}: production canonical must be ${own}`);
+      if (canonical !== own || canonicalTags.length !== 1)
+        problems.push(`${path}: production canonical must be ${own}`);
+      const route = ROUTES.find(({ cs, en }) =>
+        [cs, en].some((url) => `${url.slice(1)}index.html` === path),
+      );
+      if (route) {
+        const expectedAlternates = [
+          ['cs', route.cs],
+          ['en', route.en],
+          ['x-default', route.cs],
+        ];
+        if (
+          alternates.length !== expectedAlternates.length ||
+          expectedAlternates.some(
+            ([lang, url]) =>
+              !alternates.some(
+                ({ name, attributes }) =>
+                  name === 'link' &&
+                  attributes.rel === 'alternate' &&
+                  attributes.hreflang === lang &&
+                  attributes.href === new URL(url, PRODUCTION_ORIGIN).href,
+              ),
+          )
+        )
+          problems.push(`${path}: hreflang must match its reciprocal cs/en/x-default pair`);
+      }
     }
     if (
       /["'(]\/skloservis-brod\//.test(html) ||
@@ -104,12 +191,43 @@ export function artifactProblems(
   const sitemapLine = `Sitemap: ${PRODUCTION_ORIGIN}/sitemap.xml`;
   if (target === 'production') {
     if (!robots.includes(sitemapLine)) problems.push(`robots.txt must list ${sitemapLine}`);
-    const urls = sitemap.match(/<loc>/g)?.length ?? 0;
-    if (urls !== ROUTES.length * 2) {
-      problems.push(`sitemap.xml must list ${ROUTES.length * 2} pages, found ${urls}`);
+    const urls = elements(sitemap)
+      .filter(({ name }) => name === 'url')
+      .flatMap((node) =>
+        node.children
+          .filter(
+            (child): child is ElementNode => child.type === ELEMENT_NODE && child.name === 'loc',
+          )
+          .map((child) =>
+            child.children.map((text) => (text.type === TEXT_NODE ? text.value : '')).join(''),
+          ),
+      );
+    const expectedUrls = new Set(
+      ROUTES.flatMap(({ cs, en }) => [cs, en].map((url) => new URL(url, PRODUCTION_ORIGIN).href)),
+    );
+    if (
+      urls.length !== expectedUrls.size ||
+      new Set(urls).size !== urls.length ||
+      urls.some((url) => !expectedUrls.has(url))
+    ) {
+      problems.push(
+        `sitemap.xml must list exactly ${expectedUrls.size} unique canonical page URLs`,
+      );
     }
   } else if (robots.includes('Sitemap:')) {
     problems.push('Preview robots.txt must not advertise a sitemap');
+  }
+  if (
+    target === 'preview' &&
+    elements(sitemap).some(({ name }) => name === 'loc' || name === 'image:loc')
+  )
+    problems.push('Preview sitemap.xml must not advertise URLs');
+  if (imageUrls) {
+    for (const tag of elements(sitemap).filter(({ name }) => name === 'image:loc'))
+      checkImage(
+        tag.children.map((child) => (child.type === TEXT_NODE ? child.value : '')).join(''),
+        'sitemap.xml: image:loc',
+      );
   }
   return problems;
 }

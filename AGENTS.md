@@ -15,5 +15,6 @@ Read local `.reference/agents/LAUNCH.md`, `.reference/agents/STATUS.md` and `doc
 - No fabricated reviews, counters, certifications, locations or ranking guarantees. Backlinks must be earned and relevant; no outreach authorized.
 - Smallest complete change. No extra frameworks, abstraction layers or paid services. No inline execution scripts, broad rewrites or recursive delegation.
 - Only the lead stages, commits, pushes and deploys. Workers own explicit non-overlapping files. Check advice against source and real runtime.
+- Sol and Astra own project analysis, implementation, tests and acceptance. OpenCode, Antigravity and other supplementary models advise only within Parliament. No automatic pool, implementation, file edits or runnable checks by consultants. This overrides supplementary-pool skill defaults.
 - Run the repository's format, type, test and build checks. Verify changed workflows in a real browser. Report unrun checks and exact blockers.
 - Replies: concise natural Czech. Code/comments: normal English. Instructions: concise English.
