@@ -34,7 +34,7 @@
     "@types/node": "^24.19.2",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "overrides": {
     "basic-ftp": "6.2.6"
