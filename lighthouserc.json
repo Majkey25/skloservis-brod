@@ -5,9 +5,11 @@
       "startServerReadyPattern": "Local",
       "startServerReadyTimeout": 60000,
       "url": [
+        "http://127.0.0.1:4173/skloservis-brod/?performance-measurement",
         "http://127.0.0.1:4173/skloservis-brod/en/",
         "http://127.0.0.1:4173/skloservis-brod/galerie/",
-        "http://127.0.0.1:4173/skloservis-brod/kontakt/"
+        "http://127.0.0.1:4173/skloservis-brod/kontakt/",
+        "http://127.0.0.1:4173/skloservis-brod/sklenene-dvere/"
       ],
       "numberOfRuns": 3
     },
