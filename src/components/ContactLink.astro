@@ -25,6 +25,7 @@ const Tag = copy || reveal ? 'button' : 'a';
       : `${pageUrl('contact', lang, import.meta.env.BASE_URL)}#contact-methods`
   }
   data-astro-reload
+  data-astro-prefetch={Tag === 'a' ? 'false' : undefined}
   data-contact-value={encodeContact(value)}
   data-contact-kind={kind}
   data-contact-copy={copy ? '' : undefined}
@@ -32,7 +33,11 @@ const Tag = copy || reveal ? 'button' : 'a';
 >
   <slot />
 </Tag>
-{reveal && <a class="text-link" data-contact-revealed data-astro-reload hidden></a>}
+{reveal && (
+  <template>
+    <a class="text-link" data-contact-revealed data-astro-reload></a>
+  </template>
+)}
 
 <script>
   import { contactUri, decodeContact } from '../lib/contact';
@@ -54,12 +59,14 @@ const Tag = copy || reveal ? 'button' : 'a';
       return;
     }
     if (control.hasAttribute('data-contact-reveal')) {
-      const link = control.nextElementSibling;
+      const template = control.nextElementSibling;
+      if (!(template instanceof HTMLTemplateElement)) return;
+      const link = template.content.firstElementChild;
       if (!(link instanceof HTMLAnchorElement)) return;
       event.preventDefault();
       link.href = contactUri(value, kind);
       link.textContent = value;
-      link.hidden = false;
+      template.replaceWith(link);
       control.hidden = true;
       link.focus({ preventScroll: true });
       return;
