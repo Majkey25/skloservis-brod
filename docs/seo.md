@@ -174,6 +174,7 @@ nepopisuje současný výstup. Změnu této volby je nutné znovu měřit na ste
 stránkách a za stejných podmínek. [Lighthouse CI](../lighthouserc.json) hlídá na pěti
 stránkách medián skóre výkonu nejméně 80, LCP nejvýše 2500 ms, CLS nejvýše 0,1
 a TBT nejvýše 200 ms.
+Kontrola procházení odkazů vyžaduje `href` s použitelnou adresou.
 Laboratorní výsledky nejsou skutečné uživatelské INP ani měřením pořadí.
 
 Ruční volba jazyka a motivu i výchozí nastavení zařízení zůstávají beze změny.
