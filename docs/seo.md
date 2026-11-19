@@ -171,8 +171,11 @@ Styly jednotlivých stránek se vkládají do HTML podle
 [pravidel Astro](https://docs.astro.build/en/reference/configuration-reference/#buildinlinestylesheets).
 Dřívější měření z 28. října před oddělením prostředků jednotlivých stránek
 nepopisuje současný výstup. Změnu této volby je nutné znovu měřit na stejných
-stránkách a za stejných podmínek. [Lighthouse CI](../lighthouserc.json) hlídá
-medián LCP nejvýše 2500 ms a CLS nejvýše 0,1 na třech vybraných stránkách.
+stránkách a za stejných podmínek. [Lighthouse CI](../lighthouserc.json) provádí na
+každé z pěti stránek pět měření. Hlídá medián skóre výkonu nejméně 80, LCP nejvýše
+2500 ms, CLS nejvýše 0,1 a TBT nejvýše 200 ms. Jednotlivé výsledky jsou v artefaktu
+GitHub Actions i při selhání limitu.
+Kontrola procházení odkazů vyžaduje `href` s použitelnou adresou.
 Laboratorní výsledky nejsou skutečné uživatelské INP ani měřením pořadí.
 
 Ruční volba jazyka a motivu i výchozí nastavení zařízení zůstávají beze změny.

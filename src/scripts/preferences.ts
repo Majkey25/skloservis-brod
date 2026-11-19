@@ -274,6 +274,17 @@ document.addEventListener('astro:before-swap', (event) => {
   observeTransition(event.viewTransition, () => state?.dispose());
   if (state?.language) {
     state.scroll = { left: scrollX, top: scrollY };
+    if (location.hash && !event.to.hash) {
+      try {
+        const id = decodeURIComponent(location.hash.slice(1));
+        if (document.getElementById(id) && event.newDocument.getElementById(id)) {
+          event.to.hash = location.hash;
+          state.scroll = undefined;
+        }
+      } catch {
+        // Invalid percent encoding has no matching section; keep the scroll position.
+      }
+    }
     const incoming = event.newDocument.querySelectorAll<HTMLDetailsElement>('main details');
     document.querySelectorAll<HTMLDetailsElement>('main details').forEach((section, index) => {
       const target = incoming[index];
@@ -289,7 +300,7 @@ document.addEventListener('astro:before-swap', (event) => {
 document.addEventListener('astro:after-swap', () => {
   initializePreferences();
   const position = navigation?.scroll;
-  const focusTarget = position ? '.language-nav [aria-current="page"]' : '#main';
+  const focusTarget = navigation?.language ? '.language-nav [aria-current="page"]' : '#main';
   if (position) window.scrollTo({ ...position, behavior: 'instant' });
   document.querySelector<HTMLElement>(focusTarget)?.focus({ preventScroll: true });
   if (navigation) navigation.scroll = undefined;
