@@ -11,7 +11,7 @@
         "http://127.0.0.1:4173/skloservis-brod/kontakt/",
         "http://127.0.0.1:4173/skloservis-brod/sklenene-dvere/"
       ],
-      "numberOfRuns": 3
+      "numberOfRuns": 5
     },
     "assert": {
       "assertions": {
