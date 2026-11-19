@@ -199,7 +199,7 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
             <figure class="gallery-card__figure">
               <a
                 href={item.image.src}
-                class="gallery-card"
+                class="gallery-card gallery-card__image-wrap"
                 data-gallery-card
                 data-index={index}
                 aria-haspopup="dialog"
@@ -207,25 +207,23 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
                 data-astro-reload
                 data-astro-prefetch="false"
               >
-                <div class="gallery-card__image-wrap">
-                  <Picture
-                    src={item.image}
-                    alt={altText}
-                    formats={['avif']}
-                    fallbackFormat="webp"
-                    width={Math.min(960, item.image.width)}
-                    widths={[
-                      ...new Set(
-                        [360, 540, 720, Math.min(960, item.image.width)].filter(
-                          (width) => width <= item.image.width,
-                        ),
+                <Picture
+                  src={item.image}
+                  alt={altText}
+                  formats={['avif']}
+                  fallbackFormat="webp"
+                  width={Math.min(960, item.image.width)}
+                  widths={[
+                    ...new Set(
+                      [360, 540, 720, Math.min(960, item.image.width)].filter(
+                        (width) => width <= item.image.width,
                       ),
-                    ]}
-                    sizes={`auto, ${sizes}`}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
+                    ),
+                  ]}
+                  sizes={`auto, ${sizes}`}
+                  loading="lazy"
+                  decoding="async"
+                />
               </a>
               <figcaption class="gallery-card__caption">
                 {isServiceCategory(item.category) ? (
@@ -874,7 +872,6 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
 
   /* Square photos, no radius; the 3:2 frame keeps every card in one rhythm */
   .gallery-card__image-wrap {
-    position: relative;
     aspect-ratio: 3 / 2;
     background: var(--surface, #edf7fa);
   }
@@ -910,11 +907,11 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
     z-index: 2;
   }
 
-  .gallery-card:focus-visible .gallery-card__image-wrap::before {
+  .gallery-card:focus-visible::before {
     opacity: 1;
   }
 
-  .gallery-card:focus-visible .gallery-card__image-wrap :global(picture) {
+  .gallery-card:focus-visible :global(picture) {
     clip-path: inset(0);
   }
 
@@ -923,11 +920,11 @@ const safeJsonData = JSON.stringify(itemsData).replace(/</g, '\\u003c');
       z-index: 2;
     }
 
-    .gallery-card:hover .gallery-card__image-wrap::before {
+    .gallery-card:hover::before {
       opacity: 1;
     }
 
-    .gallery-card:hover .gallery-card__image-wrap :global(picture) {
+    .gallery-card:hover :global(picture) {
       clip-path: inset(0);
     }
   }
