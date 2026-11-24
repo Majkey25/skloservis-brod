@@ -34,8 +34,8 @@ service_groups:
     title_en: Glass processing and glazing
     summary_cs: Provádíme veškeré úpravy a opracování skla a skleněných výrobků včetně zasklívání a montáže na míru.
     summary_en: We process and finish glass and glass products, including made-to-measure glazing and installation.
-    text_cs: Řezání, vrtání, pískování, broušení a další úpravy skla a skleněných výrobků. Zasklívání nových i stávajících otvorů dle potřeb zákazníka.
-    text_en: Cutting, drilling, sandblasting, grinding and other glass finishing. Glazing for new and existing openings, tailored to your needs.
+    text_cs: Řezání, vrtání, pískování, broušení a další úpravy skla. Zasklíváme nové i stávající otvory podle zadání. K poptávce zrcadla na míru uveďte přibližnou šířku, výšku, umístění a požadovaný tvar, třeba zaoblené rohy.
+    text_en: Cutting, drilling, sandblasting, grinding and other glass finishing. We glaze new and existing openings to suit your needs. For a made-to-measure mirror, tell us the approximate width and height, where it will go and the shape you want, such as rounded corners.
     link: services
   - id: doors
     title_cs: Výroba a montáž skleněných dveří

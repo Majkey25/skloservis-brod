@@ -19,12 +19,15 @@ const [settings, about, contact, services, gallery] = await Promise.all([
 ]);
 const photo = gallery.find((item) => item.image.src.includes('staircase-glass-wall')) ?? gallery[0];
 const url = (page: Parameters<typeof pageUrl>[0]) => pageUrl(page, lang, import.meta.env.BASE_URL);
+const hasMirrors = gallery.some((item) => item.category === 'zrcadla');
 const labels = {
   cs: {
     process: 'Jak probíhá zakázka',
     enquiry: 'Nezávazná poptávka',
     gallery: 'Prohlédnout realizace',
     groups: 'Co pro vás vyrobíme',
+    mirrorExample: 'Ukázka zrcadla na míru',
+    partition: 'Skleněná stěna na míru',
     steps: ['Návrh', 'Zaměření', 'Výroba', 'Montáž'],
   },
   en: {
@@ -32,6 +35,8 @@ const labels = {
     enquiry: 'Project enquiry',
     gallery: 'View our work',
     groups: 'What we make for you',
+    mirrorExample: 'Made-to-measure mirror example',
+    partition: 'Made-to-measure glass partitions',
     steps: ['Planning', 'Measuring', 'Manufacture', 'Installation'],
   },
 }[lang];
@@ -82,12 +87,26 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
           <h3>{group[`title_${lang}`]}</h3>
           <p class="services-group__summary">{group[`summary_${lang}`]}</p>
           <p>{group[`text_${lang}`]}</p>
-          {group.link !== 'services' && (
-            <a class="text-link services-group__link" href={url(group.link)}>
-              {services.find((service) => service.slug === group.link)?.[`title_${lang}`]}
-              <Icon name="arrow-right" />
-            </a>
-          )}
+          <div class="services-group__links">
+            {group.link !== 'services' && (
+              <a class="text-link services-group__link" href={url(group.link)}>
+                {services.find((service) => service.slug === group.link)?.[`title_${lang}`]}
+                <Icon name="arrow-right" />
+              </a>
+            )}
+            {group.id === 'processing' && hasMirrors && (
+              <a class="text-link services-group__link" href={`${url('gallery')}#gallery-zrcadla`}>
+                {labels.mirrorExample}
+                <Icon name="arrow-right" />
+              </a>
+            )}
+            {group.id === 'structures' && group.link !== 'sklenena-stena' && (
+              <a class="text-link services-group__link" href={url('sklenena-stena')}>
+                {labels.partition}
+                <Icon name="arrow-right" />
+              </a>
+            )}
+          </div>
         </article>
       ))}
     </div>
@@ -231,6 +250,12 @@ const paragraphs = about[`body_${lang}`].trim().split(/\n\s*\n/);
 
   .services-group p {
     max-width: 65ch;
+  }
+
+  .services-group__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
   }
 
   .services-group__link {
