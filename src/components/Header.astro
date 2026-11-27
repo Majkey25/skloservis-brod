@@ -517,9 +517,11 @@ const products = {
   .nav-products[open] .products-panel {
     animation: header-panel-open 280ms var(--ease) backwards;
   }
-  .nav-products[open] li {
-    animation: header-panel-item 260ms var(--ease) backwards;
-    animation-delay: calc(60ms + var(--i) * 22ms);
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-products[open] li {
+      animation: header-panel-item 260ms var(--ease) backwards;
+      animation-delay: calc(60ms + var(--i) * 22ms);
+    }
   }
   @keyframes header-panel-open {
     from {
@@ -653,9 +655,11 @@ const products = {
   .mobile-menu[open] .mobile-nav {
     animation: header-menu-open 320ms var(--ease) backwards;
   }
-  .mobile-menu[open] .mobile-nav > * {
-    animation: header-panel-item 280ms var(--ease) backwards;
-    animation-delay: calc(60ms + var(--i) * 35ms);
+  @media (prefers-reduced-motion: no-preference) {
+    .mobile-menu[open] .mobile-nav > * {
+      animation: header-panel-item 280ms var(--ease) backwards;
+      animation-delay: calc(60ms + var(--i) * 35ms);
+    }
   }
   @keyframes header-menu-open {
     from {
